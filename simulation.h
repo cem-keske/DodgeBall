@@ -67,7 +67,11 @@ class Simulation {
 };
 	
 
-/// READER ///	
+/// READER ///
+/**
+ * This class will be useful when reading a data from files.
+ * It can be used to read specific datas and initialize the current simulation.
+ */
 
 enum ReaderState {
 	BEGIN,
