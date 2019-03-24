@@ -27,7 +27,7 @@ ReaderState Reader::reader_state() const {return reader_state_;}
 
 void Reader::reader_state(ReaderState reader_state) {reader_state_ = reader_state;}
 
-// ===== Public Methodes =====
+// ===== Public Methods =====
 
 /**
  * Reads and imports a complete data file 
