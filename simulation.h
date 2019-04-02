@@ -25,7 +25,7 @@ class Simulation {
 		Length player_radius_;
 		Length player_speed_;
 		Length ball_radius_;
-		unsigned int ball_speed_;
+		Length ball_speed_;
 		Length marge_jeu_;
 		Length marge_lecture_;
 		
