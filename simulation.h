@@ -23,7 +23,7 @@ class Simulation {
 	private:
 		size_t nb_cells_;
 		Length player_radius_;
-		unsigned int player_speed_;
+		Length player_speed_;
 		Length ball_radius_;
 		unsigned int ball_speed_;
 		Length marge_jeu_;
