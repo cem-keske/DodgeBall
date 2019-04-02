@@ -39,7 +39,7 @@ class Player{
 				
 		// ===== Methods =====
 		
-		void move(); //To implement in further versions...
+		void move(); //To implement in further versions
 };
 
 
