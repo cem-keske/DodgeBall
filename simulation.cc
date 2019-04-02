@@ -292,9 +292,9 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		// file import.															 
 		nb_cells_ = 0;
 		player_radius_ = -1.;
-		player_speed_ = 0;
+		player_speed_ = -1;
 		ball_radius_ = -1.;
-		ball_speed_ = 0;
+		ball_speed_ = -1;
 		marge_jeu_ = -1.;
 		marge_lecture_ = -1.;
 
