@@ -12,6 +12,8 @@
 
 /// ===== TYPEDEF ===== ///
 
+
+
 typedef std::map<std::pair<size_t, size_t>, Rectangle> Rectangle_map;
 
 /// ===== ENUM ===== ///
