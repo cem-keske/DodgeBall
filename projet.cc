@@ -43,11 +43,9 @@ int main(int argc, char* argv[]) {
 	Simulation simulation(execution_parameters, io_files);
 	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 
-	Gtk::Window eventWindow;
-	eventWindow.set_default_size(300, 200);
-	eventWindow.set_resizable(false);
-
-	return app->run(eventWindow);
+	Gtk::Window proWindow;
+	proWindow.set_default_size(300, 200);
+	return app->run(proWindow);
 }
 
 /// ===== FUNCTION DEFINITIONS ===== ///

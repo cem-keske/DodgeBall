@@ -35,7 +35,7 @@ clean:
 # -Automatically generated dependency rules-
 #
 # DO NOT DELETE THIS LINE
-projet.o: projet.cc define.h simulation.h tools.h player.h map.h ball.h \
+projet.o: projet.cc define.h simulation.h tools.h player.h map.h ball.h gui.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@ $(LINKING)
 simulation.o: simulation.cc simulation.h tools.h player.h map.h ball.h \
  error.h define.h
@@ -43,5 +43,5 @@ player.o: player.cc player.h tools.h
 ball.o: ball.cc ball.h tools.h
 map.o: map.cc map.h tools.h define.h
 tools.o: tools.cc tools.h
-gui.o: gui.cc gui.h simulation.h tools.h player.h map.h ball.h \
+gui.o: gui.cc gui.h simulation.h tools.h player.h map.h ball.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@ $(LINKING)
