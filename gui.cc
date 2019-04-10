@@ -77,39 +77,53 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 //--------------------------------------
 
 MyEvent::MyEvent() :
-  m_Box(Gtk::ORIENTATION_VERTICAL,10),
-  m_Box_Buttons(Gtk::ORIENTATION_HORIZONTAL, 10),
-  m_Box_Sim_Area(Gtk::ORIENTATION_HORIZONTAL, 10),
-  m_Button_Exit("Exit"),
-  m_Button_Open("Open")
+	m_Box(Gtk::ORIENTATION_VERTICAL,10),
+	m_Box_Buttons(Gtk::ORIENTATION_HORIZONTAL, 10),
+	m_Box_Sim_Arena(Gtk::ORIENTATION_HORIZONTAL, 10),
+	m_Button_Exit("Exit"),
+	m_Button_Open("Open"),
+	m_Button_Save("Save"),
+	m_Button_Start("Start"),
+	m_Button_Step("Step")
   
 {
-  // Set title and border of the window
-  set_title("DodgeBall");
-  set_border_width(0);
+	// Set title and border of the window
+	set_title("DodgeBall");
+	set_border_width(3);
   
-  // Add outer box to the window (because the window
-  // can only contain a single widget)
+	// Add outer box to the window (because the window
+	// can only contain a single widget)
   
-  add(m_Box);
+	add(m_Box);
+	
+	//Put the inner boxes and the separator in the outer box:
+	m_Box.pack_start(m_Box_Buttons);
+	m_Box.pack_start(m_Box_Sim_Arena);
+  
+	m_Area.set_size_request(200,200);
+	m_Box_Sim_Arena.pack_start(m_Area);
+  
+	m_Box_Buttons.pack_start(m_Button_Exit,false,false);// keep fixed width
+	m_Box_Buttons.pack_start(m_Button_Open,false,false); // and aligned to left;  
+	m_Box_Buttons.pack_start(m_Button_Save,false,false);
+	m_Box_Buttons.pack_start(m_Button_Start,false,false);
+	m_Box_Buttons.pack_start(m_Button_Step,false,false);
+	// Connect the clicked signal of the button to
+	// their signal handler
+	m_Button_Exit.signal_clicked().connect(sigc::mem_fun(*this,
+										   &MyEvent::on_button_clicked_exit));
 
-  //Put the inner boxes and the separator in the outer box:
-  m_Box.pack_start(m_Box_Buttons);
-  m_Box.pack_start(m_Box_Sim_Area);
-  
-  m_Area.set_size_request(200,200);
-  m_Box_Sim_Area.pack_start(m_Area);
-  
-  m_Box_Buttons.pack_start(m_Button_Exit,false,false);// keep fixed width
-  m_Box_Buttons.pack_start(m_Button_Open,false,false); // and aligned to left;  
-  
-  // Connect the clicked signal of the button to
-  // their signal handler
-  m_Button_Exit.signal_clicked().connect(sigc::mem_fun(*this,
-              &MyEvent::on_button_clicked_clear) );
-
-  m_Button_Open.signal_clicked().connect(sigc::mem_fun(*this,
-              &MyEvent::on_button_clicked_draw) );
+	m_Button_Open.signal_clicked().connect(sigc::mem_fun(*this,
+										   &MyEvent::on_button_clicked_open));
+              
+	m_Button_Save.signal_clicked().connect(sigc::mem_fun(*this,
+										   &MyEvent::on_button_clicked_save));
+		  
+	m_Button_Start.signal_clicked().connect(sigc::mem_fun(*this,
+										   &MyEvent::on_button_clicked_start));
+		  
+	m_Button_Step.signal_clicked().connect(sigc::mem_fun(*this,
+										   &MyEvent::on_button_clicked_step));
 
   // Show all children of the window
   show_all_children();
@@ -119,14 +133,27 @@ MyEvent::~MyEvent()
 {
 }
 
-void MyEvent::on_button_clicked_clear()
+void MyEvent::on_button_clicked_exit()
 {
-  cout << "Clear" << endl;
-  m_Area.clear();
+  cout << "exit" << endl;
 }
 
-void MyEvent::on_button_clicked_draw()
+void MyEvent::on_button_clicked_open()
 {
-  cout << "Draw" << endl;
-  m_Area.draw();
+  cout << "open" << endl;
+}
+
+void MyEvent::on_button_clicked_save()
+{
+  cout << "save" << endl;
+}
+
+void MyEvent::on_button_clicked_start()
+{
+  cout << "start" << endl;
+}
+
+void MyEvent::on_button_clicked_step()
+{
+  cout << "step" << endl;
 }
