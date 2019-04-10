@@ -34,10 +34,10 @@ protected:
   void on_button_clicked_clear();
   void on_button_clicked_draw();
 
-  Gtk::Box m_Box, m_Box_Top, m_Box_Bottom;
+  Gtk::Box m_Box, m_Box_Buttons, m_Box_Sim_Area;
   MyArea              m_Area;
-  Gtk::Button 		  m_Button_Clear;
-  Gtk::Button 		  m_Button_Draw;
+  Gtk::Button 		  m_Button_Exit;
+  Gtk::Button 		  m_Button_Open;
   
 private:
 	void draw();

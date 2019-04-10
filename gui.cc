@@ -78,13 +78,14 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 MyEvent::MyEvent() :
   m_Box(Gtk::ORIENTATION_VERTICAL,10),
-  m_Box_Top(Gtk::ORIENTATION_HORIZONTAL, 10),
-  m_Box_Bottom(Gtk::ORIENTATION_HORIZONTAL, 10),
-  m_Button_Clear("Clear"),
-  m_Button_Draw("Draw")
+  m_Box_Buttons(Gtk::ORIENTATION_HORIZONTAL, 10),
+  m_Box_Sim_Area(Gtk::ORIENTATION_HORIZONTAL, 10),
+  m_Button_Exit("Exit"),
+  m_Button_Open("Open")
+  
 {
   // Set title and border of the window
-  set_title("Drawing Area and Buttons");
+  set_title("DodgeBall");
   set_border_width(0);
   
   // Add outer box to the window (because the window
@@ -93,21 +94,21 @@ MyEvent::MyEvent() :
   add(m_Box);
 
   //Put the inner boxes and the separator in the outer box:
-  m_Box.pack_start(m_Box_Top);
-  m_Box.pack_start(m_Box_Bottom);
+  m_Box.pack_start(m_Box_Buttons);
+  m_Box.pack_start(m_Box_Sim_Area);
   
   m_Area.set_size_request(200,200);
-  m_Box_Top.pack_start(m_Area);
+  m_Box_Sim_Area.pack_start(m_Area);
   
-  m_Box_Bottom.pack_start(m_Button_Clear,false,false);// keep fixed width
-  m_Box_Bottom.pack_start(m_Button_Draw,false,false); // and aligned to left;  
+  m_Box_Buttons.pack_start(m_Button_Exit,false,false);// keep fixed width
+  m_Box_Buttons.pack_start(m_Button_Open,false,false); // and aligned to left;  
   
   // Connect the clicked signal of the button to
   // their signal handler
-  m_Button_Clear.signal_clicked().connect(sigc::mem_fun(*this,
+  m_Button_Exit.signal_clicked().connect(sigc::mem_fun(*this,
               &MyEvent::on_button_clicked_clear) );
 
-  m_Button_Draw.signal_clicked().connect(sigc::mem_fun(*this,
+  m_Button_Open.signal_clicked().connect(sigc::mem_fun(*this,
               &MyEvent::on_button_clicked_draw) );
 
   // Show all children of the window
