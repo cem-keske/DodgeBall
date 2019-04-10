@@ -42,12 +42,11 @@ int main(int argc, char* argv[]) {
 	
 	Simulation simulation(execution_parameters, io_files);
 	
-	if(execution_parameters["Error"] == false) {		
-		auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
+	if(execution_parameters["Error"] == false) {
+				
+		auto app = Gtk::Application::create();
 		
 		MyEvent proWindow;
-		proWindow.set_default_size(300, 200);
-		
 		return app->run(proWindow);
 	}
 }

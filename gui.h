@@ -40,17 +40,20 @@ class MyEvent : public Gtk::Window
 		void on_button_clicked_start();
 		void on_button_clicked_step();
 		
-		Gtk::Box m_Box, m_Box_Buttons, m_Box_Sim_Arena;
+		Gtk::Box frame; 
+		Gtk::Box canvas;
+		Gtk::HButtonBox interaction_box;
 		MyArea 			m_Area;
 		Gtk::Button 	m_Button_Exit;
 		Gtk::Button 	m_Button_Open;
 		Gtk::Button		m_Button_Save;
 		Gtk::Button		m_Button_Start;
 		Gtk::Button 	m_Button_Step;
+		Gtk::Label		m_Label_Message;
 		
 	private:
-	
 		void draw();
+		void connect_buttons_to_handlers();
 };
 
 #endif
