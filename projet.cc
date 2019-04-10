@@ -41,11 +41,15 @@ int main(int argc, char* argv[]) {
 	}	//cmd_parameters' lifetime expired, we don't need it anymore
 	
 	Simulation simulation(execution_parameters, io_files);
-	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
-
-	Gtk::Window proWindow;
-	proWindow.set_default_size(300, 200);
-	return app->run(proWindow);
+	
+	if(execution_parameters["Error"] == false) {		
+		auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
+		
+		Gtk::Window proWindow;
+		proWindow.set_default_size(300, 200);
+		
+		return app->run(proWindow);
+	}
 }
 
 /// ===== FUNCTION DEFINITIONS ===== ///
