@@ -7,7 +7,6 @@
 
 #include "gui.h"
 #include <iostream>
-#include "myevent.h"
 #include <cairomm/context.h>
 
 using namespace std;

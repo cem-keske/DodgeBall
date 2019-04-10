@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	if(execution_parameters["Error"] == false) {		
 		auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 		
-		Gtk::Window proWindow;
+		MyEvent proWindow;
 		proWindow.set_default_size(300, 200);
 		
 		return app->run(proWindow);
