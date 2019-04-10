@@ -1,3 +1,6 @@
+#ifndef GUI_H_INCLUDED
+#define GUI_H_INCLUDED
+
 #include "simulation.h"
 #include "tools.h"
 #include <gtkmm.h>
@@ -39,3 +42,5 @@ protected:
 private:
 	void draw();
 };
+
+#endif
