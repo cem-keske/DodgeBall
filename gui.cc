@@ -44,7 +44,7 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 //--------------------------------------
 
-MyEvent::MyEvent() :
+Gui_Window::Gui_Window() :
 	button_exit("Exit"),
 	button_open("Open"),
 	button_save("Save"),
@@ -69,24 +69,24 @@ MyEvent::MyEvent() :
 	show_all_children();
 }
 
-MyEvent::~MyEvent()
+Gui_Window::~Gui_Window()
 {
 }
 
-void MyEvent::connect_buttons_to_handlers(){
+void Gui_Window::connect_buttons_to_handlers(){
 	button_exit.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_exit));
+										   &Gui_Window::on_button_clicked_exit));
 	button_open.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_open));         
+										   &Gui_Window::on_button_clicked_open));         
 	button_save.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_save));  
+										   &Gui_Window::on_button_clicked_save));  
 	button_start_stop.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_start_stop));	  
+										   &Gui_Window::on_button_clicked_start_stop));	  
 	button_step.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_step));
+										   &Gui_Window::on_button_clicked_step));
 }
 
-void MyEvent::add_button_panel_components(){
+void Gui_Window::add_button_panel_components(){
 	interaction_box.add(button_exit);
 	interaction_box.add(button_open);
 	interaction_box.add(button_save);
@@ -95,22 +95,22 @@ void MyEvent::add_button_panel_components(){
 	interaction_box.add(label_message);
 }
 
-void MyEvent::on_button_clicked_exit(){
+void Gui_Window::on_button_clicked_exit(){
 	
 	std::cout << button_exit.get_label() << std::endl;
 }
 
-void MyEvent::on_button_clicked_open(){
+void Gui_Window::on_button_clicked_open(){
 	
 	std::cout <<button_open.get_label() << std::endl;
 }
 
-void MyEvent::on_button_clicked_save(){
+void Gui_Window::on_button_clicked_save(){
 	
 	std::cout << button_save.get_label() << std::endl;
 }
 
-void MyEvent::on_button_clicked_start_stop(){
+void Gui_Window::on_button_clicked_start_stop(){
 	static std::string labels[] = {"Start","Stop"};
 	
 	
@@ -123,7 +123,7 @@ void MyEvent::on_button_clicked_start_stop(){
 								 labels[1] : labels[0]);
 }
 
-void MyEvent::on_button_clicked_step(){
+void Gui_Window::on_button_clicked_step(){
 	
 	std::cout << button_step.get_label() << std::endl;
 }// benim adım cem

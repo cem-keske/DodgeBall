@@ -25,12 +25,12 @@ class Canvas : public Gtk::DrawingArea
 };
 
 
-class MyEvent : public Gtk::Window
+class Gui_Window : public Gtk::Window
 {
 	public:
 	
-		MyEvent();
-		virtual ~MyEvent();
+		Gui_Window();
+		virtual ~Gui_Window();
 
 	protected:
 		
