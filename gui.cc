@@ -122,4 +122,3 @@ void MyEvent::on_button_clicked_step(){
 	std::cout << "step" << std::endl;
 }
 
-// emre
