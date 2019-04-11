@@ -12,8 +12,7 @@
 Canvas::Canvas(): empty(false)
 { 
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
-	center(get_allocated_width(), get_allocated_height());
-	set_resizable(false);
+	center = {get_allocated_width()/2., get_allocated_height()/2.};
 }
 
 Canvas::~Canvas()
