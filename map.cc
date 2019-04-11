@@ -27,7 +27,7 @@ void Map::initialise_map(size_t nbCell) {
 
 size_t Map::max_index() const {return size_ - 1;}
 
-size_t nb_obstacles() const {return nb_obstacles_;}
+size_t Map::nb_obstacles() const {return nb_obstacles_;}
 
 
 bool Map::is_free(size_t line, size_t col) const {
