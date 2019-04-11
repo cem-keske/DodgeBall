@@ -34,7 +34,8 @@ class Simulation {
 		Map map_;
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
-
+		
+		bool success_;
 	
 	public:
 		// ===== Constructor =====
@@ -43,6 +44,7 @@ class Simulation {
 				   std::vector<std::string> const&);
 		
 		// ===== Public Methods =====
+		bool success() const;
 		void nb_cells(size_t);
 		bool initialise_player(double, double, Counter, Counter);
 		bool initialise_ball(double, double, Angle);
