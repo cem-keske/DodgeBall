@@ -51,24 +51,10 @@ MyEvent::MyEvent() :
 	m_Button_Save("Save"),
 	m_Button_Start("Start"),
 	m_Button_Step("Step"),
-	m_Label_Message("No Message")
-  
-{
+	m_Label_Message("No Message"){
 	// Set title and border of the window
 	set_title("DodgeBall");
-  
-	// Add outer box to the window (because the window
-	// can only contain a single widget)
-  
 	
-	//Put the inner boxes and the separator in the outer box:
-	/*
-	interaction_box.pack_start(m_Button_Exit,false,false);// keep fixed width
-	interaction_box.pack_start(m_Button_Open,false,false); // and aligned to left;  
-	interaction_box.pack_start(m_Button_Save,false,false);
-	interaction_box.pack_start(m_Button_Start,false,false);
-	interaction_box.pack_start(m_Button_Step,false,false);
-	*/
 	interaction_box.set_layout(Gtk::ButtonBoxStyle::BUTTONBOX_START);
 	
 	interaction_box.add(m_Button_Exit);
@@ -87,6 +73,7 @@ MyEvent::MyEvent() :
 	the_big_box.add(interaction_box);
 	the_big_box.add(sim_arena);
 	
+	add(the_big_box);
 	set_resizable(false);
 	// Show all children of the window
 	
