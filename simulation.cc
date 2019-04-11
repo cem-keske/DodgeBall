@@ -475,12 +475,25 @@ bool Simulation::save(const std::string &o_file_path) const {
 	os_stream << "#nbCell" << "\n";
 	os_stream << nb_cells_ << "\n\n";
 	
-	os_stream << "#Players" << "\n" << players_.size() << "\n";
+	os_stream << "#number of players" << "\n" << players_.size() << "\n\n";
+	
+	os_stream << "#position of players" << "\n";
 	
 	for (auto const& player : players_) {
 		os_stream << player.body().center().x << "\t" << player.body().center().y;
-		os_stream << "\n";
+		os_stream << "\t";
+		os_stream << player.lives() << " " << player.cooldown();
+		os_stream << "\n";	
 	}
+	os_stream << "\n";
+	
+	os_stream << "#nbObstacles" << "\n";
+	os_stream << map_.nb_obstacles() << "\n\n";
+	
+	os_stream << "#position of obstacles" << "\n";
+	
+	for(size_t i(0); )
+	
 	
 	return true;
 }

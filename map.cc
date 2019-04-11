@@ -15,7 +15,7 @@
 // ===== Map initializer =====
 
 
-void Map::initialise_map(size_t nbCell) {
+void Map::initialise_map(size_t nbCell) : nb_obstacles_(0) {
 	grid_ = Grid(nbCell); 
 	size_ = nbCell;
 	for(auto& col: grid_)
@@ -25,6 +25,8 @@ void Map::initialise_map(size_t nbCell) {
 // ===== Accessors & Manipulators ===== ///
 
 size_t Map::max_index() const {return size_ - 1;}
+
+size_t nb_obstacles() const {return nb_obstacles_;}
 
 
 bool Map::is_free(size_t line, size_t col) const {
@@ -58,6 +60,8 @@ void Map::add_obstacle(size_t line, size_t col) {
 	
 	grid_[line][col] = Cell::OBSTACLE;
 	create_obstacle(line,col);
+	
+	nb_obstacles_++;
 }
 
 void Map::remove_obstacle(size_t line, size_t col) {
@@ -66,6 +70,8 @@ void Map::remove_obstacle(size_t line, size_t col) {
 	
 	grid_[line][col] = Cell::FREE;
 	destroy_obstacle(line,col);
+	
+	nb_obstacles_--;
 }
 
 /**

@@ -37,6 +37,7 @@ class Map{
 		
 		size_t size_;				// This is memorised to eliminiate the -
 									//  need to compute grid.size() every time
+		size_t nb_obstacles_;
 		
 	public:
 	
@@ -49,7 +50,8 @@ class Map{
 		
 		// ===== Accessors =====
 		
-		size_t max_index() const;			// maximum possible line or column index 
+		size_t max_index() const;			// maximum possible line or column index
+		size_t nb_obstacles() const; 
 		bool is_free(size_t line, size_t col) const;
 		bool is_obstacle(size_t line, size_t col) const; 
 		const Rectangle& obstacle_body(size_t, size_t) const;
