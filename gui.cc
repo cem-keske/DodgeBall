@@ -45,18 +45,18 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 //--------------------------------------
 
 MyEvent::MyEvent() :
-	m_Button_Exit("Exit"),
-	m_Button_Open("Open"),
-	m_Button_Save("Save"),
-	start_stop_("Start"),
-	m_Button_Step("Step"),
-	m_Label_Message("No Message")
+	button_exit("Exit"),
+	button_open("Open"),
+	button_save("Save"),
+	button_start_stop("Start"),
+	button_step("Step"),
+	label_message("No Message")
 {
 	set_title("DodgeBall");
-	//init buttons
+	//init button panel
 	interaction_box.set_layout(Gtk::ButtonBoxStyle::BUTTONBOX_START);
+	add_button_panel_components();
 	connect_buttons_to_handlers();
-	add_buttons();
 	//init canvas
 	canvas.set_size_request(DIM_MAX*2,DIM_MAX*2);
 	sim_arena.add(canvas);
@@ -74,42 +74,40 @@ MyEvent::~MyEvent()
 }
 
 void MyEvent::connect_buttons_to_handlers(){
-	m_Button_Exit.signal_clicked().connect(sigc::mem_fun(*this,
+	button_exit.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_exit));
-	m_Button_Open.signal_clicked().connect(sigc::mem_fun(*this,
+	button_open.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_open));         
-	m_Button_Save.signal_clicked().connect(sigc::mem_fun(*this,
+	button_save.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_save));  
-	start_stop_.signal_clicked().connect(sigc::mem_fun(*this,
+	button_start_stop.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_start_stop));	  
-	m_Button_Step.signal_clicked().connect(sigc::mem_fun(*this,
+	button_step.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_step));
 }
 
-void MyEvent::add_buttons(){
-	
-	interaction_box.add(m_Button_Exit);
-	interaction_box.add(m_Button_Open);
-	interaction_box.add(m_Button_Save);
-	interaction_box.add(start_stop_);
-	interaction_box.add(m_Button_Step);
-	interaction_box.add(m_Label_Message);
-
+void MyEvent::add_button_panel_components(){
+	interaction_box.add(button_exit);
+	interaction_box.add(button_open);
+	interaction_box.add(button_save);
+	interaction_box.add(button_start_stop);
+	interaction_box.add(button_step);
+	interaction_box.add(label_message);
 }
 
 void MyEvent::on_button_clicked_exit(){
 	
-	std::cout << "exit" << std::endl;
+	std::cout << button_exit.get_label() << std::endl;
 }
 
 void MyEvent::on_button_clicked_open(){
 	
-	std::cout << "open" << std::endl;
+	std::cout <<button_open.get_label() << std::endl;
 }
 
 void MyEvent::on_button_clicked_save(){
 	
-	std::cout << "save" << std::endl;
+	std::cout << button_save.get_label() << std::endl;
 }
 
 void MyEvent::on_button_clicked_start_stop(){
@@ -120,13 +118,13 @@ void MyEvent::on_button_clicked_start_stop(){
 	
 	
 	//print on the console and change the label
-	std::cout << start_stop_.get_label() << std::endl;
-	start_stop_.set_label((start_stop_.get_label()==labels[0]) ? 
-						   labels[1] : labels[0]);
+	std::cout << button_start_stop.get_label() << std::endl;
+	button_start_stop.set_label((button_start_stop.get_label()==labels[0]) ? 
+								 labels[1] : labels[0]);
 }
 
 void MyEvent::on_button_clicked_step(){
 	
-	std::cout << "step" << std::endl;
+	std::cout << button_step.get_label() << std::endl;
 }// benim adım cem
 
