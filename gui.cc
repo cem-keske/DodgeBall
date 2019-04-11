@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cairomm/context.h>
 
+//cem
 
 Canvas::Canvas(): empty(false)
 {
