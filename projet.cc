@@ -113,6 +113,6 @@ static void load_simulation(std::unordered_map<std::string, bool>& exec_paramete
 static int open_gui() {
 	auto app = Gtk::Application::create();
 		
-	MyEvent proWindow;
+	Gui_Window proWindow;
 	return app->run(proWindow);
 }

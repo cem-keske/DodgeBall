@@ -15,7 +15,8 @@
 // ===== Map initializer =====
 
 
-void Map::initialise_map(size_t nbCell) : nb_obstacles_(0) {
+void Map::initialise_map(size_t nbCell) {
+	nb_obstacles_ = 0;
 	grid_ = Grid(nbCell); 
 	size_ = nbCell;
 	for(auto& col: grid_)
