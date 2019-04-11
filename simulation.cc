@@ -463,6 +463,10 @@ bool Simulation::test_collisions() {
 	return true;
 }
 
+/**
+ * Saves the currrent state of the simulation to a given file path. Exporting will be
+ * done in a straightforward way so there is no need for another class as in Reader.
+ */
 bool Simulation::save(const std::string &o_file_path) const {
 	
 	// opening file
@@ -476,13 +480,10 @@ bool Simulation::save(const std::string &o_file_path) const {
 	os_stream << nb_cells_ << "\n\n";
 	
 	os_stream << "#number of players" << "\n" << players_.size() << "\n\n";
-	
 	os_stream << "#position of players" << "\n";
-	
 	for (auto const& player : players_) {
 		os_stream << player.body().center().x << "\t" << player.body().center().y;
-		os_stream << "\t";
-		os_stream << player.lives() << " " << player.cooldown();
+		os_stream << "\t" << player.lives() << " " << player.cooldown();
 		os_stream << "\n";	
 	}
 	os_stream << "\n";
@@ -491,9 +492,26 @@ bool Simulation::save(const std::string &o_file_path) const {
 	os_stream << map_.nb_obstacles() << "\n\n";
 	
 	os_stream << "#position of obstacles" << "\n";
+	for(size_t i(0); i < nb_cells_; ++i) {
+		for(size_t j(0); j < nb_cells_; ++j) {
+			if(map_.is_obstacle(i, j)) {
+				os_stream << i << "\t" << j << "n";
+			}
+		}
+	}
+	os_stream << "\n";
 	
-	for(size_t i(0); )
+	os_stream << "#nbBalls" << "\n" << balls_.size() << "\n\n";
+	os_stream << "#position of balls" << "\n";
+	for (auto const& ball : balls_) {
+		os_stream << ball.geometry().center().x << "\t" << ball.geometry().center().y;
+		os_stream << "\t" << ball.direction().angle() << "\n";	
+	}
+	os_stream << "\n#file saved successfully";
 	
+	o_file << os_stream.str();
+	if(!o_file) return false;
 	
+	o_file.close();		
 	return true;
 }
