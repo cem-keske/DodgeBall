@@ -297,6 +297,7 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		ball_speed_ = -1;
 		marge_jeu_ = -1.;
 		marge_lecture_ = -1.;
+		success_ = false;
 
 	if(execution_parameters_["Error"]) {	//
 		if(io_files.empty()) { 
@@ -309,7 +310,9 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
 			exit(0);
+		success_ = true; 	//succcessful initialisation
 	}
+	
 }
 
 // ===== Public methods ===== 
@@ -369,6 +372,10 @@ bool Simulation::test_center_position(double x,double y) const {
 		return false;
 	}
 	return true;
+}
+
+bool Simulation::success() const {
+	return success_;
 }
 
 void Simulation::nb_cells(size_t nb_cells){
