@@ -33,7 +33,7 @@ class MyEvent : public Gtk::Window
 		virtual ~MyEvent();
 
 	protected:
-	
+		
 		void on_button_clicked_exit();
 		void on_button_clicked_open();
 		void on_button_clicked_save();
@@ -56,6 +56,7 @@ class MyEvent : public Gtk::Window
 	private:
 		void draw();
 		void connect_buttons_to_handlers();
+		void add_buttons();
 };
 
 #endif

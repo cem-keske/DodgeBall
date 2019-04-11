@@ -50,32 +50,22 @@ MyEvent::MyEvent() :
 	m_Button_Save("Save"),
 	m_Button_Start("Start"),
 	m_Button_Step("Step"),
-	m_Label_Message("No Message"){
-	// Set title and border of the window
+	m_Label_Message("No Message")
+{
 	set_title("DodgeBall");
-	
+	//init buttons
 	interaction_box.set_layout(Gtk::ButtonBoxStyle::BUTTONBOX_START);
-	
-	interaction_box.add(m_Button_Exit);
-	interaction_box.add(m_Button_Open);
-	interaction_box.add(m_Button_Save);
-	interaction_box.add(m_Button_Start);
-	interaction_box.add(m_Button_Step);
-	interaction_box.add(m_Label_Message);
-	
 	connect_buttons_to_handlers();
-	
+	add_buttons();
+	//init canvas
 	canvas.set_size_request(DIM_MAX*2,DIM_MAX*2);
-	
 	sim_arena.add(canvas);
-	
+	//add components to the big box
 	the_big_box.add(interaction_box);
 	the_big_box.add(sim_arena);
-	
+	//add the big box to the window and show everything
 	add(the_big_box);
 	set_resizable(false);
-	// Show all children of the window
-	
 	show_all_children();
 }
 
@@ -94,6 +84,17 @@ void MyEvent::connect_buttons_to_handlers(){
 										   &MyEvent::on_button_clicked_start));	  
 	m_Button_Step.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_step));
+}
+
+void MyEvent::add_buttons(){
+	
+	interaction_box.add(m_Button_Exit);
+	interaction_box.add(m_Button_Open);
+	interaction_box.add(m_Button_Save);
+	interaction_box.add(m_Button_Start);
+	interaction_box.add(m_Button_Step);
+	interaction_box.add(m_Label_Message);
+
 }
 
 void MyEvent::on_button_clicked_exit(){
@@ -121,4 +122,3 @@ void MyEvent::on_button_clicked_step(){
 	std::cout << "step" << std::endl;
 }// benim adım cem
 
-// r e e e y 
