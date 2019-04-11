@@ -97,7 +97,12 @@ void Gui_Window::add_button_panel_components(){
 
 void Gui_Window::on_button_clicked_exit(){
 	
+
+	std::cout << "exit" << std::endl;
+	exit(0);
+=======
 	std::cout << button_exit.get_label() << std::endl;
+
 }
 
 void Gui_Window::on_button_clicked_open(){
@@ -110,6 +115,10 @@ void Gui_Window::on_button_clicked_save(){
 	std::cout << button_save.get_label() << std::endl;
 }
 
+void MyEvent::on_button_clicked_start(){
+
+	std::cout << "start" << std::endl;
+=======
 void Gui_Window::on_button_clicked_start_stop(){
 	static std::string labels[] = {"Start","Stop"};
 	
@@ -125,6 +134,10 @@ void Gui_Window::on_button_clicked_start_stop(){
 
 void Gui_Window::on_button_clicked_step(){
 	
+
+	std::cout << "step" << std::endl;
+}
+=======
 	std::cout << button_step.get_label() << std::endl;
-}// benim adım cem
+}
 
