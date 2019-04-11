@@ -471,35 +471,35 @@ bool Simulation::save(const std::string &o_file_path) const {
 	std::ofstream o_file(o_file_path);
 	if (!o_file) return false;
 	std::ostringstream os_stream;	//to reach the file only once at the end
-
-	os_stream << "#nbCell" << "\n" << nb_cells_ << "\n\n";
+	os_stream.setf(std::ios::right);
+	os_stream << "# nbCell" << "\n\t" << nb_cells_ << "\n\n";
 	
-	os_stream << "#number of players" << "\n" << players_.size() << "\n\n";
-	os_stream << "#position of players" << "\n";
+	os_stream << "# number of players" << "\n\t" << players_.size() << "\n\n";
+	os_stream << "# position of players" << "\n\t";
 	for (auto const& player : players_) {
 		os_stream << player.body().center().x << "\t" << player.body().center().y;
-		os_stream << "\t" << player.lives() << " " << player.cooldown() << "\n";
+		os_stream << "\t" << player.lives() << "\t" << player.cooldown() << "\n\t";
 	}
 	os_stream << "\n";
 	
-	os_stream << "#nbObstacles" << "\n" << map_.nb_obstacles() << "\n\n";
-	os_stream << "#position of obstacles" << "\n";
+	os_stream << "# nbObstacles" << "\n\t" << map_.nb_obstacles() << "\n\n";
+	os_stream << "# position of obstacles" << "\n";
 	for(size_t i(0); i < nb_cells_; ++i) {
 		for(size_t j(0); j < nb_cells_; ++j) {
 			if(map_.is_obstacle(i, j)) {
-				os_stream << i << "\t" << j << "n";
+				os_stream << "\t" << i << "\t" << j << "\n";
 			}
 		}
 	}
 	os_stream << "\n";
 	
-	os_stream << "#nbBalls" << "\n" << balls_.size() << "\n\n";
-	os_stream << "#position of balls" << "\n";
+	os_stream << "# nbBalls" << "\n\t" << balls_.size() << "\n\n";
+	os_stream << "# position of balls" << "\n\t";
 	for (auto const& ball : balls_) {
 		os_stream << ball.geometry().center().x << "\t" << ball.geometry().center().y;
-		os_stream << "\t" << ball.direction().angle() << "\n";	
+		os_stream << "\t" << ball.direction().angle() << "\n\t";	
 	}
-	os_stream << "\n#file saved successfully";
+	os_stream << "\n# file saved successfully";
 	
 	o_file << os_stream.str();
 	if(!o_file) return false;
