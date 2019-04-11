@@ -277,9 +277,6 @@ void print_error_state(ReaderState error_state) {
 }
 
 
-
-
-
 /// ===== SIMULATION ===== ///
 
 // ===== Constructor ===== 
@@ -353,7 +350,6 @@ bool Simulation::initialise_ball (double x, double y, Angle alpha){
 	balls_.push_back(Ball(alpha, x, y, ball_radius_));
 	return true;
 }
-
 
 bool Simulation::initialise_player (double x, double y, Counter lives, 
 									Counter cooldown){
@@ -464,5 +460,27 @@ bool Simulation::test_collisions() {
 	if(detect_all_ball_obstacle_collisions() == false)
 		return false;
 		
+	return true;
+}
+
+bool Simulation::save(const std::string &o_file_path) const {
+	
+	// opening file
+	std::ofstream o_file(o_file_path);
+	if (!o_file) return false;
+	
+	// output string used to ensure that the file is not reached too frequently 
+	std::ostringstream os_stream;
+
+	os_stream << "#nbCell" << "\n";
+	os_stream << nb_cells_ << "\n\n";
+	
+	os_stream << "#Players" << "\n" << players_.size() << "\n";
+	
+	for (auto const& player : players_) {
+		os_stream << player.body().center().x << "\t" << player.body().center().y;
+		os_stream << "\n";
+	}
+	
 	return true;
 }

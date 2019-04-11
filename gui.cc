@@ -99,6 +99,7 @@ void MyEvent::connect_buttons_to_handlers(){
 void MyEvent::on_button_clicked_exit(){
 	
 	std::cout << "exit" << std::endl;
+	exit(0);
 }
 
 void MyEvent::on_button_clicked_open(){
@@ -112,13 +113,11 @@ void MyEvent::on_button_clicked_save(){
 }
 
 void MyEvent::on_button_clicked_start(){
-	
+
 	std::cout << "start" << std::endl;
 }
 
 void MyEvent::on_button_clicked_step(){
 	
 	std::cout << "step" << std::endl;
-}// benim adım cem
-
-// r e e e y 
+}

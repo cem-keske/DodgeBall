@@ -40,6 +40,8 @@ class MyEvent : public Gtk::Window
 		void on_button_clicked_start();
 		void on_button_clicked_step();
 		
+		bool is_running;
+		
 		Gtk::VBox the_big_box;
 		
 		Gtk::HButtonBox interaction_box;

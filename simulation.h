@@ -54,9 +54,11 @@ class Simulation {
 		bool initialise_obstacle(int, int, Counter);	
 		
 		bool test_collisions();
-
+		
+		bool save(const std::string &o_file_path) const;
+		
 	private:
-
+		
 		bool detect_collision(Player const&, Player const&);
 		bool detect_collision(Player const&, Ball const&);
 		bool detect_collision(Ball const&, Ball const&);
@@ -126,7 +128,5 @@ class Reader {
 	
 	
 };
-
-
 
 #endif
