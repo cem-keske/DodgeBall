@@ -121,5 +121,5 @@ void MyEvent::on_button_clicked_start(){
 void MyEvent::on_button_clicked_step(){
 	
 	std::cout << "step" << std::endl;
-}
+}// benim adım cem
 
