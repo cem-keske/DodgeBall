@@ -48,7 +48,7 @@ MyEvent::MyEvent() :
 	m_Button_Exit("Exit"),
 	m_Button_Open("Open"),
 	m_Button_Save("Save"),
-	m_Button_Start("Start"),
+	start_stop_("Start"),
 	m_Button_Step("Step"),
 	m_Label_Message("No Message")
 {
@@ -80,8 +80,8 @@ void MyEvent::connect_buttons_to_handlers(){
 										   &MyEvent::on_button_clicked_open));         
 	m_Button_Save.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_save));  
-	m_Button_Start.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_start));	  
+	start_stop_.signal_clicked().connect(sigc::mem_fun(*this,
+										   &MyEvent::on_button_clicked_start_stop));	  
 	m_Button_Step.signal_clicked().connect(sigc::mem_fun(*this,
 										   &MyEvent::on_button_clicked_step));
 }
@@ -91,7 +91,7 @@ void MyEvent::add_buttons(){
 	interaction_box.add(m_Button_Exit);
 	interaction_box.add(m_Button_Open);
 	interaction_box.add(m_Button_Save);
-	interaction_box.add(m_Button_Start);
+	interaction_box.add(start_stop_);
 	interaction_box.add(m_Button_Step);
 	interaction_box.add(m_Label_Message);
 
@@ -112,9 +112,17 @@ void MyEvent::on_button_clicked_save(){
 	std::cout << "save" << std::endl;
 }
 
-void MyEvent::on_button_clicked_start(){
+void MyEvent::on_button_clicked_start_stop(){
+	static std::string labels[] = {"Start","Stop"};
 	
-	std::cout << "start" << std::endl;
+	
+	
+	
+	
+	//print on the console and change the label
+	std::cout << start_stop_.get_label() << std::endl;
+	start_stop_.set_label((start_stop_.get_label()==labels[0]) ? 
+						   labels[1] : labels[0]);
 }
 
 void MyEvent::on_button_clicked_step(){

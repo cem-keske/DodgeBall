@@ -37,7 +37,7 @@ class MyEvent : public Gtk::Window
 		void on_button_clicked_exit();
 		void on_button_clicked_open();
 		void on_button_clicked_save();
-		void on_button_clicked_start();
+		void on_button_clicked_start_stop();
 		void on_button_clicked_step();
 		
 		Gtk::VBox the_big_box;
@@ -49,7 +49,7 @@ class MyEvent : public Gtk::Window
 		Gtk::Button 	m_Button_Exit;
 		Gtk::Button 	m_Button_Open;
 		Gtk::Button		m_Button_Save;
-		Gtk::Button		m_Button_Start;
+		Gtk::Button		start_stop_;
 		Gtk::Button 	m_Button_Step;
 		Gtk::Label		m_Label_Message;
 		
