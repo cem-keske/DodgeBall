@@ -4,7 +4,7 @@
 #include "simulation.h"
 #include "tools.h"
 #include <gtkmm.h>
-
+//cem
 class Canvas : public Gtk::DrawingArea
 {
 	public:
