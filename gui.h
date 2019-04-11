@@ -5,12 +5,12 @@
 #include "tools.h"
 #include <gtkmm.h>
 
-class MyArea : public Gtk::DrawingArea
+class Canvas : public Gtk::DrawingArea
 {
 	public:
 
-		MyArea();
-		virtual ~MyArea();
+		Canvas();
+		virtual ~Canvas();
 		void clear();
 		void draw();
 
@@ -40,10 +40,12 @@ class MyEvent : public Gtk::Window
 		void on_button_clicked_start();
 		void on_button_clicked_step();
 		
-		Gtk::Box frame; 
-		Gtk::Box canvas;
+		Gtk::VBox the_big_box;
+		
 		Gtk::HButtonBox interaction_box;
-		MyArea 			m_Area;
+		Gtk::Box		sim_arena;
+		Canvas 			canvas;
+		
 		Gtk::Button 	m_Button_Exit;
 		Gtk::Button 	m_Button_Open;
 		Gtk::Button		m_Button_Save;

@@ -10,32 +10,32 @@
 #include <cairomm/context.h>
 
 
-MyArea::MyArea(): empty(false)
+Canvas::Canvas(): empty(false)
 {
 }
 
-MyArea::~MyArea()
+Canvas::~Canvas()
 {
 }
 
-void MyArea::clear()
+void Canvas::clear()
 {
   empty = true; 
   refresh();
 }
 
-void MyArea::draw()
+void Canvas::draw()
 {
   empty = false;
   refresh();
 }
 
-void MyArea::refresh()
+void Canvas::refresh()
 {
   
 }
 
-bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
   
 
@@ -46,9 +46,6 @@ bool MyArea::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 //--------------------------------------
 
 MyEvent::MyEvent() :
-	frame(Gtk::ORIENTATION_VERTICAL,10),
-	//interaction_box(Gtk::ORIENTATION_HORIZONTAL, 10),
-	canvas(Gtk::ORIENTATION_HORIZONTAL,10),
 	m_Button_Exit("Exit"),
 	m_Button_Open("Open"),
 	m_Button_Save("Save"),
@@ -63,14 +60,8 @@ MyEvent::MyEvent() :
 	// Add outer box to the window (because the window
 	// can only contain a single widget)
   
-	add(frame);
-	canvas.set_size_request(DIM_MAX*2,DIM_MAX*2);
-	//Put the inner boxes and the separator in the outer box:
-	frame.add(interaction_box);
-	frame.add(canvas);
-  
 	
-	canvas.pack_start(m_Area);
+	//Put the inner boxes and the separator in the outer box:
 	/*
 	interaction_box.pack_start(m_Button_Exit,false,false);// keep fixed width
 	interaction_box.pack_start(m_Button_Open,false,false); // and aligned to left;  
@@ -79,6 +70,7 @@ MyEvent::MyEvent() :
 	interaction_box.pack_start(m_Button_Step,false,false);
 	*/
 	interaction_box.set_layout(Gtk::ButtonBoxStyle::BUTTONBOX_START);
+	
 	interaction_box.add(m_Button_Exit);
 	interaction_box.add(m_Button_Open);
 	interaction_box.add(m_Button_Save);
@@ -86,15 +78,19 @@ MyEvent::MyEvent() :
 	interaction_box.add(m_Button_Step);
 	interaction_box.add(m_Label_Message);
 	
-	
-	
-	// Connect the clicked signal of the button to
-	// their signal handler
 	connect_buttons_to_handlers();
-
-  // Show all children of the window
-  set_resizable(false);
-  show_all_children();
+	
+	canvas.set_size_request(DIM_MAX*2,DIM_MAX*2);
+	
+	sim_arena.add(canvas);
+	
+	the_big_box.add(interaction_box);
+	the_big_box.add(sim_arena);
+	
+	set_resizable(false);
+	// Show all children of the window
+	
+	show_all_children();
 }
 
 MyEvent::~MyEvent()
