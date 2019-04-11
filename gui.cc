@@ -44,80 +44,100 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 //--------------------------------------
 
-MyEvent::MyEvent() :
-	m_Button_Exit("Exit"),
-	m_Button_Open("Open"),
-	m_Button_Save("Save"),
-	m_Button_Start("Start"),
-	m_Button_Step("Step"),
-	m_Label_Message("No Message"){
-	// Set title and border of the window
+Gui_Window::Gui_Window() :
+	button_exit("Exit"),
+	button_open("Open"),
+	button_save("Save"),
+	button_start_stop("Start"),
+	button_step("Step"),
+	label_message("No Message")
+{
 	set_title("DodgeBall");
-	
+	//init button panel
 	interaction_box.set_layout(Gtk::ButtonBoxStyle::BUTTONBOX_START);
-	
-	interaction_box.add(m_Button_Exit);
-	interaction_box.add(m_Button_Open);
-	interaction_box.add(m_Button_Save);
-	interaction_box.add(m_Button_Start);
-	interaction_box.add(m_Button_Step);
-	interaction_box.add(m_Label_Message);
-	
+	add_button_panel_components();
 	connect_buttons_to_handlers();
-	
+	//init canvas
 	canvas.set_size_request(DIM_MAX*2,DIM_MAX*2);
-	
 	sim_arena.add(canvas);
-	
+	//add components to the big box
 	the_big_box.add(interaction_box);
 	the_big_box.add(sim_arena);
-	
+	//add the big box to the window and show everything
 	add(the_big_box);
 	set_resizable(false);
-	// Show all children of the window
-	
 	show_all_children();
 }
 
-MyEvent::~MyEvent()
+Gui_Window::~Gui_Window()
 {
 }
 
-void MyEvent::connect_buttons_to_handlers(){
-	m_Button_Exit.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_exit));
-	m_Button_Open.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_open));         
-	m_Button_Save.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_save));  
-	m_Button_Start.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_start));	  
-	m_Button_Step.signal_clicked().connect(sigc::mem_fun(*this,
-										   &MyEvent::on_button_clicked_step));
+void Gui_Window::connect_buttons_to_handlers(){
+	button_exit.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_exit));
+	button_open.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_open));         
+	button_save.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_save));  
+	button_start_stop.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_start_stop));	  
+	button_step.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_step));
 }
 
-void MyEvent::on_button_clicked_exit(){
+void Gui_Window::add_button_panel_components(){
+	interaction_box.add(button_exit);
+	interaction_box.add(button_open);
+	interaction_box.add(button_save);
+	interaction_box.add(button_start_stop);
+	interaction_box.add(button_step);
+	interaction_box.add(label_message);
+}
+
+void Gui_Window::on_button_clicked_exit(){
 	
+
 	std::cout << "exit" << std::endl;
 	exit(0);
+=======
+	std::cout << button_exit.get_label() << std::endl;
+
 }
 
-void MyEvent::on_button_clicked_open(){
+void Gui_Window::on_button_clicked_open(){
 	
-	std::cout << "open" << std::endl;
+	std::cout <<button_open.get_label() << std::endl;
 }
 
-void MyEvent::on_button_clicked_save(){
+void Gui_Window::on_button_clicked_save(){
 	
-	std::cout << "save" << std::endl;
+	std::cout << button_save.get_label() << std::endl;
 }
 
 void MyEvent::on_button_clicked_start(){
 
 	std::cout << "start" << std::endl;
+=======
+void Gui_Window::on_button_clicked_start_stop(){
+	static std::string labels[] = {"Start","Stop"};
+	
+	
+	
+	
+	
+	//print on the console and change the label
+	std::cout << button_start_stop.get_label() << std::endl;
+	button_start_stop.set_label((button_start_stop.get_label()==labels[0]) ? 
+								 labels[1] : labels[0]);
 }
 
-void MyEvent::on_button_clicked_step(){
+void Gui_Window::on_button_clicked_step(){
 	
+
 	std::cout << "step" << std::endl;
 }
+=======
+	std::cout << button_step.get_label() << std::endl;
+}
+

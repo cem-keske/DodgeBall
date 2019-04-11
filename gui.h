@@ -25,19 +25,19 @@ class Canvas : public Gtk::DrawingArea
 };
 
 
-class MyEvent : public Gtk::Window
+class Gui_Window : public Gtk::Window
 {
 	public:
 	
-		MyEvent();
-		virtual ~MyEvent();
+		Gui_Window();
+		virtual ~Gui_Window();
 
 	protected:
-	
+		
 		void on_button_clicked_exit();
 		void on_button_clicked_open();
 		void on_button_clicked_save();
-		void on_button_clicked_start();
+		void on_button_clicked_start_stop();
 		void on_button_clicked_step();
 		
 		bool is_running;
@@ -48,16 +48,17 @@ class MyEvent : public Gtk::Window
 		Gtk::Box		sim_arena;
 		Canvas 			canvas;
 		
-		Gtk::Button 	m_Button_Exit;
-		Gtk::Button 	m_Button_Open;
-		Gtk::Button		m_Button_Save;
-		Gtk::Button		m_Button_Start;
-		Gtk::Button 	m_Button_Step;
-		Gtk::Label		m_Label_Message;
+		Gtk::Button 	button_exit;
+		Gtk::Button 	button_open;
+		Gtk::Button		button_save;
+		Gtk::Button		button_start_stop;
+		Gtk::Button 	button_step;
+		Gtk::Label		label_message;
 		
 	private:
 		void draw();
 		void connect_buttons_to_handlers();
+		void add_button_panel_components();
 };
 
 #endif
