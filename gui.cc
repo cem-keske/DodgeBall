@@ -10,7 +10,10 @@
 #include <cairomm/context.h>
 
 Canvas::Canvas(): empty(false)
-{
+{ 
+	set_size_request(DIM_MAX*2,DIM_MAX*2);
+	center(get_allocated_width(), get_allocated_height());
+	set_resizable(false);
 }
 
 Canvas::~Canvas()
@@ -19,14 +22,14 @@ Canvas::~Canvas()
 
 void Canvas::clear()
 {
-  empty = true; 
-  refresh();
+	empty = true; 
+	refresh();
 }
 
 void Canvas::draw()
 {
-  empty = false;
-  refresh();
+	empty = false;
+	refresh();
 }
 
 void Canvas::refresh()
@@ -36,10 +39,13 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-  
-
-  return true;
+	return true;
 }
+Coordinate Canvas::convert_coordinate(Coordinate const& pos){
+	return pos+center;
+}
+
+
 
 
 //--------------------------------------
@@ -58,7 +64,6 @@ Gui_Window::Gui_Window() :
 	add_button_panel_components();
 	connect_buttons_to_handlers();
 	//init canvas
-	canvas.set_size_request(DIM_MAX*2,DIM_MAX*2);
 	sim_arena.add(canvas);
 	//add components to the big box
 	the_big_box.add(interaction_box);

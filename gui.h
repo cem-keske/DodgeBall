@@ -19,9 +19,10 @@ class Canvas : public Gtk::DrawingArea
 		bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
   
 	private:
-	
+		Coordinate center;
 		bool empty;
 		void refresh();
+		Coordinate convert_coordinate(Coordinate const&);
 };
 
 
@@ -54,9 +55,11 @@ class Gui_Window : public Gtk::Window
 		Gtk::Label		label_message;
 		
 	private:
+		
 		void draw();
 		void connect_buttons_to_handlers();
 		void add_button_panel_components();
+		
 };
 
 #endif
