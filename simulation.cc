@@ -468,29 +468,21 @@ bool Simulation::test_collisions() {
  * done in a straightforward way so there is no need for another class as in Reader.
  */
 bool Simulation::save(const std::string &o_file_path) const {
-	
-	// opening file
 	std::ofstream o_file(o_file_path);
 	if (!o_file) return false;
-	
-	// output string used to ensure that the file is not reached too frequently 
-	std::ostringstream os_stream;
+	std::ostringstream os_stream;	//to reach the file only once at the end
 
-	os_stream << "#nbCell" << "\n";
-	os_stream << nb_cells_ << "\n\n";
+	os_stream << "#nbCell" << "\n" << nb_cells_ << "\n\n";
 	
 	os_stream << "#number of players" << "\n" << players_.size() << "\n\n";
 	os_stream << "#position of players" << "\n";
 	for (auto const& player : players_) {
 		os_stream << player.body().center().x << "\t" << player.body().center().y;
-		os_stream << "\t" << player.lives() << " " << player.cooldown();
-		os_stream << "\n";	
+		os_stream << "\t" << player.lives() << " " << player.cooldown() << "\n";
 	}
 	os_stream << "\n";
 	
-	os_stream << "#nbObstacles" << "\n";
-	os_stream << map_.nb_obstacles() << "\n\n";
-	
+	os_stream << "#nbObstacles" << "\n" << map_.nb_obstacles() << "\n\n";
 	os_stream << "#position of obstacles" << "\n";
 	for(size_t i(0); i < nb_cells_; ++i) {
 		for(size_t j(0); j < nb_cells_; ++j) {
