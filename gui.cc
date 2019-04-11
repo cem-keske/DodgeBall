@@ -9,8 +9,6 @@
 #include <iostream>
 #include <cairomm/context.h>
 
-//cem
-
 Canvas::Canvas(): empty(false)
 {
 }
@@ -123,3 +121,4 @@ void MyEvent::on_button_clicked_step(){
 	std::cout << "step" << std::endl;
 }// benim adım cem
 
+// r e e e y 
