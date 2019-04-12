@@ -21,6 +21,7 @@
 
 class Simulation {	
 	
+	
 	private:
 		size_t nb_cells_;
 		Length player_radius_;
