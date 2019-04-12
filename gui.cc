@@ -9,25 +9,21 @@
 #include <iostream>
 #include <cairomm/context.h>
 
-Canvas::Canvas(): empty(false)
-{ 
+Canvas::Canvas() {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
 	center = {get_allocated_width()/2., get_allocated_height()/2.};
 }
 
-Canvas::~Canvas()
-{
+Canvas::~Canvas(){
 }
 
-void Canvas::clear()
-{
-	empty = true; 
+void Canvas::clear(){
 	refresh();
 }
 
-void Canvas::draw()
-{
-	empty = false;
+
+
+void Canvas::draw(){
 	refresh();
 }
 

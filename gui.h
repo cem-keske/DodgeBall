@@ -5,7 +5,22 @@
 #include "tools.h"
 #include <memory>
 #include <gtkmm.h>
-//cem
+
+/// DRAWABLE ///
+
+/**
+ * Pure virtual class for drawable gui objects.
+ */ 
+class Drawable {
+	protected:
+		virtual void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
+};
+
+/// CANVAS ///
+
+/**
+ * Drawing canvas for gui.
+ */
 class Canvas : public Gtk::DrawingArea
 {
 	public:
@@ -20,13 +35,17 @@ class Canvas : public Gtk::DrawingArea
 		bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
   
 	private:
+		std::vector<std::unique_ptr<Drawable>> objects;
 		Coordinate center;
-		bool empty;
-		void refresh();
+		
 		Coordinate convert_coordinate(Coordinate const&);
+		void refresh();
 };
 
-
+/// GUI WINDOW ///
+/**
+ * 
+ */ 
 class Gui_Window : public Gtk::Window
 {
 	public:
@@ -63,10 +82,8 @@ class Gui_Window : public Gtk::Window
 		
 };
 
-class Drawable {
-	protected:
-		virtual void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
-};
+
+// ===== Drawables ===== //
 
 class Gui_Player : public Drawable {
 	private:
@@ -84,7 +101,7 @@ class Gui_Obstacle : public Drawable {
 	private:
 		std::shared_ptr<Rectangle> rectangle;
 		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
-	
 };
+
 
 #endif
