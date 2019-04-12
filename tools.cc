@@ -260,15 +260,15 @@ void Circle::radius(Length radius) {
 
 /// ===== Tools namespace ===== ///
 
-Color color_red() {return {0.93, 0, 0};} 		
+Color Tools::color_red() {return {0.93, 0, 0};} 		
 
-Color color_orange() {return {1, 0.28, 0.09};}
+Color Tools::color_orange() {return {1, 0.28, 0.09};}
 
-Color color_yellow() {return {1, 0.91, 0};}
+Color Tools::color_yellow() {return {1, 0.91, 0};}
 
-Color color_green() {return {0, 0.94, 0};}
+Color Tools::color_green() {return {0, 0.94, 0};}
 
-Color color_blue() {return {0.19, 0.38, 0.92};}
+Color Tools::color_blue() {return {0.19, 0.38, 0.92};}
 
 bool Tools::intersect(const Rectangle& rect_one, const Rectangle& rect_two, 
 					  Length tolerance) {
