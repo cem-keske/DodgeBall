@@ -12,6 +12,7 @@
 Canvas::Canvas() {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
 	center = {get_allocated_width()/2., get_allocated_height()/2.};
+	draw_disk(Circle(4),{0.5,0.5,0.5},);
 }
 
 Canvas::~Canvas(){
@@ -39,6 +40,18 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
 	return pos+center;
 }
+
+void Canvas::draw_disk(Circle const& original, Color const& color,
+					   const Cairo::RefPtr<Cairo::Context>& cr){
+	Coordinate converted = convert_coordinate(original.center);
+	cr->set_source_rgb(color.r,color.g,color.b);
+	cr->arc(converted.x, converted.y, original.radius());
+	cr->paint();		   
+}
+		void draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
+					  Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_square(Rectangle const& original, 
+					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true);
 
 
 
