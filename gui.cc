@@ -10,9 +10,8 @@
 #include <cmath>
 #include <cairomm/context.h>
 
-static constexpr Color default_arc_color(Tools::color_blue());
 
-Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false), has_to_refresh(true) {
+Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
 	
 }
@@ -36,11 +35,11 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
-	return center+pos;
+	return center.symmetric_x_axis()+pos;
 }
 
-void Canvas::draw_disk(Circle const& original, Color const& color,
-					   const Cairo::RefPtr<Cairo::Context>& cr){
+void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr, 
+					   Color const& color = default_disk_color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.center()));
 	cr->set_source_rgb(color.r,color.g,color.b);
@@ -50,23 +49,25 @@ void Canvas::draw_disk(Circle const& original, Color const& color,
 	cr->restore();
 }
 void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
-			   Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr){
+			   Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr,
+			   Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.center()));
 	cr->set_line_width(thickness);
-	cr->set_source_rgb(default_arc_color);
+	cr->set_source_rgb(color.r, color.g, color.b);
 	cr->arc(converted.x, converted.y, original.radius(), -M_PI_2 , alpha-M_PI_2);
 	cr->stroke_preserve();
 	cr->fill();		   
 	cr->restore();
 }
 void Canvas::draw_square(Rectangle const& original, 
-					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill) {
+					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill,
+					     Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.center()));
 	cr->set_line_width(thickness);
-	cr->set_source_rgb(default_arc_color);
-	cr->arc(converted.x, converted.y, original.radius(), -M_PI_2 , alpha-M_PI_2);
+	cr->set_source_rgb(color.r, color.g, color.b);
+	cr->rectangle(converted.x, converted.y, original.base(), original.height());
 	cr->stroke_preserve();
 	cr->fill();		   
 	cr->restore();				 
