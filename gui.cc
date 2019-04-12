@@ -31,7 +31,9 @@ void Canvas::refresh()
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
 	draw_disk(Circle(100),get_window()->create_cairo_context(),{1,0.0,0.0});
-
+	Rectangle rect({-50,-50},20,20);
+	draw_rectangle(rect,cr);
+	draw_arc({0,0},10,100,M_PI_4,cr);
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
@@ -60,7 +62,7 @@ void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha,
 	cr->fill();		   
 	cr->restore();
 }
-void Canvas::draw_square(Rectangle const& original, 
+void Canvas::draw_rectangle(Rectangle const& original, 
 					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill,
 					     Color const& color){
 	cr->save();

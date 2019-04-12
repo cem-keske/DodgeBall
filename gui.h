@@ -40,7 +40,7 @@ class Canvas : public Gtk::DrawingArea
 		void draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
 					  Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr,
 					  Color const& color = Tools::color_blue());
-		void draw_square(Rectangle const& original, 
+		void draw_rectangle(Rectangle const& original, 
 						 const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true,
 					     Color const & color = Tools::color_red());
 };
