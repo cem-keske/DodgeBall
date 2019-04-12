@@ -130,5 +130,8 @@ void Gui_Window::on_button_clicked_start_stop(){
 void Gui_Window::on_button_clicked_step(){
 	
 	std::cout << button_step.get_label() << std::endl;
-}// benim adım cem
+}
+
+
+
 

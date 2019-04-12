@@ -3,6 +3,7 @@
 
 #include "simulation.h"
 #include "tools.h"
+#include <memory>
 #include <gtkmm.h>
 //cem
 class Canvas : public Gtk::DrawingArea
@@ -63,7 +64,27 @@ class Gui_Window : public Gtk::Window
 };
 
 class Drawable {
-	void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
+	protected:
+		virtual void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
+};
+
+class Gui_Player : public Drawable {
+	private:
+		std::shared_ptr<Player> player;
+		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
+};
+
+class Gui_Ball : public Drawable {
+	private:
+		std::shared_ptr<Ball> ball;
+		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
+};
+
+class Gui_Obstacle : public Drawable {
+	private:
+		std::shared_ptr<Rectangle> rectangle;
+		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
+	
 };
 
 #endif
