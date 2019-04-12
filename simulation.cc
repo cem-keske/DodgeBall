@@ -46,7 +46,12 @@ class Simulation {
 				   std::vector<std::string> const&);
 		
 		// ===== Public Methods =====
+		
 		bool success() const;
+		const std::vector<Player>& players() const;
+		const std::vector<Ball>& balls() const;
+		const Rectangle_map& obstacles() const;
+		
 		void nb_cells(size_t);
 		bool initialise_player(double, double, Counter, Counter);
 		bool initialise_ball(double, double, Angle);
@@ -128,6 +133,55 @@ class Reader {
 };
 
 
+/// ===== SIMULATOR ===== ///
+
+/**
+ * This vector will hold up to two simulation instances. During reading of a new 
+ * simulation (with Open button) it will be pushed back in this vector. In case of
+ * a successful reading, new simulation is moved to active_sims[0].
+ */
+static std::vector<Simulation> active_sims;
+
+void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
+									  execution_parameters, 
+									  std::vector<std::string> const& io_files)	{
+									 
+	if (active_sims.size() == 0)
+		active_sims.push_back(Simulation(execution_parameters, io_files));
+	else {
+		active_sims.push_back(Simulation(execution_parameters, io_files));
+		if (active_sims.back().success())
+			active_sims.erase(active_sims.begin());
+			// old sim is destroyed. new sim is moved to index 0
+	}								
+	
+	assert(active_sims.size()==1);
+
+}
+
+/**
+ * Returns a vector containing player bodies along with their remeaning life counters
+ * (for gui draw and color determination, respectively). 
+ */
+std::vector<std::pair<Circle, Counter>> get_player_bodies() {
+	std::vector<std::pair<Circle, Counter>> player_bodies;
+	for  (const auto& player : active_sims[0].players()) {
+		player_bodies.push_back(std::make_pair(player.body(), player.lives()));
+	}
+	
+	return player_bodies;
+}
+
+std::vector<Circle> get_ball_bodies() {
+	std::vector <Circle> ball_bodies;
+	for  (const auto& ball : active_sims[0].balls()) {
+		ball_bodies.push_back(ball.geometry());
+	}
+	
+	return ball_bodies;
+}
+
+
 
 /// ===== SIMULATION ===== ///
 
@@ -165,6 +219,14 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 }
 
 // ===== Public methods ===== 
+
+
+const std::vector<Player>& Simulation::players() const {return players_;}
+
+const std::vector<Ball>& Simulation::balls() const {return balls_;}
+
+const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
+
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
 	if(x < 0 || (unsigned)x > map_.max_index()) {
@@ -623,32 +685,4 @@ void print_error_state(ReaderState error_state) {
 		std::cout << "Error in state : " << state_strings[error_state] << std::endl;
 	}
 }
-
-
-/// ===== SIMULATOR ===== ///
-
-/**
- * This vector will hold up to two simulation instances. During reading of a new 
- * simulation (with Open button) it will be pushed back in this vector. In case of
- * a successful reading, new simulation is moved to active_sims[0].
- */
-static std::vector<Simulation> active_sims;
-
-void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
-									  execution_parameters, 
-									  std::vector<std::string> const& io_files)	{
-									 
-	if (active_sims.size() == 0)
-		active_sims.push_back(Simulation(execution_parameters, io_files));
-	else {
-		active_sims.push_back(Simulation(execution_parameters, io_files));
-		if (active_sims.back().success())
-			active_sims.erase(active_sims.begin());
-			// old sim is destroyed. new sim is moved to index 0
-	}								
-	
-	assert(active_sims.size()==1);
-
-}
-
 
