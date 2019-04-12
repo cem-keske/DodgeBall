@@ -36,11 +36,11 @@ std::string Coordinate::to_string() const {
 	return "[" + std::to_string(this->x) + ", " + std::to_string(this->y) + "]";
 }
 
-Coordinate Coordinate::symmetric_x_axis(){
+Coordinate Coordinate::symmetric_x_axis() const{
 	return {x,-y};
 }
 
-Coordinate Coordinate::symmetric_y_axis(){
+Coordinate Coordinate::symmetric_y_axis() const{
 	return {-x,y};
 }
 // ===== Operator Overloads =====
