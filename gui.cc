@@ -7,25 +7,19 @@
 #include "define.h"
 #include "gui.h"
 #include <iostream>
+#include <cmath>
 #include <cairomm/context.h>
 
-Canvas::Canvas() {
+Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false), has_to_refresh(true) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
-	center = {get_allocated_width()/2., get_allocated_height()/2.};
-	draw_disk(Circle(4),{0.5,0.5,0.5},);
+	
 }
 
 Canvas::~Canvas(){
 }
 
-void Canvas::clear(){
-	refresh();
-}
-
-
-
 void Canvas::draw(){
-	refresh();
+	
 }
 
 void Canvas::refresh()
@@ -34,22 +28,29 @@ void Canvas::refresh()
 }
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
+{	
+	draw_disk(Circle(100),{1,0.0,0.0},get_window()->create_cairo_context());
+
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
-	return pos+center;
+	return center+pos;
 }
 
 void Canvas::draw_disk(Circle const& original, Color const& color,
 					   const Cairo::RefPtr<Cairo::Context>& cr){
-	Coordinate converted = convert_coordinate(original.center);
+	cr->save();
+	Coordinate converted(convert_coordinate(original.center()));
 	cr->set_source_rgb(color.r,color.g,color.b);
-	cr->arc(converted.x, converted.y, original.radius());
-	cr->paint();		   
+	cr->arc(converted.x, converted.y, original.radius(), 0, M_PI * 2);
+	cr->stroke_preserve();
+	cr->fill();		   
+	cr->restore();
 }
-		void draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
-					  Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr);
+void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
+			   Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr){
+						  
+}
 		void draw_square(Rectangle const& original, 
 					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true);
 
@@ -137,7 +138,6 @@ void Gui_Window::on_button_clicked_start_stop(){
 }
 
 void Gui_Window::on_button_clicked_step(){
-	
 	std::cout << button_step.get_label() << std::endl;
 }
 

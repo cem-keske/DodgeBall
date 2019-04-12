@@ -27,7 +27,10 @@ class Canvas : public Gtk::DrawingArea
 	private:
 		Coordinate center;
 		Coordinate convert_coordinate(Coordinate const&);
-		
+		bool sim_running;
+		bool has_to_refresh;
+		void refresh();
+	public:
 		/**
 		 * All the arguments given to the functions below must be the original shapes
 		 * in the simulation. (these functions also converts coordinates)
@@ -38,7 +41,6 @@ class Canvas : public Gtk::DrawingArea
 					  Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr);
 		void draw_square(Rectangle const& original, 
 					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true);
-		void refresh();
 };
 
 /// GUI WINDOW ///
