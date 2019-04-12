@@ -65,11 +65,11 @@ void Canvas::draw_square(Rectangle const& original,
 					     Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.center()));
-	cr->set_line_width(thickness);
 	cr->set_source_rgb(color.r, color.g, color.b);
 	cr->rectangle(converted.x, converted.y, original.base(), original.height());
 	cr->stroke_preserve();
-	cr->fill();		   
+	if(fill)
+		cr->fill();	
 	cr->restore();				 
 }
 
