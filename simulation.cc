@@ -334,7 +334,7 @@ bool Simulation::initialise_obstacle(int x, int y, Counter counter){
 	size_t nb_players(players_.size());	
 	for(size_t i(0); i < nb_players; ++i) {
 		if(Tools::intersect(map_.obstacle_body(x,y), 
-		   players_[i].body(), marge_lecture_)) {
+		   players_[i]->body(), marge_lecture_)) {
 			std::cout << COLL_OBST_PLAYER(counter, (i+1)) << std::endl;
 			return false;
 		} 
@@ -347,7 +347,7 @@ bool Simulation::initialise_ball (double x, double y, Angle alpha){
 		std::cout << BALL_OUT(balls_.size() + 1) << std::endl;
 		return false;	
 	}
-	balls_.push_back(Ball(alpha, x, y, ball_radius_));
+	balls_.push_back(std::shared_ptr<Ball>(new Ball(alpha, x, y, ball_radius_)));
 	return true;
 }
 
@@ -359,7 +359,8 @@ bool Simulation::initialise_player (double x, double y, Counter lives,
 		return false;
 	}
 	
-	players_.push_back(Player(x, y, player_radius_, lives, cooldown));
+	players_.push_back(std::shared_ptr<Player>(new Player(x, y, player_radius_, 
+											   lives, cooldown)));
 	return true;
 }
 
@@ -382,7 +383,7 @@ bool Simulation::detect_initial_player_collisions() const {
 	size_t nb_players = players_.size();
 	for(size_t i(0); i < nb_players; ++i) {
 		for(size_t j(i+1); j < nb_players; ++j) {
-			if(Tools::intersect((players_[j]).body(), (players_[i]).body(),
+			if(Tools::intersect((players_[j])->body(), (players_[i])->body(),
 								marge_lecture_)) {
 				std::cout << PLAYER_COLLISION(i+1, j+1) << std::endl;
 				return false;
@@ -396,8 +397,8 @@ bool Simulation::detect_initial_ball_collisions() const {
 	size_t nb_balls = balls_.size();
 	for(size_t i(0); i < nb_balls; ++i){
 		for(size_t j(i+1); j < nb_balls; j++){
-			if(Tools::intersect(balls_[i].geometry(), 
-								balls_[j].geometry(), marge_lecture_)){
+			if(Tools::intersect(balls_[i]->geometry(), 
+								balls_[j]->geometry(), marge_lecture_)){
 				std::cout << BALL_COLLISION(i+1,j+1) << std::endl;
 				return false;								
 			}	
@@ -411,8 +412,8 @@ bool Simulation::detect_all_ball_player_collisions() const {
 	size_t nb_players = players_.size();
 	for(size_t i(0); i<nb_balls; ++i){
 		for(size_t j(0); j<nb_players; ++j){
-			if(Tools::intersect(players_[j].body(), 
-								balls_[i].geometry(), marge_lecture_)) {
+			if(Tools::intersect(players_[j]->body(), 
+								balls_[i]->geometry(), marge_lecture_)) {
 				std::cout << PLAYER_BALL_COLLISION(j+1,i+1) << std::endl;
 				return false;					
 			}
@@ -425,7 +426,8 @@ bool Simulation::detect_all_ball_obstacle_collisions() const {
 	size_t nb_balls = balls_.size();
 	for(auto const& obs_value : map_.obstacle_bodies()){ //iterate over obstacle pairs
 		for(size_t i(0); i<nb_balls; ++i){
-			if(Tools::intersect(obs_value.second,balls_[i].geometry(),marge_lecture_)){
+			if(Tools::intersect(obs_value.second,balls_[i]->geometry(),
+			   marge_lecture_)){
 				std::cout << COLL_BALL_OBSTACLE(i+1) << std::endl; 
 				return false;
 			}
@@ -477,8 +479,8 @@ bool Simulation::save(const std::string &o_file_path) const {
 	os_stream << "# number of players" << "\n\t" << players_.size() << "\n\n";
 	os_stream << "# position of players" << "\n\t";
 	for (auto const& player : players_) {
-		os_stream << player.body().center().x << "\t" << player.body().center().y;
-		os_stream << "\t" << player.lives() << "\t" << player.cooldown() << "\n\t";
+		os_stream << player->body().center().x << "\t" << player->body().center().y;
+		os_stream << "\t" << player->lives() << "\t" << player->cooldown() << "\n\t";
 	}
 	os_stream << "\n";
 	
@@ -496,8 +498,8 @@ bool Simulation::save(const std::string &o_file_path) const {
 	os_stream << "# nbBalls" << "\n\t" << balls_.size() << "\n\n";
 	os_stream << "# position of balls" << "\n\t";
 	for (auto const& ball : balls_) {
-		os_stream << ball.geometry().center().x << "\t" << ball.geometry().center().y;
-		os_stream << "\t" << ball.direction().angle() << "\n\t";	
+		os_stream << ball->geometry().center().x <<"\t"<< ball->geometry().center().y;
+		os_stream << "\t" << ball->direction().angle() << "\n\t";	
 	}
 	os_stream << "\n# file saved successfully";
 	
