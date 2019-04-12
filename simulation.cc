@@ -168,7 +168,7 @@ static std::vector<Simulation> active_sims;
 void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 									  execution_parameters, 
 									  std::vector<std::string> const& io_files)	{
-									 
+				 
 	if (active_sims.size() == 0)
 		active_sims.push_back(Simulation(execution_parameters, io_files));
 	else {
@@ -177,7 +177,6 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 			active_sims.erase(active_sims.begin());
 			// old sim is destroyed. new sim is moved to index 0
 	}								
-	
 	assert(active_sims.size()==1);
 
 }
@@ -236,8 +235,9 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 			exit(0);
 		success_ = true; 	// succcessful initialisation
 	}
-	
+
 	update_bodies();		// generate initial geometrical state
+
 }
 
 // ===== Public methods ===== 
@@ -423,7 +423,7 @@ void Simulation::update_bodies() {
 }
 
 void Simulation::update_player_bodies() {
-	
+
 	player_bodies_.clear();	// clear all bodies
 	
 	for (const auto& player : active_sims[0].players()) {	// reconstruct needed ones
@@ -446,8 +446,8 @@ void Simulation::update_obstacle_bodies() {
 	
 	obstacle_bodies_.clear();
 	
-	for(auto iter = obstacles().begin(); iter != obstacles().end(); ++iter) {
-		obstacle_bodies_.push_back(iter->second);
+	for(const auto& obs : obstacle_bodies_) {
+		obstacle_bodies_.push_back(obs);
 	}
 	
 }
