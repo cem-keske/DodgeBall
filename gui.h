@@ -6,16 +6,6 @@
 #include <memory>
 #include <gtkmm.h>
 
-/// DRAWABLE ///
-
-/**
- * Pure virtual class for drawable gui objects.
- */ 
-class Drawable {
-	protected:
-		virtual void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
-};
-
 /// CANVAS ///
 
 /**
@@ -35,7 +25,6 @@ class Canvas : public Gtk::DrawingArea
 		bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
   
 	private:
-		std::vector<std::unique_ptr<Drawable>> objects;
 		Coordinate center;
 		
 		Coordinate convert_coordinate(Coordinate const&);
@@ -82,26 +71,6 @@ class Gui_Window : public Gtk::Window
 		
 };
 
-
-// ===== Drawables ===== //
-
-class Gui_Player : public Drawable {
-	private:
-		std::shared_ptr<Player> player;
-		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
-};
-
-class Gui_Ball : public Drawable {
-	private:
-		std::shared_ptr<Ball> ball;
-		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
-};
-
-class Gui_Obstacle : public Drawable {
-	private:
-		std::shared_ptr<Rectangle> rectangle;
-		void draw(const Cairo::RefPtr<Cairo::Context>& cr);
-};
 
 
 #endif
