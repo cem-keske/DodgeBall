@@ -166,8 +166,10 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 std::vector<std::pair<Circle, Color>> Simulator::get_player_bodies() {
 	
 	// Player colors with respect to lives left.
-	static std::array<Color, MAX_TOUCH> player_colors = {Tools::RED, Tools:: ORANGE,
-														 Tools::YELLOW, Tools::GREEN};
+	static std::array<Color, MAX_TOUCH> player_colors= {Tools::color_red(), 
+														Tools::color_orange(),
+														Tools::color_yellow(), 
+														Tools::color_green()};
 	std::vector<std::pair<Circle, 	Color>> player_bodies;
 	
 	for (const auto& player : active_sims[0].players()) {
