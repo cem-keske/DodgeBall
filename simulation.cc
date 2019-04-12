@@ -23,6 +23,12 @@
 class Simulation {	
 	
 	private:
+	
+		// Player colors with respect to lives left.
+		static std::array<Color, MAX_TOUCH> player_colors= {Tools::color_red(), 
+															Tools::color_orange(),
+															Tools::color_yellow(), 
+															Tools::color_green()};
 		size_t nb_cells_;
 		Length player_radius_;
 		Length player_speed_;
@@ -30,6 +36,7 @@ class Simulation {
 		Length ball_speed_;
 		Length marge_jeu_;
 		Length marge_lecture_;
+		bool success_;
 		
 		std::unordered_map<std::string, bool> execution_parameters_;
 		
@@ -37,8 +44,14 @@ class Simulation {
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
 
-		bool success_;
-	
+		std::vector<std::pair<Circle, Color>> player_bodies_;
+		std::vector <Circle> ball_bodies_;
+		std::vector <Rectangle> obstacle_bodies_;
+
+
+
+
+		
 	public:
 		// ===== Constructor =====
 		
@@ -165,12 +178,6 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  */
 std::vector<std::pair<Circle, Color>> Simulator::get_player_bodies() {
 	
-	// Player colors with respect to lives left.
-	static std::array<Color, MAX_TOUCH> player_colors= {Tools::color_red(), 
-														Tools::color_orange(),
-														Tools::color_yellow(), 
-														Tools::color_green()};
-	std::vector<std::pair<Circle, 	Color>> player_bodies;
 	
 	for (const auto& player : active_sims[0].players()) {
 		player_bodies.push_back(std::make_pair(player.body(), 
@@ -180,8 +187,9 @@ std::vector<std::pair<Circle, Color>> Simulator::get_player_bodies() {
 	return player_bodies;
 }
 
-std::vector<Circle> get_ball_bodies() {
-	std::vector <Circle> ball_bodies;
+std::vector<Circle> Simulator::get_ball_bodies() {
+	
+	
 	for  (const auto& ball : active_sims[0].balls()) {
 		ball_bodies.push_back(ball.geometry());
 	}
@@ -189,6 +197,14 @@ std::vector<Circle> get_ball_bodies() {
 	return ball_bodies;
 }
 
+const std::vector<Rectangle>& Simulator::get_obstacle_bodies() {
+	
+	
+	for(const auto& obs : active_sims[0].obstacles()) {
+		obstacle_bodies.push_back(obs);
+	}
+	
+}
 
 
 /// ===== SIMULATION ===== ///

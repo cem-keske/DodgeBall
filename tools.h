@@ -233,7 +233,8 @@ namespace Tools {
 		Color color_red(); 		
 		Color color_orange(); 
 		Color color_yellow(); 
-		Color color_green();	
+		Color color_green();
+		Color color_blue();	
 	
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);
