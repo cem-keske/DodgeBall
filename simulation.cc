@@ -393,9 +393,25 @@ void print_error_state(ReaderState error_state) {
 /**
  * This vector will hold up to two simulation instances. During reading of a new 
  * simulation (with Open button) it will be pushed back in this vector. In case of
- * a successful reading, new simulation is move to active_sims[0]
+ * a successful reading, new simulation is moved to active_sims[0].
  */
-static std::vector<Simulation> active_sims(1);
+static std::vector<Simulation> active_sims;
+
+void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
+									  execution_parameters, 
+									  std::vector<std::string> const& io_files)	{
+									 
+	if active_sims.size() == 0
+		active_sims.push_back(Simulation(execution_parameters, io_files));
+									
+
+
+}
+
+
+
+
+
 
 /// ===== SIMULATION ===== ///
 
