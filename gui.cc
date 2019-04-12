@@ -60,8 +60,17 @@ void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha,
 	cr->fill();		   
 	cr->restore();
 }
-		void draw_square(Rectangle const& original, 
-					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true);
+void Canvas::draw_square(Rectangle const& original, 
+					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill) {
+	cr->save();
+	Coordinate converted(convert_coordinate(original.center()));
+	cr->set_line_width(thickness);
+	cr->set_source_rgb(default_arc_color);
+	cr->arc(converted.x, converted.y, original.radius(), -M_PI_2 , alpha-M_PI_2);
+	cr->stroke_preserve();
+	cr->fill();		   
+	cr->restore();				 
+}
 
 
 

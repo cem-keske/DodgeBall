@@ -48,6 +48,7 @@ struct Coordinate {
 	Length distance(Coordinate const&) const;	
 	std::string to_string() const;	//[x, y]
 	
+	
 	// ===== Member operator overloads =====
 	
 	Coordinate& operator+=(Coordinate const&);
