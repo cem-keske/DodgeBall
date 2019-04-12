@@ -73,7 +73,8 @@ class Simulation {
 		const std::vector<Circle>& get_ball_bodies() const;
 		const std::vector<Rectangle>& get_obstacle_bodies() const;
 		
-		
+		void update_bodies();
+
 		bool save(const std::string &o_file_path) const;
 		
 	private:
@@ -84,7 +85,6 @@ class Simulation {
 		bool detect_initial_player_collisions() const ;
 		bool detect_initial_ball_collisions() const ;
 
-		void update_bodies();
 		void update_player_bodies();
 		void update_ball_bodies();
 		void update_obstacle_bodies();
@@ -169,15 +169,19 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 									  execution_parameters, 
 									  std::vector<std::string> const& io_files)	{
 				 
-	if (active_sims.size() == 0)
+	if (active_sims.empty()) {
 		active_sims.push_back(Simulation(execution_parameters, io_files));
-	else {
+	} else {
 		active_sims.push_back(Simulation(execution_parameters, io_files));
 		if (active_sims.back().success())
 			active_sims.erase(active_sims.begin());
 			// old sim is destroyed. new sim is moved to index 0
 	}								
 	assert(active_sims.size()==1);
+	
+	if(execution_parameters["Error"]) return;	// All is done for Error mode.
+	
+	active_sims[0].update_bodies();		// generate initial geometrical state
 
 }
 
@@ -235,8 +239,6 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 			exit(0);
 		success_ = true; 	// succcessful initialisation
 	}
-
-	update_bodies();		// generate initial geometrical state
 
 }
 
@@ -425,11 +427,12 @@ void Simulation::update_bodies() {
 void Simulation::update_player_bodies() {
 
 	player_bodies_.clear();	// clear all bodies
-	
+
 	for (const auto& player : active_sims[0].players()) {	// reconstruct needed ones
 		player_bodies_.push_back(std::make_pair(player.body(), 
 											   player_colors[player.lives()]));
 	}
+	
 }
 
 void Simulation::update_ball_bodies() {
