@@ -10,6 +10,7 @@
 #include "player.h"
 #include "map.h"
 #include "ball.h"
+#include "tools.h"
 #include "assert.h"
 #include <iostream>
 #include <string>
@@ -247,6 +248,19 @@ const std::vector<Player>& Simulation::players() const {return players_;}
 const std::vector<Ball>& Simulation::balls() const {return balls_;}
 
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
+
+const std::vector<std::pair<Circle, Color>>& Simulation::get_player_bodies() const {
+	return player_bodies_;
+}
+
+const std::vector<Circle>& Simulation::get_ball_bodies() const {
+	return ball_bodies_;
+}
+
+const std::vector<Rectangle>& Simulation::get_obstacle_bodies() const {
+	return obstacle_bodies_;
+}
+
 
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
