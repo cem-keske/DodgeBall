@@ -44,7 +44,7 @@ class Canvas : public Gtk::DrawingArea
 
 /// GUI WINDOW ///
 /**
- * 
+ * Our big window for the gui.
  */ 
 class Gui_Window : public Gtk::Window
 {
