@@ -179,7 +179,7 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 	}								
 	assert(active_sims.size()==1);
 	
-	if(execution_parameters["Error"]) return;	// All is done for Error mode.
+	if(execution_parameters.at("Error")) return;	// All is done for Error mode.
 	
 	active_sims[0].update_bodies();		// generate initial geometrical state
 
