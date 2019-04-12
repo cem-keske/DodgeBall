@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 /// SIMULATION ///
 
@@ -32,8 +33,15 @@ class Simulation {
 		std::unordered_map<std::string, bool> execution_parameters_;
 
 		Map map_;
-		std::vector<Player> players_;
-		std::vector<Ball> balls_;
+		
+		/**
+		 * We have decided to use shared_ptr to make it possible for the gui to 
+		 * reach the bodies and be aware of their eventual dissappearence 
+		 * from the simulation.
+		 */
+
+		std::vector<std::shared_ptr<Player>> players_;
+		std::vector<std::shared_ptr<Ball>> balls_;
 		
 		bool success_;
 	
