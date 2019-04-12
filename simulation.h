@@ -31,7 +31,9 @@ class Simulator{
 		static void create_simulation(std::unordered_map<std::string, bool> const&
 									  exec_parameters, 
 									  std::vector<std::string> const& io_files);
-									  		
+		/**
+		 * Accessors to simulation's geometry 
+		 */							  		
 		static const std::vector<std::pair<Circle, Color>>& get_player_bodies(); 
 		static const std::vector<Circle>& get_ball_bodies();
 		static const std::vector<Rectangle>& get_obstacle_bodies();
