@@ -51,6 +51,8 @@ int main(int argc, char* argv[]) {
 	
 	if(execution_parameters["Error"] == false) open_gui();
 	
+	//simulation->save("out.txt");
+	
 }
 
 /// ===== FUNCTION DEFINITIONS ===== ///
