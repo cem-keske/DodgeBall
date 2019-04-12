@@ -21,7 +21,6 @@
 
 class Simulation {	
 	
-	
 	private:
 		size_t nb_cells_;
 		Length player_radius_;
@@ -34,15 +33,8 @@ class Simulation {
 		std::unordered_map<std::string, bool> execution_parameters_;
 
 		Map map_;
-		
-		/**
-		 * We have decided to use shared_ptr to make it possible for the gui to 
-		 * reach the bodies and be aware of their eventual dissappearence 
-		 * from the simulation.
-		 */
-
-		std::vector<std::shared_ptr<Player>> players_;
-		std::vector<std::shared_ptr<Ball>> balls_;
+		std::vector<Player> players_;
+		std::vector<Ball> balls_;
 		
 		bool success_;
 	
