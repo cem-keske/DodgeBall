@@ -28,6 +28,10 @@ class Canvas : public Gtk::DrawingArea
 		Coordinate center;
 		
 		Coordinate convert_coordinate(Coordinate const&);
+		void draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_arc(Coordinate original, Length thickness, Angle alpha
+					  const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_square();
 		void refresh();
 };
 
