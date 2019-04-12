@@ -23,12 +23,7 @@
 class Simulation {	
 	
 	private:
-	
-		// Player colors with respect to lives left.
-		static std::array<Color, MAX_TOUCH> player_colors= {Tools::color_red(), 
-															Tools::color_orange(),
-															Tools::color_yellow(), 
-															Tools::color_green()};
+		
 		size_t nb_cells_;
 		Length player_radius_;
 		Length player_speed_;
@@ -49,10 +44,8 @@ class Simulation {
 		std::vector <Rectangle> obstacle_bodies_;
 
 
-
-
-		
 	public:
+	
 		// ===== Constructor =====
 		
 		Simulation(std::unordered_map<std::string, bool> const&, 
@@ -75,6 +68,11 @@ class Simulation {
 		
 		bool test_collisions();
 		
+		const std::vector<std::pair<Circle, Color>>& get_player_bodies() const;
+		const std::vector<Circle>& get_ball_bodies() const;
+		const std::vector<Rectangle>& get_obstacle_bodies() const;
+		
+		
 		bool save(const std::string &o_file_path) const;
 		
 	private:
@@ -85,6 +83,10 @@ class Simulation {
 		bool detect_initial_player_collisions() const ;
 		bool detect_initial_ball_collisions() const ;
 
+		void update_bodies();
+		void update_player_bodies();
+		void update_ball_bodies();
+		void update_obstacle_bodies();
 };
 
 
@@ -148,6 +150,13 @@ class Reader {
 
 /// ===== SIMULATOR ===== ///
 
+// Predefined colors for players with respect to their lives left.
+static const std::array<Color, MAX_TOUCH> player_colors = {Tools::color_red(), 
+														   Tools::color_orange(),
+														   Tools::color_yellow(), 
+														   Tools::color_green()};
+
+
 /**
  * This vector will hold up to two simulation instances. During reading of a new 
  * simulation (with Open button) it will be pushed back in this vector. In case of
@@ -176,35 +185,22 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-std::vector<std::pair<Circle, Color>> Simulator::get_player_bodies() {
-	
-	
-	for (const auto& player : active_sims[0].players()) {
-		player_bodies.push_back(std::make_pair(player.body(), 
-											   player_colors[player.lives()]));
-	}
-	
-	return player_bodies;
+const std::vector<std::pair<Circle, Color>>& Simulator::get_player_bodies() {
+		
+	return active_sims[0].get_player_bodies();
 }
 
-std::vector<Circle> Simulator::get_ball_bodies() {
+const std::vector<Circle>& Simulator::get_ball_bodies() {
 	
-	
-	for  (const auto& ball : active_sims[0].balls()) {
-		ball_bodies.push_back(ball.geometry());
-	}
-	
-	return ball_bodies;
+	return active_sims[0].get_ball_bodies();
 }
 
 const std::vector<Rectangle>& Simulator::get_obstacle_bodies() {
 	
-	
-	for(const auto& obs : active_sims[0].obstacles()) {
-		obstacle_bodies.push_back(obs);
-	}
+	return active_sims[0].get_obstacle_bodies();
 	
 }
+
 
 
 /// ===== SIMULATION ===== ///
@@ -237,9 +233,10 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
 			exit(0);
-		success_ = true; 	//succcessful initialisation
+		success_ = true; 	// succcessful initialisation
 	}
 	
+	update_bodies();		// generate initial geometrical state
 }
 
 // ===== Public methods ===== 
@@ -399,6 +396,46 @@ bool Simulation::test_collisions() {
 		return false;
 		
 	return true;
+}
+
+
+/**
+ * Updates all body vectors 
+ */
+void Simulation::update_bodies() {
+	update_player_bodies();
+	update_ball_bodies();
+	update_obstacle_bodies();
+}
+
+void Simulation::update_player_bodies() {
+	
+	player_bodies_.clear();	// clear all bodies
+	
+	for (const auto& player : active_sims[0].players()) {	// reconstruct needed ones
+		player_bodies_.push_back(std::make_pair(player.body(), 
+											   player_colors[player.lives()]));
+	}
+}
+
+void Simulation::update_ball_bodies() {
+	
+	ball_bodies_.clear();
+	
+	for (const auto& ball : active_sims[0].balls()) {
+		ball_bodies_.push_back(ball.geometry());
+	}
+	
+}
+
+void Simulation::update_obstacle_bodies() {
+	
+	obstacle_bodies_.clear();
+	
+	for(auto iter = obstacles().begin(); iter != obstacles().end(); ++iter) {
+		obstacle_bodies_.push_back(iter->second);
+	}
+	
 }
 
 /**
