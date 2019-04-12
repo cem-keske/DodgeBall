@@ -13,7 +13,6 @@
 
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
-	
 }
 
 Canvas::~Canvas(){
