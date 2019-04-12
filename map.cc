@@ -46,7 +46,7 @@ const Rectangle& Map::obstacle_body(size_t line, size_t col) const {
 	assert(x >= 0 && y >= 0 && x <= max_index() && y <= max_index());
 	assert(is_obstacle(line, col));
 	
-	return *obstacles_.at(std::make_pair(line, col));
+	return obstacles_.at(std::make_pair(line, col));
 }
 
 const Rectangle_map& Map::obstacle_bodies() const {
@@ -84,9 +84,7 @@ void Map::create_obstacle(size_t line, size_t col) {
 	double bottom_left_x = -DIM_MAX + col*rectangle_side;
 	double bottom_left_y = DIM_MAX - (line+1)*rectangle_side;
 	Rectangle rect({bottom_left_x, bottom_left_y}, rectangle_side, rectangle_side);
-	obstacles_.emplace(std::make_pair(line, col), std::shared_ptr<Rectangle> 
-					  (new Rectangle({bottom_left_x, bottom_left_y}, 
-					   rectangle_side, rectangle_side)));
+	obstacles_.emplace(std::make_pair(line, col), rect);
 }
 
 void Map::destroy_obstacle(size_t line, size_t col) {

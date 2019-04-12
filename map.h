@@ -16,7 +16,7 @@
  * We have decided to use shared_ptr to make it possible for the gui to 
  * reach the bodies and be aware of their eventual dissappearence from the simulation.
  */
-typedef std::map<std::pair<size_t, size_t>, std::shared_ptr<Rectangle>> Rectangle_map;
+typedef std::map<std::pair<size_t, size_t>, Rectangle> Rectangle_map;
 
 /// ===== ENUM ===== ///
 /**
