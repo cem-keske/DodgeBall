@@ -10,11 +10,65 @@
 #include "player.h"
 #include "map.h"
 #include "ball.h"
+#include "assert.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <array>
 #include <fstream>
+
+
+/// SIMULATION ///
+
+class Simulation {	
+	
+	private:
+		size_t nb_cells_;
+		Length player_radius_;
+		Length player_speed_;
+		Length ball_radius_;
+		Length ball_speed_;
+		Length marge_jeu_;
+		Length marge_lecture_;
+		
+		std::unordered_map<std::string, bool> execution_parameters_;
+		
+		Map map_;
+		std::vector<Player> players_;
+		std::vector<Ball> balls_;
+
+		bool success_;
+	
+	public:
+		// ===== Constructor =====
+		
+		Simulation(std::unordered_map<std::string, bool> const&, 
+				   std::vector<std::string> const&);
+		
+		// ===== Public Methods =====
+		bool success() const;
+		void nb_cells(size_t);
+		bool initialise_player(double, double, Counter, Counter);
+		bool initialise_ball(double, double, Angle);
+		void initialise_dimensions(size_t);
+	
+		//signed input to test negative values. counter is for error report.
+		bool initialise_obstacle(int, int, Counter);	
+		
+		bool test_collisions();
+		
+		bool save(const std::string &o_file_path) const;
+		
+	private:
+				
+		bool test_center_position(double x,double y) const;
+		bool detect_all_ball_player_collisions() const;
+		bool detect_all_ball_obstacle_collisions() const;		
+		bool detect_initial_player_collisions() const ;
+		bool detect_initial_ball_collisions() const ;
+
+};
+
 
 /// READER ///
 /**
@@ -74,56 +128,239 @@ class Reader {
 };
 
 
-/// SIMULATION ///
 
-class Simulation {	
-	
-	private:
-		size_t nb_cells_;
-		Length player_radius_;
-		Length player_speed_;
-		Length ball_radius_;
-		Length ball_speed_;
-		Length marge_jeu_;
-		Length marge_lecture_;
-		
-		std::unordered_map<std::string, bool> execution_parameters_;
-		
-		Map map_;
-		std::vector<Player> players_;
-		std::vector<Ball> balls_;
+/// ===== SIMULATION ===== ///
 
-		bool success_;
-	
-	public:
-		// ===== Constructor =====
-		
-		Simulation(std::unordered_map<std::string, bool> const&, 
-				   std::vector<std::string> const&);
-		
-		// ===== Public Methods =====
-		bool success() const;
-		void nb_cells(size_t);
-		bool initialise_player(double, double, Counter, Counter);
-		bool initialise_ball(double, double, Angle);
-		void initialise_dimensions(size_t);
-	
-		//signed input to test negative values. counter is for error report.
-		bool initialise_obstacle(int, int, Counter);	
-		
-		bool test_collisions();
-		
-		bool save(const std::string &o_file_path) const;
-		
-	private:
-				
-		bool test_center_position(double x,double y) const;
-		bool detect_all_ball_player_collisions() const;
-		bool detect_all_ball_obstacle_collisions() const;		
-		bool detect_initial_player_collisions() const ;
-		bool detect_initial_ball_collisions() const ;
+// ===== Constructor ===== 
 
-};
+Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_parameters,
+					   std::vector<std::string>const& io_files) : execution_parameters_
+																 (execution_parameters)
+																 {
+		// set base types to debug values. They must be properly initialised during
+		// file import.															 
+		nb_cells_ = 0;
+		player_radius_ = -1.;
+		player_speed_ = -1;
+		ball_radius_ = -1.;
+		ball_speed_ = -1;
+		marge_jeu_ = -1.;
+		marge_lecture_ = -1.;
+		success_ = false;
+
+	if(execution_parameters_["Error"]) {	//
+		if(io_files.empty()) { 
+			#ifndef NDEBUG
+			std::cout << "No input file. Exiting...";
+			#endif
+			exit(0);
+		}
+
+		Reader reader(BEGIN);
+		if(reader.import_file(io_files[0], *this) == false)
+			exit(0);
+		success_ = true; 	//succcessful initialisation
+	}
+	
+}
+
+// ===== Public methods ===== 
+
+bool Simulation::initialise_obstacle(int x, int y, Counter counter){
+	if(x < 0 || (unsigned)x > map_.max_index()) {
+		std::cout << OBSTACLE_VALUE_INCORRECT(x) << std::endl;
+		return false;
+	}
+	
+	if(y < 0 || (unsigned)y > map_.max_index()) {
+		std::cout << OBSTACLE_VALUE_INCORRECT(y) << std::endl;
+		return false;
+	}
+	
+	if(map_.is_obstacle(x, y)) {
+		std::cout << MULTI_OBSTACLE(x, y) << std::endl;
+		return false;
+	}
+	map_.add_obstacle(x,y);
+	
+	size_t nb_players(players_.size());	
+	for(size_t i(0); i < nb_players; ++i) {
+		if(Tools::intersect(map_.obstacle_body(x,y), 
+		   players_[i].body(), marge_lecture_)) {
+			std::cout << COLL_OBST_PLAYER(counter, (i+1)) << std::endl;
+			return false;
+		} 
+	}
+	return true;
+}
+
+bool Simulation::initialise_ball (double x, double y, Angle alpha){
+	if(test_center_position(x,y) == false){ //angle can be positive and negative
+		std::cout << BALL_OUT(balls_.size() + 1) << std::endl;
+		return false;	
+	}
+	balls_.push_back(Ball(alpha, x, y, ball_radius_));
+	return true;
+}
+
+bool Simulation::initialise_player (double x, double y, Counter lives, 
+									Counter cooldown){
+
+	if(test_center_position(x,y) == false) {
+		std::cout << PLAYER_OUT(players_.size() + 1) << std::endl;
+		return false;
+	}
+	
+	players_.push_back(Player(x, y, player_radius_, lives, cooldown));
+	return true;
+}
+
+bool Simulation::test_center_position(double x,double y) const {
+	if (x < -DIM_MAX || y < -DIM_MAX || x > DIM_MAX || y > DIM_MAX) {
+		return false;
+	}
+	return true;
+}
+
+bool Simulation::success() const {
+	return success_;
+}
+
+void Simulation::nb_cells(size_t nb_cells){
+	nb_cells_ = nb_cells;
+}
+
+bool Simulation::detect_initial_player_collisions() const {
+	size_t nb_players = players_.size();
+	for(size_t i(0); i < nb_players; ++i) {
+		for(size_t j(i+1); j < nb_players; ++j) {
+			if(Tools::intersect((players_[j]).body(), (players_[i]).body(),
+								marge_lecture_)) {
+				std::cout << PLAYER_COLLISION(i+1, j+1) << std::endl;
+				return false;
+			}
+		}
+	}
+	return true;
+}
+ 
+bool Simulation::detect_initial_ball_collisions() const {
+	size_t nb_balls = balls_.size();
+	for(size_t i(0); i < nb_balls; ++i){
+		for(size_t j(i+1); j < nb_balls; j++){
+			if(Tools::intersect(balls_[i].geometry(), 
+								balls_[j].geometry(), marge_lecture_)){
+				std::cout << BALL_COLLISION(i+1,j+1) << std::endl;
+				return false;								
+			}	
+		}	
+	}
+	return true;
+}
+
+bool Simulation::detect_all_ball_player_collisions() const {
+	size_t nb_balls = balls_.size();
+	size_t nb_players = players_.size();
+	for(size_t i(0); i<nb_balls; ++i){
+		for(size_t j(0); j<nb_players; ++j){
+			if(Tools::intersect(players_[j].body(), 
+								balls_[i].geometry(), marge_lecture_)) {
+				std::cout << PLAYER_BALL_COLLISION(j+1,i+1) << std::endl;
+				return false;					
+			}
+		}
+	}
+	return true;
+}
+
+bool Simulation::detect_all_ball_obstacle_collisions() const {
+	size_t nb_balls = balls_.size();
+	for(auto const& obs_value : map_.obstacle_bodies()){ //iterate over obstacle pairs
+		for(size_t i(0); i<nb_balls; ++i){
+			if(Tools::intersect(obs_value.second,balls_[i].geometry(),marge_lecture_)){
+				std::cout << COLL_BALL_OBSTACLE(i+1) << std::endl; 
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+void Simulation::initialise_dimensions(size_t nb_cells) {
+	this->nb_cells(nb_cells);
+	
+	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
+	player_speed_ = COEF_VITESSE_JOUEUR * (SIDE/nb_cells);
+	
+	ball_radius_ = COEF_RAYON_BALLE * (SIDE/nb_cells);
+	ball_speed_ = COEF_VITESSE_BALLE * (SIDE/nb_cells);
+	
+	marge_jeu_= COEF_MARGE_JEU * (SIDE/nb_cells);
+	marge_lecture_= (COEF_MARGE_JEU/2) * (SIDE/nb_cells);
+	
+	map_.initialise_map(nb_cells_);
+
+}
+
+bool Simulation::test_collisions() {
+	if(detect_initial_player_collisions() == false)
+		return false;
+	if(detect_initial_ball_collisions() == false)
+		return false;
+	if(detect_all_ball_player_collisions() == false)
+		return false;
+	if(detect_all_ball_obstacle_collisions() == false)
+		return false;
+		
+	return true;
+}
+
+/**
+ * Saves the currrent state of the simulation to a given file path. Exporting will be
+ * done in a straightforward way so there is no need for another class as in Reader.
+ */
+bool Simulation::save(const std::string &o_file_path) const {
+	std::ofstream o_file(o_file_path);
+	if (!o_file) return false;
+	std::ostringstream os_stream;	//to reach the file only once at the end
+	
+	os_stream << "# nbCell" << "\n\t" << nb_cells_ << "\n\n";
+	
+	os_stream << "# number of players" << "\n\t" << players_.size() << "\n\n";
+	os_stream << "# position of players" << "\n\t";
+	for (auto const& player : players_) {
+		os_stream << player.body().center().x << "\t" << player.body().center().y;
+		os_stream << "\t" << player.lives() << "\t" << player.cooldown() << "\n\t";
+	}
+	os_stream << "\n";
+	
+	os_stream << "# nbObstacles" << "\n\t" << map_.nb_obstacles() << "\n\n";
+	os_stream << "# position of obstacles" << "\n";
+	for(size_t i(0); i < nb_cells_; ++i) {
+		for(size_t j(0); j < nb_cells_; ++j) {
+			if(map_.is_obstacle(i, j)) {
+				os_stream << "\t" << i << "\t" << j << "\n";
+			}
+		}
+	}
+	os_stream << "\n";
+	
+	os_stream << "# nbBalls" << "\n\t" << balls_.size() << "\n\n";
+	os_stream << "# position of balls" << "\n\t";
+	for (auto const& ball : balls_) {
+		os_stream << ball.geometry().center().x << "\t" << ball.geometry().center().y;
+		os_stream << "\t" << ball.direction().angle() << "\n\t";	
+	}
+	os_stream << "\n# file saved successfully";
+	
+	o_file << os_stream.str();
+	if(!o_file) return false;
+	
+	o_file.close();		
+	return true;
+}
+
+
 
 
 /// ===== READER ===== ///
@@ -401,245 +638,17 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 									  execution_parameters, 
 									  std::vector<std::string> const& io_files)	{
 									 
-	if active_sims.size() == 0
+	if (active_sims.size() == 0)
 		active_sims.push_back(Simulation(execution_parameters, io_files));
-									
-
+	else {
+		active_sims.push_back(Simulation(execution_parameters, io_files));
+		if (active_sims.back().success())
+			active_sims.erase(active_sims.begin());
+			// old sim is destroyed. new sim is moved to index 0
+	}								
+	
+	assert(active_sims.size()==1);
 
 }
 
 
-
-
-
-
-/// ===== SIMULATION ===== ///
-
-// ===== Constructor ===== 
-
-Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_parameters,
-					   std::vector<std::string>const& io_files) : execution_parameters_
-																 (execution_parameters)
-																 {
-		// set base types to debug values. They must be properly initialised during
-		// file import.															 
-		nb_cells_ = 0;
-		player_radius_ = -1.;
-		player_speed_ = -1;
-		ball_radius_ = -1.;
-		ball_speed_ = -1;
-		marge_jeu_ = -1.;
-		marge_lecture_ = -1.;
-		success_ = false;
-
-	if(execution_parameters_["Error"]) {	//
-		if(io_files.empty()) { 
-			#ifndef NDEBUG
-			std::cout << "No input file. Exiting...";
-			#endif
-			exit(0);
-		}
-
-		Reader reader(BEGIN);
-		if(reader.import_file(io_files[0], *this) == false)
-			exit(0);
-		success_ = true; 	//succcessful initialisation
-	}
-	
-}
-
-// ===== Public methods ===== 
-
-bool Simulation::initialise_obstacle(int x, int y, Counter counter){
-	if(x < 0 || (unsigned)x > map_.max_index()) {
-		std::cout << OBSTACLE_VALUE_INCORRECT(x) << std::endl;
-		return false;
-	}
-	
-	if(y < 0 || (unsigned)y > map_.max_index()) {
-		std::cout << OBSTACLE_VALUE_INCORRECT(y) << std::endl;
-		return false;
-	}
-	
-	if(map_.is_obstacle(x, y)) {
-		std::cout << MULTI_OBSTACLE(x, y) << std::endl;
-		return false;
-	}
-	map_.add_obstacle(x,y);
-	
-	size_t nb_players(players_.size());	
-	for(size_t i(0); i < nb_players; ++i) {
-		if(Tools::intersect(map_.obstacle_body(x,y), 
-		   players_[i].body(), marge_lecture_)) {
-			std::cout << COLL_OBST_PLAYER(counter, (i+1)) << std::endl;
-			return false;
-		} 
-	}
-	return true;
-}
-
-bool Simulation::initialise_ball (double x, double y, Angle alpha){
-	if(test_center_position(x,y) == false){ //angle can be positive and negative
-		std::cout << BALL_OUT(balls_.size() + 1) << std::endl;
-		return false;	
-	}
-	balls_.push_back(Ball(alpha, x, y, ball_radius_));
-	return true;
-}
-
-bool Simulation::initialise_player (double x, double y, Counter lives, 
-									Counter cooldown){
-
-	if(test_center_position(x,y) == false) {
-		std::cout << PLAYER_OUT(players_.size() + 1) << std::endl;
-		return false;
-	}
-	
-	players_.push_back(Player(x, y, player_radius_, lives, cooldown));
-	return true;
-}
-
-bool Simulation::test_center_position(double x,double y) const {
-	if (x < -DIM_MAX || y < -DIM_MAX || x > DIM_MAX || y > DIM_MAX) {
-		return false;
-	}
-	return true;
-}
-
-bool Simulation::success() const {
-	return success_;
-}
-
-void Simulation::nb_cells(size_t nb_cells){
-	nb_cells_ = nb_cells;
-}
-
-bool Simulation::detect_initial_player_collisions() const {
-	size_t nb_players = players_.size();
-	for(size_t i(0); i < nb_players; ++i) {
-		for(size_t j(i+1); j < nb_players; ++j) {
-			if(Tools::intersect((players_[j]).body(), (players_[i]).body(),
-								marge_lecture_)) {
-				std::cout << PLAYER_COLLISION(i+1, j+1) << std::endl;
-				return false;
-			}
-		}
-	}
-	return true;
-}
- 
-bool Simulation::detect_initial_ball_collisions() const {
-	size_t nb_balls = balls_.size();
-	for(size_t i(0); i < nb_balls; ++i){
-		for(size_t j(i+1); j < nb_balls; j++){
-			if(Tools::intersect(balls_[i].geometry(), 
-								balls_[j].geometry(), marge_lecture_)){
-				std::cout << BALL_COLLISION(i+1,j+1) << std::endl;
-				return false;								
-			}	
-		}	
-	}
-	return true;
-}
-
-bool Simulation::detect_all_ball_player_collisions() const {
-	size_t nb_balls = balls_.size();
-	size_t nb_players = players_.size();
-	for(size_t i(0); i<nb_balls; ++i){
-		for(size_t j(0); j<nb_players; ++j){
-			if(Tools::intersect(players_[j].body(), 
-								balls_[i].geometry(), marge_lecture_)) {
-				std::cout << PLAYER_BALL_COLLISION(j+1,i+1) << std::endl;
-				return false;					
-			}
-		}
-	}
-	return true;
-}
-
-bool Simulation::detect_all_ball_obstacle_collisions() const {
-	size_t nb_balls = balls_.size();
-	for(auto const& obs_value : map_.obstacle_bodies()){ //iterate over obstacle pairs
-		for(size_t i(0); i<nb_balls; ++i){
-			if(Tools::intersect(obs_value.second,balls_[i].geometry(),marge_lecture_)){
-				std::cout << COLL_BALL_OBSTACLE(i+1) << std::endl; 
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-void Simulation::initialise_dimensions(size_t nb_cells) {
-	this->nb_cells(nb_cells);
-	
-	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
-	player_speed_ = COEF_VITESSE_JOUEUR * (SIDE/nb_cells);
-	
-	ball_radius_ = COEF_RAYON_BALLE * (SIDE/nb_cells);
-	ball_speed_ = COEF_VITESSE_BALLE * (SIDE/nb_cells);
-	
-	marge_jeu_= COEF_MARGE_JEU * (SIDE/nb_cells);
-	marge_lecture_= (COEF_MARGE_JEU/2) * (SIDE/nb_cells);
-	
-	map_.initialise_map(nb_cells_);
-
-}
-
-bool Simulation::test_collisions() {
-	if(detect_initial_player_collisions() == false)
-		return false;
-	if(detect_initial_ball_collisions() == false)
-		return false;
-	if(detect_all_ball_player_collisions() == false)
-		return false;
-	if(detect_all_ball_obstacle_collisions() == false)
-		return false;
-		
-	return true;
-}
-
-/**
- * Saves the currrent state of the simulation to a given file path. Exporting will be
- * done in a straightforward way so there is no need for another class as in Reader.
- */
-bool Simulation::save(const std::string &o_file_path) const {
-	std::ofstream o_file(o_file_path);
-	if (!o_file) return false;
-	std::ostringstream os_stream;	//to reach the file only once at the end
-	
-	os_stream << "# nbCell" << "\n\t" << nb_cells_ << "\n\n";
-	
-	os_stream << "# number of players" << "\n\t" << players_.size() << "\n\n";
-	os_stream << "# position of players" << "\n\t";
-	for (auto const& player : players_) {
-		os_stream << player.body().center().x << "\t" << player.body().center().y;
-		os_stream << "\t" << player.lives() << "\t" << player.cooldown() << "\n\t";
-	}
-	os_stream << "\n";
-	
-	os_stream << "# nbObstacles" << "\n\t" << map_.nb_obstacles() << "\n\n";
-	os_stream << "# position of obstacles" << "\n";
-	for(size_t i(0); i < nb_cells_; ++i) {
-		for(size_t j(0); j < nb_cells_; ++j) {
-			if(map_.is_obstacle(i, j)) {
-				os_stream << "\t" << i << "\t" << j << "\n";
-			}
-		}
-	}
-	os_stream << "\n";
-	
-	os_stream << "# nbBalls" << "\n\t" << balls_.size() << "\n\n";
-	os_stream << "# position of balls" << "\n\t";
-	for (auto const& ball : balls_) {
-		os_stream << ball.geometry().center().x << "\t" << ball.geometry().center().y;
-		os_stream << "\t" << ball.direction().angle() << "\n\t";	
-	}
-	os_stream << "\n# file saved successfully";
-	
-	o_file << os_stream.str();
-	if(!o_file) return false;
-	
-	o_file.close();		
-	return true;
-}

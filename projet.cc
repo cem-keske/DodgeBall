@@ -27,8 +27,6 @@ static void read_cmd_args(int, char*[],
 						  std::vector<std::string>&, std::vector<std::string>&);
 static void init_execution_parameters(std::vector<std::string> const&, 
 									  std::unordered_map<std::string, bool>&);
-static void load_simulation(std::unordered_map<std::string, bool>&, 
-							std::vector<std::string>&, std::unique_ptr<Simulation>&);
 static int open_gui();
 
 /// ===== MAIN FUNCTION ===== ///
@@ -45,9 +43,7 @@ int main(int argc, char* argv[]) {
 	}	//cmd_parameters' lifetime expired, we don't need it anymore
 	
 	//Simulation simulation(execution_parameters, io_files);
-	
-	std::unique_ptr<Simulation> simulation(new Simulation(execution_parameters, 
-														  io_files));
+	Simulator::create_simulation(execution_parameters, io_files);
 	
 	if(execution_parameters["Error"] == false) open_gui();
 	
@@ -102,14 +98,6 @@ static void init_execution_parameters(std::vector<std::string> const &cmd_parame
 		else
 			exec_parameters.emplace(param,true);
 	}
-}
-
-static void load_simulation(std::unordered_map<std::string, bool>& exec_parameters, 
-							std::vector<std::string>& io_files, 
-							std::unique_ptr<Simulation>& sim) {
-								
-	std::unique_ptr<Simulation> loaded_sim(new Simulation(exec_parameters, io_files));
-	if(loaded_sim->success()) std::swap(sim, loaded_sim);								
 }
 
 static int open_gui() {
