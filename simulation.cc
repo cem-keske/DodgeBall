@@ -7,11 +7,82 @@
 #include "simulation.h"
 #include "error.h"
 #include "define.h"
+#include "player.h"
+#include "map.h"
+#include "ball.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <array>
 #include <fstream>
+
+/// DATA STRUCTURES ///
+
+static Map map_;
+static std::vector<Player> players_;
+static std::vector<Ball> balls_;
+
+
+
+
+/// READER ///
+/**
+ * This class will be useful when reading a data from files.
+ * It can be used to read specific datas and initialize the current simulation.
+ */
+
+enum ReaderState {
+	BEGIN,
+	READ_NB_CELLS,
+	READ_PLAYERS,
+	READ_OBSTACLES,
+	READ_BALLS,
+	SUCCESS
+};
+
+
+class Reader {
+	
+	private:
+		ReaderState reader_state_;
+		
+	public:
+		// ===== Constructor =====
+
+		Reader(ReaderState);
+
+		// ===== Accessors =====
+		
+		ReaderState reader_state() const;
+
+		// ===== Manipulators
+		
+		void reader_state(ReaderState);
+
+		// ===== Public Methods =====
+		
+		bool import_file(std::string const&, Simulation&);
+		bool read_file(std::ifstream&, Simulation&,bool = false);
+		
+	
+	private:
+		// ===== Private Static Functions =====
+		
+		/// Reads the next line in the file (provided by "istream") ignoring comments
+		static bool next_data_line(std::ifstream&, std::string&);
+		static bool read_nb_cells(std::ifstream&, Simulation&);
+		static bool read_players(std::ifstream&, Simulation&);
+		static bool read_obstacles(std::ifstream&, Simulation&);
+		static bool read_balls(std::ifstream&, Simulation&);
+		static void finalise_reading(ReaderState &actual_state);
+		static void print_error_state(ReaderState); /// for debugging
+
+		// ===== Private Methods =====
+	
+	
+};
+
+
 
 
 
@@ -471,7 +542,7 @@ bool Simulation::save(const std::string &o_file_path) const {
 	std::ofstream o_file(o_file_path);
 	if (!o_file) return false;
 	std::ostringstream os_stream;	//to reach the file only once at the end
-	os_stream.setf(std::ios::right);
+	
 	os_stream << "# nbCell" << "\n\t" << nb_cells_ << "\n\n";
 	
 	os_stream << "# number of players" << "\n\t" << players_.size() << "\n\n";
