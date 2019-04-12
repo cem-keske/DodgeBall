@@ -10,6 +10,8 @@
 #include <cmath>
 #include <cairomm/context.h>
 
+static constexpr Color default_arc_color(Tools::color_blue());
+
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false), has_to_refresh(true) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
 	
@@ -49,7 +51,14 @@ void Canvas::draw_disk(Circle const& original, Color const& color,
 }
 void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
 			   Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr){
-						  
+	cr->save();
+	Coordinate converted(convert_coordinate(original.center()));
+	cr->set_line_width(thickness);
+	cr->set_source_rgb(default_arc_color);
+	cr->arc(converted.x, converted.y, original.radius(), -M_PI_2 , alpha-M_PI_2);
+	cr->stroke_preserve();
+	cr->fill();		   
+	cr->restore();
 }
 		void draw_square(Rectangle const& original, 
 					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true);
