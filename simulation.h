@@ -32,9 +32,9 @@ class Simulator{
 									  exec_parameters, 
 									  std::vector<std::string> const& io_files);
 									  		
-		static std::vector<std::pair<Circle, Color>> get_player_bodies(); 
-		static std::vector<Circle> get_ball_bodies();
-		static std::vector<Rectangle> get_obstacle_bodies();
+		static const std::vector<std::pair<Circle, Color>>& get_player_bodies(); 
+		static const std::vector<Circle>& get_ball_bodies();
+		static const std::vector<Rectangle>& get_obstacle_bodies();
 };	
 
 #endif
