@@ -48,7 +48,7 @@ struct Coordinate {
 	Length distance(Coordinate const&) const;	
 	std::string to_string() const;	//[x, y]
 	Coordinate symmetric_x_axis() const;
-	Coordinate symmetric_x_axis() const;
+	Coordinate symmetric_y_axis() const;
 	
 	
 	// ===== Member operator overloads =====
@@ -182,6 +182,7 @@ class Rectangle {
 		Length height() const;
 		Length base() const;
 		const Coordinate& bottom_left() const;
+		const Coordinate& top_left() const;
 		double y_up() const;	//upper bound
 		double y_down() const;	//lower bound
 		double x_left() const;	//left bound

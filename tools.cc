@@ -191,7 +191,12 @@ Length Rectangle::height() const {return height_;}
 
 Length Rectangle::base() const {return base_;}
 
-const Coordinate& Rectangle::bottom_left() const {return bottom_left_;}				  
+const Coordinate& Rectangle::bottom_left() const {return bottom_left_;}	
+
+const Coordinate& Rectangle::top_left() const {
+	return Coordinate{0,height_} += bottom_left_;
+}						  
+					
 					
 double Rectangle::y_up() const {
 	return bottom_left_.y + height_;
@@ -263,7 +268,7 @@ Color color_yellow() {return {1, 0.91, 0};}
 
 Color color_green() {return {0, 0.94, 0};}
 
-Color color_blue() {return {0.19, 0.38, 0.92}}
+Color color_blue() {return {0.19, 0.38, 0.92};}
 
 bool Tools::intersect(const Rectangle& rect_one, const Rectangle& rect_two, 
 					  Length tolerance) {

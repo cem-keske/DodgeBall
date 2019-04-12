@@ -30,7 +30,7 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
-	draw_disk(Circle(100),{1,0.0,0.0},get_window()->create_cairo_context());
+	draw_disk(Circle(100),get_window()->create_cairo_context(),{1,0.0,0.0});
 
 	return true;
 }
@@ -39,7 +39,7 @@ Coordinate Canvas::convert_coordinate(Coordinate const& pos){
 }
 
 void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr, 
-					   Color const& color = default_disk_color){
+					   Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.center()));
 	cr->set_source_rgb(color.r,color.g,color.b);
@@ -49,13 +49,13 @@ void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context
 	cr->restore();
 }
 void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
-			   Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr,
+			   Length radius, const Cairo::RefPtr<Cairo::Context>& cr,
 			   Color const& color){
 	cr->save();
-	Coordinate converted(convert_coordinate(original.center()));
+	Coordinate converted(convert_coordinate(original));
 	cr->set_line_width(thickness);
 	cr->set_source_rgb(color.r, color.g, color.b);
-	cr->arc(converted.x, converted.y, original.radius(), -M_PI_2 , alpha-M_PI_2);
+	cr->arc(converted.x, converted.y, radius, -M_PI_2 , alpha-M_PI_2);
 	cr->stroke_preserve();
 	cr->fill();		   
 	cr->restore();
@@ -64,7 +64,7 @@ void Canvas::draw_square(Rectangle const& original,
 					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill,
 					     Color const& color){
 	cr->save();
-	Coordinate converted(convert_coordinate(original.center()));
+	Coordinate converted(convert_coordinate(original.top_left()));
 	cr->set_source_rgb(color.r, color.g, color.b);
 	cr->rectangle(converted.x, converted.y, original.base(), original.height());
 	cr->stroke_preserve();
