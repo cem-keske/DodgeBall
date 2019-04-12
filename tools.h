@@ -30,6 +30,7 @@ struct Color {
 	double g;
 	double b;
 };
+
 /// COORDINATE ///
 
 struct Coordinate {
@@ -227,6 +228,12 @@ class Circle {
 /// ===== NAMESPACES FOR UTILITY FUNCTIONS ===== ///
 
 namespace Tools {	
+			
+		// some color constants	
+		Color color_red(); 		
+		Color color_orange(); 
+		Color color_yellow(); 
+		Color color_green();	
 	
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);

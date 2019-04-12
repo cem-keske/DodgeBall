@@ -163,10 +163,16 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-std::vector<std::pair<Circle, Counter>> get_player_bodies() {
-	std::vector<std::pair<Circle, Counter>> player_bodies;
-	for  (const auto& player : active_sims[0].players()) {
-		player_bodies.push_back(std::make_pair(player.body(), player.lives()));
+std::vector<std::pair<Circle, Color>> Simulator::get_player_bodies() {
+	
+	// Player colors with respect to lives left.
+	static std::array<Color, MAX_TOUCH> player_colors = {Tools::RED, Tools:: ORANGE,
+														 Tools::YELLOW, Tools::GREEN};
+	std::vector<std::pair<Circle, 	Color>> player_bodies;
+	
+	for (const auto& player : active_sims[0].players()) {
+		player_bodies.push_back(std::make_pair(player.body(), 
+											   player_colors[player.lives()]));
 	}
 	
 	return player_bodies;

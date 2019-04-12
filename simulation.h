@@ -32,7 +32,7 @@ class Simulator{
 									  exec_parameters, 
 									  std::vector<std::string> const& io_files);
 									  		
-		static std::vector<std::pair<Circle, Counter>> get_player_bodies(); 
+		static std::vector<std::pair<Circle, Color>> get_player_bodies(); 
 	
 };	
 
