@@ -16,15 +16,6 @@
 #include <array>
 #include <fstream>
 
-/// DATA STRUCTURES ///
-
-static Map map_;
-static std::vector<Player> players_;
-static std::vector<Ball> balls_;
-
-
-
-
 /// READER ///
 /**
  * This class will be useful when reading a data from files.
@@ -83,7 +74,56 @@ class Reader {
 };
 
 
+/// SIMULATION ///
 
+class Simulation {	
+	
+	private:
+		size_t nb_cells_;
+		Length player_radius_;
+		Length player_speed_;
+		Length ball_radius_;
+		Length ball_speed_;
+		Length marge_jeu_;
+		Length marge_lecture_;
+		
+		std::unordered_map<std::string, bool> execution_parameters_;
+		
+		Map map_;
+		std::vector<Player> players_;
+		std::vector<Ball> balls_;
+
+		bool success_;
+	
+	public:
+		// ===== Constructor =====
+		
+		Simulation(std::unordered_map<std::string, bool> const&, 
+				   std::vector<std::string> const&);
+		
+		// ===== Public Methods =====
+		bool success() const;
+		void nb_cells(size_t);
+		bool initialise_player(double, double, Counter, Counter);
+		bool initialise_ball(double, double, Angle);
+		void initialise_dimensions(size_t);
+	
+		//signed input to test negative values. counter is for error report.
+		bool initialise_obstacle(int, int, Counter);	
+		
+		bool test_collisions();
+		
+		bool save(const std::string &o_file_path) const;
+		
+	private:
+				
+		bool test_center_position(double x,double y) const;
+		bool detect_all_ball_player_collisions() const;
+		bool detect_all_ball_obstacle_collisions() const;		
+		bool detect_initial_player_collisions() const ;
+		bool detect_initial_ball_collisions() const ;
+
+};
 
 
 /// ===== READER ===== ///
@@ -347,6 +387,15 @@ void print_error_state(ReaderState error_state) {
 	}
 }
 
+
+/// ===== SIMULATOR ===== ///
+
+/**
+ * This vector will hold up to two simulation instances. During reading of a new 
+ * simulation (with Open button) it will be pushed back in this vector. In case of
+ * a successful reading, new simulation is move to active_sims[0]
+ */
+static std::vector<Simulation> active_sims(1);
 
 /// ===== SIMULATION ===== ///
 

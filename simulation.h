@@ -14,57 +14,20 @@
 #include <unordered_map>
 #include <memory>
 
-/// SIMULATION ///
 
-class Simulation {	
-	
-	private:
-		size_t nb_cells_;
-		Length player_radius_;
-		Length player_speed_;
-		Length ball_radius_;
-		Length ball_speed_;
-		Length marge_jeu_;
-		Length marge_lecture_;
-		
-		std::unordered_map<std::string, bool> execution_parameters_;
-		
-		bool success_;
+/**
+ * This is a helper class to make it possible to move the declaration of Simulation 
+ * to .cc file. This way we do not need to include (and thus export) the inner modules.
+ * Using this class, we ensure encapsulation during communication with gui and projet.
+ */
+class Simulator{
 	
 	public:
-		// ===== Constructor =====
+		static void create_simulation(std::unordered_map<std::string, bool> const&
+									  exec_parameters, 
+									  std::vector<std::string> const& io_files);		
 		
-		Simulation(std::unordered_map<std::string, bool> const&, 
-				   std::vector<std::string> const&);
-		
-		// ===== Public Methods =====
-		bool success() const;
-		void nb_cells(size_t);
-		bool initialise_player(double, double, Counter, Counter);
-		bool initialise_ball(double, double, Angle);
-		void initialise_dimensions(size_t);
 	
-		//signed input to test negative values. counter is for error report.
-		bool initialise_obstacle(int, int, Counter);	
-		
-		bool test_collisions();
-		
-		bool save(const std::string &o_file_path) const;
-		
-	private:
-		
-		//bool detect_collision(Player const&, Player const&);
-		//bool detect_collision(Player const&, Ball const&);
-		//bool detect_collision(Ball const&, Ball const&);
-		//bool detect_collision(Player const&, Map const&);
-		
-		bool test_center_position(double x,double y) const;
-		bool detect_all_ball_player_collisions() const;
-		bool detect_all_ball_obstacle_collisions() const;		
-		bool detect_initial_player_collisions() const ;
-		bool detect_initial_ball_collisions() const ;
-
-};
-	
+};	
 
 #endif
