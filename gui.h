@@ -62,4 +62,8 @@ class Gui_Window : public Gtk::Window
 		
 };
 
+class Drawable {
+	void draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
+};
+
 #endif
