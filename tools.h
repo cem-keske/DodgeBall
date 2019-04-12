@@ -21,6 +21,15 @@ typedef unsigned int Counter; //any type that counts something...
 
 /// ===== STRUCTS ===== ///
 
+/// COLOR ///
+/**
+ * Using convention [0,1]
+ */
+struct Color {
+	double r;
+	double g;
+	double b;
+};
 /// COORDINATE ///
 
 struct Coordinate {

@@ -26,12 +26,18 @@ class Canvas : public Gtk::DrawingArea
   
 	private:
 		Coordinate center;
-		
 		Coordinate convert_coordinate(Coordinate const&);
-		void draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr);
-		void draw_arc(Coordinate original, Length thickness, Angle alpha
-					  const Cairo::RefPtr<Cairo::Context>& cr);
-		void draw_square();
+		
+		/**
+		 * All the arguments given to the functions below must be the original shapes
+		 * in the simulation. (these functions also converts coordinates)
+		 */ 
+		void draw_disk(Circle const& original, Color const& color,
+					   const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
+					  Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_square(Rectangle const& original, 
+					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true);
 		void refresh();
 };
 
