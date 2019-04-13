@@ -52,7 +52,7 @@ class Simulation {
 		
 		Simulation(std::unordered_map<std::string, bool> const&, 
 				   std::vector<std::string> const&);
-	    ~Simulation();
+
 		// ===== Public Methods =====
 		
 		bool success() const;
@@ -257,10 +257,6 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 	update_graphics();
 	
 	success_ = true;
-}
-
-Simulation::~Simulation(){
-	std::cout << "Inside simulation destructor." << std::endl;
 }
 
 // ===== Public methods ===== 
@@ -784,6 +780,7 @@ bool Reader::read_balls(std::ifstream& in_file, Simulation& simulation){
 	}
 	
 	return true;
+	
 }
 
 
