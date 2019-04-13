@@ -1,5 +1,5 @@
 /**
- * file: map.h
+ * file: gui.h
  * 
  * authors:	Cem Keske
  * 			Emre Yazici
@@ -12,6 +12,7 @@
 
 static constexpr int default_border_thickness(5);
 static constexpr double circle_arc_ratio(0.35);
+
 
 // ===== Utility Functions =====
 
@@ -26,15 +27,8 @@ const Color& predefined_color_chooser(Predefined_Color color){
 }
 
 
-Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
+Canvas::Canvas() : center(DIM_MAX,DIM_MAX) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
-}
-
-Canvas::~Canvas(){
-}
-
-void Canvas::draw(){
-	
 }
 
 void Canvas::refresh()
@@ -46,7 +40,7 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
-	std::cout << "on_draw" << std::endl;
+	std::cout << "on_draw for Canvas" << std::endl;
 	draw_background(cr);
 	if(Simulator::empty() == false){
 		draw_all_player_graphics(cr);
@@ -135,21 +129,18 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 		draw_arc(circ.center(), circle_arc_ratio * circ.radius(), circ.radius(), 
 				 arc_angle,cr);
 	}
-	std::cout << "All players drawn. " << std::endl;
 }
 
 void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& rectangle : Simulator::fetch_obstacle_bodies()){
 		draw_rectangle(rectangle, cr);
 	}
-		std::cout << "All rectangles drawn. " << std::endl;
 }
 
 void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& circle : Simulator::fetch_ball_bodies()){
 		draw_disk(circle, cr);
 	}	
-	std::cout << "All balls drawn. " << std::endl;
 }
 
 
@@ -180,17 +171,10 @@ Gui_Window::Gui_Window() :
 	show_all_children();
 }
 
-Gui_Window::~Gui_Window()
-{
-}
 
 void Gui_Window::refresh(){
+	label_message.set_text(Simulator::active_simulation_state());
 	on_draw(get_window()->create_cairo_context());
-}
-bool Gui_Window::on_draw(const Cairo::RefPtr<Cairo::Context>& cr){
-	Gtk::Window::on_draw(cr);
-	
-	return true;
 }
 
 void Gui_Window::connect_buttons_to_handlers(){
@@ -242,17 +226,20 @@ void Gui_Window::on_button_clicked_open(){
 
 void Gui_Window::on_button_clicked_save(){
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
-										Gtk::FILE_CHOOSER_ACTION_OPEN); 
+										Gtk::FILE_CHOOSER_ACTION_SAVE); 
+	//Put the dialog on our window
 	file_dialog.set_transient_for(*this);
-		
-	file_dialog.add_button("Open", Gtk::RESPONSE_OK);
+	
+	//Add dialog buttons
+	file_dialog.add_button("Save", Gtk::RESPONSE_OK);
 	file_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
 	
 	int response = file_dialog.run();
 	
 	if(response == Gtk::RESPONSE_OK){
-		//Simulator::output_file(file_dialog.get_filename());
+		Simulator::save_simulation(file_dialog.get_filename());
 	}
+	refresh();
 	std::cout << button_save.get_label() << std::endl;
 }
 
@@ -267,6 +254,7 @@ void Gui_Window::on_button_clicked_start_stop(){
 }
 
 void Gui_Window::on_button_clicked_step(){
+	refresh();
 	std::cout << button_step.get_label() << std::endl;
 }
 
