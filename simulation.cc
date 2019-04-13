@@ -226,16 +226,22 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 			#endif
 			exit(0);
 		}
+
+		Reader reader(BEGIN);
+		if(reader.import_file(io_files[0], *this) == false)
+			exit(0);
 	}
 	
 	// if there are files to import to simulation
 	if (io_files.size() > 0) {
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
+			success_ = true;
+		else
+			success_ = false;
 	}
 
 	update_graphics();
-	success_ = true; 	// succcessful initialisation
 }
 
 // ===== Public methods ===== 
