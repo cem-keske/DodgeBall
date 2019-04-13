@@ -119,8 +119,18 @@ void Canvas::draw_rectangle(Rectangle const& original,
 	cr->restore();				 
 }
 
-void Canvas::draw_all_player_bodies() {
-	const vec_player_graphics&()
+void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
+	const vec_player_graphics& circles_and_arcs(Simulation::get_player_graphics());
+	
+	for (auto const& circled_arc : circles_and_arcs) {
+		//get the circle from the tuple and draw its disk
+		draw_disk(*(std::get<0>(circled_arc)), cr, 
+				  predefined_color_chooser((std::get<2>(circled_arc)));//get the color
+		
+		//get the arc angle from the tuple and draw the arc
+		draw_arc();
+	}
+	
 }
 
 
