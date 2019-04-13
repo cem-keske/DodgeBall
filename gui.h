@@ -29,7 +29,9 @@ class Canvas : public Gtk::DrawingArea
 		Coordinate convert_coordinate(Coordinate const&);
 		bool sim_running;
 		void refresh();
-		void draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
+		void draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
 		/**
 		 * All the arguments given to the functions below must be the original shapes
 		 * in the simulation. (these functions also converts coordinates).
