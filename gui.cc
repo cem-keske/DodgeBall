@@ -46,9 +46,10 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
 	std::cout << "on_draw" << std::endl;
 	draw_background(cr);
+	draw_all_player_graphics(cr);
+	draw_all_rectangle_bodies(cr);
+	draw_all_ball_graphics(cr);
 	draw_border(cr, default_border_thickness);	
-	draw_all_player_bodies(cr);
-	
 	/*Length radius(30);
 	draw_disk(Circle(radius),cr, Tools::COLOR_RED);
 	draw_disk(Circle({70,0},radius),cr, Tools::COLOR_GREEN);
@@ -128,14 +129,12 @@ void Canvas::draw_rectangle(Rectangle const& original,
 	cr->restore();				 
 }
 
-void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
-
-	vec_player_graphics* disks_and_arcs(Simulator::get_player_graphics());
-
-	for (auto const& circled_arc : *disks_and_arcs) {
+void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
+	
+	for (auto const& circled_arc : *Simulator::fetch_player_graphics()) {
 		//get the circle, color and angle from the tuple
-		Circle const & circ(*(std::get<0>(circled_arc)));
-		Color const& color(predefined_color_chooser((std::get<2>(circled_arc))));
+		Circle const& circ(*(std::get<0>(circled_arc)));
+		Color const& color(predefined_color_chooser(std::get<2>(circled_arc)));
 		Angle arc_angle(std::get<1>(circled_arc));
 		
 		draw_disk(circ, cr, color);
@@ -144,6 +143,20 @@ void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
 				 arc_angle,cr);
 	}
 }
+
+void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
+	for (auto const& rectangle : *Simulator::fetch_obstacle_bodies()){
+		draw_rectangle(*rectangle, cr);
+	}
+}
+
+void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
+	for (auto const& circle : *Simulator::fetch_ball_bodies()){
+		draw_disk(*circle, cr);
+	}	
+}
+
+
 
 //--------------------------------------
 
