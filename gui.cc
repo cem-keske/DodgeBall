@@ -11,6 +11,7 @@
 #include <cairomm/context.h>
 
 static constexpr int default_border_thickness(5);
+static constexpr double circle_arc_ratio(0.35);
 
 // ===== Utility Functions =====
 
@@ -44,10 +45,11 @@ void Canvas::refresh()
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
 	std::cout << "on_draw" << std::endl;
-	draw_all_player_bodies(cr);
 	draw_background(cr);
-	draw_border(cr, default_border_thickness);
-	Length radius(30);
+	draw_border(cr, default_border_thickness);	
+	draw_all_player_bodies(cr);
+	
+	/*Length radius(30);
 	draw_disk(Circle(radius),cr, Tools::COLOR_RED);
 	draw_disk(Circle({70,0},radius),cr, Tools::COLOR_GREEN);
 	draw_disk(Circle({140,0},radius),cr, Tools::COLOR_YELLOW);
@@ -58,7 +60,7 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	draw_arc({70,0},radius/4,radius,0.93*M_PI,cr);
 	draw_arc({140,0},radius/4,radius,1.4*M_PI,cr);
 	draw_arc({210,0},radius/4,radius,1.90*M_PI,cr);
-	std::cout << "on_draw finished" << std::endl;
+	*/
 
 	return true;
 }
@@ -100,12 +102,14 @@ void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context
 void Canvas::draw_arc(Coordinate const& original,Length thickness,Length outer_radius, 
 					  Angle alpha, const Cairo::RefPtr<Cairo::Context>& cr,
 					  Color const& color){
+	static double starting_angle(M_PI_2*3);
+	
 	cr->save();
 	Coordinate converted(convert_coordinate(original));
 	cr->set_line_width(thickness);
 	cr->set_source_rgb(color.r, color.g, color.b);
 	cr->arc(converted.x, converted.y,
-			(outer_radius-thickness/2.0)+1, 3*M_PI_2 , alpha + 3*M_PI_2);
+			(outer_radius-thickness/2.0)+1, starting_angle , starting_angle + alpha);
 	cr->stroke();	   
 	cr->restore();
 }
@@ -125,24 +129,21 @@ void Canvas::draw_rectangle(Rectangle const& original,
 }
 
 void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
-	const vec_player_graphics& disks_and_arcs(Simulator::get_player_graphics());
-	std::cout << "D_and_a size: " << disks_and_arcs.size() << std:: endl;
-	for (auto const& circled_arc : disks_and_arcs) {
-		std::cout << "girdi" << std::endl;
-		//get the circle from the tuple and draw its disk
-		draw_disk(*(std::get<0>(circled_arc)), cr, 
-				  predefined_color_chooser((std::get<2>(circled_arc))));
-		std::cout << std::get<0>(circled_arc)->center().to_string() << std::endl;
-		std::cout << "çıktı" << std::endl;
-		//get the color
+
+	vec_player_graphics* disks_and_arcs(Simulator::get_player_graphics());
+
+	for (auto const& circled_arc : *disks_and_arcs) {
+		//get the circle, color and angle from the tuple
+		Circle const & circ(*(std::get<0>(circled_arc)));
+		Color const& color(predefined_color_chooser((std::get<2>(circled_arc))));
+		Angle arc_angle(std::get<1>(circled_arc));
 		
-		//get the arc angle from the tuple and draw the arc
+		draw_disk(circ, cr, color);
+
+		draw_arc(circ.center(), circle_arc_ratio * circ.radius(), circ.radius(), 
+				 arc_angle,cr);
 	}
-	std::cout << "all player bodies finished" << std:: endl;
 }
-
-
-
 
 //--------------------------------------
 

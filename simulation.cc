@@ -70,7 +70,7 @@ class Simulation {
 		
 		bool test_collisions();
 		
-		vec_player_graphics get_player_graphics() const;
+		vec_player_graphics* get_player_graphics() const;
 		vec_ball_bodies get_ball_bodies() const;
 		vec_obstacle_bodies get_obstacle_bodies() const;
 		std::vector<Arc> get_player_arcs() const;
@@ -173,7 +173,7 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-vec_player_graphics Simulator::get_player_graphics() {
+vec_player_graphics* Simulator::get_player_graphics() {
 		
 	return active_sims[0].get_player_graphics();
 }
@@ -237,13 +237,13 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
 
-vec_player_graphics Simulation::get_player_graphics() const {
+vec_player_graphics* Simulation::get_player_graphics() const {
 	
 	size_t nb_players(players().size());
 	
 	// Create and allocate the vector to be returned
-	vec_player_graphics player_graphics;
-	player_graphics.reserve(nb_players);
+	vec_player_graphics* player_graphics(new vec_player_graphics);
+	player_graphics->reserve(nb_players);
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
 						// of a player
@@ -254,8 +254,8 @@ vec_player_graphics Simulation::get_player_graphics() const {
 		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 		
 		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
-		auto player_color = static_cast<Predefined_Color>(players_[i].lives());
-		player_graphics.emplace_back(ptr_to_body, arc_angle, player_color);		
+		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
+		player_graphics->emplace_back(ptr_to_body, arc_angle, player_color);		
 		
 	}
 	return player_graphics;
