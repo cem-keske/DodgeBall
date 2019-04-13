@@ -160,16 +160,16 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 				 
 	if (active_sims.empty()) {
 		active_sims.push_back(Simulation(execution_parameters, io_files));
+		std::cout << "Sim[0] created." << std::endl;
 	} else {
 		active_sims.push_back(Simulation(execution_parameters, io_files));
 		if (active_sims.back().success())
 			active_sims.erase(active_sims.begin());
+			std::cout << "Other sim" << std::endl;
 			// old sim is destroyed. new sim is moved to index 0
 	}								
 	assert(active_sims.size()==1);
-	
-	if(execution_parameters.at("Error")) return;	// All is done for Error mode.
-	
+	std::cout << active_sims[0].success() << std::endl;
 }
 
 /**
@@ -260,8 +260,6 @@ vec_player_graphics Simulation::get_player_graphics() const {
 		player_graphics.emplace_back(ptr_to_body, arc_angle, player_color);		
 		
 	}
-	std::cout << "Players size: " << players_.size() << std::endl;
-	std::cout << "Player graphics size: " << player_graphics.size() << std::endl;
 	return player_graphics;
 }
 
