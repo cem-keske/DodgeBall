@@ -71,9 +71,9 @@ class Simulation {
 		bool test_collisions();
 		
 		vec_player_graphics get_player_graphics() const;
-		const vec_ball_bodies& get_ball_bodies() const;
-		const vec_obstacle_bodies& get_obstacle_bodies() const;
-		const std::vector<Arc>& get_player_arcs() const;
+		vec_ball_bodies get_ball_bodies() const;
+		vec_obstacle_bodies get_obstacle_bodies() const;
+		std::vector<Arc> get_player_arcs() const;
 		
 		bool save(const std::string &o_file_path) const;
 		
@@ -181,12 +181,12 @@ vec_player_graphics Simulator::get_player_graphics() {
 	return active_sims[0].get_player_graphics();
 }
 
-const vec_ball_bodies& Simulator::get_ball_bodies() {
-	
+vec_ball_bodies Simulator::get_ball_bodies() {
+
 	return active_sims[0].get_ball_bodies();
 }
 
-const vec_obstacle_bodies& Simulator::get_obstacle_bodies() {
+vec_obstacle_bodies Simulator::get_obstacle_bodies() {
 	
 	return active_sims[0].get_obstacle_bodies();
 	
@@ -260,11 +260,11 @@ vec_player_graphics Simulation::get_player_graphics() const {
 		player_graphics.emplace_back(ptr_to_body, arc_angle, player_color);		
 		
 	}
-	
+	std::cout << "Player graphics size: " << player_graphics.size() << std::endl;
 	return player_graphics;
 }
 
-const vec_ball_bodies& Simulation::get_ball_bodies() const {
+vec_ball_bodies Simulation::get_ball_bodies() const {
 
 	size_t nb_balls(balls().size());
 	
@@ -277,10 +277,10 @@ const vec_ball_bodies& Simulation::get_ball_bodies() const {
 		ball_bodies.emplace_back(ptr_to_body);	
 	}
 	
-	return std::move(ball_bodies);
+	return ball_bodies;
 }
 
-const vec_obstacle_bodies& Simulation::get_obstacle_bodies() const {
+vec_obstacle_bodies Simulation::get_obstacle_bodies() const {
 
 	size_t nb_obstacles(obstacles().size());
 	
@@ -292,7 +292,7 @@ const vec_obstacle_bodies& Simulation::get_obstacle_bodies() const {
 		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
 		obstacle_bodies.emplace_back(ptr_to_body);		
 	}
-	return std::move(obstacle_bodies);
+	return obstacle_bodies;
 }
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
