@@ -41,9 +41,9 @@ class Simulation {
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
 
-		std::vector<std::pair<Circle, Color>> player_bodies_;
-		std::vector <Circle> ball_bodies_;
-		std::vector <Rectangle> obstacle_bodies_;
+		std::unique_ptr<vec_player_graphics> player_graphics_;		
+		std::unique_ptr<vec_ball_bodies> ball_bodies_;		
+		std::unique_ptr<vec_obstacle_bodies> obstacle_bodies_;		
 
 
 	public:
@@ -70,11 +70,10 @@ class Simulation {
 		
 		bool test_collisions();
 		
-		vec_player_graphics* get_player_graphics() const;
-		vec_ball_bodies get_ball_bodies() const;
-		vec_obstacle_bodies get_obstacle_bodies() const;
-		std::vector<Arc> get_player_arcs() const;
-		
+		const std::unique_ptr<vec_player_graphics>& player_graphics() const;
+		const std::unique_ptr<vec_ball_bodies>& ball_bodies() const;
+		const std::unique_ptr<vec_obstacle_bodies>& obstacle_bodies() const;
+				
 		bool save(const std::string &o_file_path) const;
 		
 	private:
@@ -84,6 +83,9 @@ class Simulation {
 		bool detect_all_ball_obstacle_collisions() const;		
 		bool detect_initial_player_collisions() const ;
 		bool detect_initial_ball_collisions() const ;
+		
+		void update_player_graphics();
+
 };
 
 
@@ -173,19 +175,19 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-vec_player_graphics* Simulator::get_player_graphics() {
+const std::unique_ptr<vec_player_graphics>& Simulator::fetch_player_graphics() {
 		
-	return active_sims[0].get_player_graphics();
+	return active_sims[0].player_graphics();
 }
 
-vec_ball_bodies Simulator::get_ball_bodies() {
+const std::unique_ptr<vec_ball_bodies>& Simulator::fetch_ball_bodies() {
 
-	return active_sims[0].get_ball_bodies();
+	return active_sims[0].ball_bodies();
 }
 
-vec_obstacle_bodies Simulator::get_obstacle_bodies() {
+const std::unique_ptr<vec_obstacle_bodies>& Simulator::fetch_obstacle_bodies() {
 	
-	return active_sims[0].get_obstacle_bodies();
+	return active_sims[0].obstacle_bodies();
 	
 }
 
@@ -237,12 +239,12 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
 
-vec_player_graphics* Simulation::get_player_graphics() const {
+std::unique_ptr<vec_player_graphics> Simulation::player_graphics() const {
 	
 	size_t nb_players(players().size());
 	
 	// Create and allocate the vector to be returned
-	vec_player_graphics* player_graphics(new vec_player_graphics);
+	std::unique_ptr<vec_player_graphics> player_graphics(new vec_player_graphics);
 	player_graphics->reserve(nb_players);
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
@@ -261,7 +263,7 @@ vec_player_graphics* Simulation::get_player_graphics() const {
 	return player_graphics;
 }
 
-vec_ball_bodies Simulation::get_ball_bodies() const {
+const std::unique_ptr<vec_ball_bodies>& Simulation::ball_bodies() const {
 
 	size_t nb_balls(balls().size());
 	
@@ -274,10 +276,10 @@ vec_ball_bodies Simulation::get_ball_bodies() const {
 		ball_bodies.emplace_back(ptr_to_body);	
 	}
 	
-	return ball_bodies;
+	return ball_bodies_;
 }
 
-vec_obstacle_bodies Simulation::get_obstacle_bodies() const {
+std::unique_ptr<vec_obstacle_bodies> Simulation::obstacle_bodies() const {
 
 	size_t nb_obstacles(obstacles().size());
 	
@@ -289,8 +291,33 @@ vec_obstacle_bodies Simulation::get_obstacle_bodies() const {
 		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
 		obstacle_bodies.emplace_back(ptr_to_body);		
 	}
-	return obstacle_bodies;
+	return obstacle_bodies_;
 }
+
+void Simulation::update_player_graphics() {
+		
+	size_t nb_players(players().size());
+	
+	player_graphics->resize(nb_players);	// resize to nb_players : we need only this
+											// many graphic objects.
+	
+	double arc_angle;	// angle of the arc corresponding to cooldown counter 
+						// of a player
+	
+	for(size_t i(0); i < nb_players; ++i) {
+		
+		// alpha = 2*pi * (1 - cooldown / max cooldown) 
+		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
+		
+		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
+		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
+		
+		// modify existing values
+		player_graphics[i] = ptr_to_body, arc_angle, player_color;	
+		
+	}
+}
+
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
 	if(x < 0 || (unsigned)x > map_.max_index()) {
