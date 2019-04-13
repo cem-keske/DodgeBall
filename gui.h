@@ -42,7 +42,7 @@ class Canvas : public Gtk::DrawingArea
 					  Color const& color = Tools::color_blue());
 		void draw_rectangle(Rectangle const& original, 
 						 const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true,
-					     Color const & color = Tools::color_red());
+					     Color const & color = Tools::color_brown());
 };
 
 /// GUI WINDOW ///

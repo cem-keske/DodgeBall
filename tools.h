@@ -150,7 +150,7 @@ const Vector operator/(Vector, double);
 	
 /// RECTANGLE ///
 /** 
- * Rectangle specified by its base, bottom-left vertex and height.
+ * Rectangle specified by its base, bottom left vertex and height.
  * Oblique rectnagles are not supported in this version.
  * 
  * Visualisation of vertexes:
@@ -234,11 +234,12 @@ class Circle {
 namespace Tools {	
 			
 		// some color constants	
-		Color color_red(); 		
-		Color color_orange(); 
-		Color color_yellow(); 
-		Color color_green();
-		Color color_blue();	
+		const Color color_red(); 		
+		const Color color_orange(); 
+		const Color color_yellow(); 
+		const Color color_green();
+		const Color color_blue();	
+		const Color color_brown();
 	
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);
