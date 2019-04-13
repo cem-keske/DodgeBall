@@ -72,6 +72,7 @@ class Simulation {
 		const vec_player_graphics& get_player_graphics() const;
 		const vec_ball_bodies& get_ball_bodies() const;
 		const vec_obstacle_bodies& get_obstacle_bodies() const;
+		const std::vector<Arc>& get_player_arcs() const;
 		
 		bool save(const std::string &o_file_path) const;
 		
@@ -286,8 +287,6 @@ const vec_obstacle_bodies& Simulation::get_obstacle_bodies() const {
 	}
 	return std::move(obstacle_bodies);
 }
-
-
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
 	if(x < 0 || (unsigned)x > map_.max_index()) {

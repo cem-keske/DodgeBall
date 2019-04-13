@@ -28,9 +28,12 @@ enum Predefined_Color : unsigned{
 /**
  * We have decided to use shared_ptr to avoid unnecessary copying of relatively 
  * heavier Circle and Rectangle objects.
+ * 
+ * Tuple constains the circle corresponding to player body, angle of cooldown arc
+ * and the preferred color for the player (according to lives left)
  */
-typedef std::vector<std::pair<std::shared_ptr<const Circle>,
-							  Predefined_Color>>  			vec_player_graphics;
+typedef std::vector<std::tuple<std::shared_ptr<const Circle>, Angle
+							   Predefined_Color>>  			vec_player_graphics;
 typedef std::vector<std::shared_ptr<const Circle>> 			vec_ball_bodies;
 typedef std::vector<std::shared_ptr<const Rectangle>>		vec_obstacle_bodies;
 
