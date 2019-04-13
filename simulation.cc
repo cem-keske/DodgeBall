@@ -232,7 +232,8 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 	if(reader.import_file(io_files[0], *this) == false)
 		exit(0);
 	success_ = true; 	// succcessful initialisation
-
+	
+	update_graphics();
 }
 
 // ===== Public methods ===== 

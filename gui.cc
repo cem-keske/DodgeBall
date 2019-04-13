@@ -47,7 +47,7 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	std::cout << "on_draw" << std::endl;
 	draw_background(cr);
 	draw_all_player_graphics(cr);
-	draw_all_rectangle_bodies(cr);
+	draw_all_rectangle_graphics(cr);
 	draw_all_ball_graphics(cr);
 	draw_border(cr, default_border_thickness);	
 	/*Length radius(30);
