@@ -185,7 +185,7 @@ Gui_Window::~Gui_Window()
 }
 
 void Gui_Window::refresh(){
-	on_draw(get_window()->create_cairo_context(););
+	on_draw(get_window()->create_cairo_context());
 }
 bool Gui_Window::on_draw(const Cairo::RefPtr<Cairo::Context>& cr){
 	Gtk::Window::on_draw(cr);
@@ -221,6 +221,8 @@ void Gui_Window::on_button_clicked_exit(){
 }
 
 void Gui_Window::on_button_clicked_open(){
+	
+	
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
 										Gtk::FILE_CHOOSER_ACTION_OPEN); 
 	file_dialog.set_transient_for(*this);
@@ -230,8 +232,10 @@ void Gui_Window::on_button_clicked_open(){
 	
 	int response = file_dialog.run();
 	
-	if(response == Gtk::RESPONSE_OK){
-	Simulator::import_file(file_dialog.get_filename());
+	if(response == Gtk::RESPONSE_OK)
+		Simulator::import_file(file_dialog.get_filename());
+	
+	//refresh the window after importing
 	refresh();
 	std::cout <<button_open.get_label() << std::endl;
 }
