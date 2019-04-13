@@ -260,6 +260,7 @@ vec_player_graphics Simulation::get_player_graphics() const {
 		player_graphics.emplace_back(ptr_to_body, arc_angle, player_color);		
 		
 	}
+	std::cout << "Players size: " << players_.size() << std::endl;
 	std::cout << "Player graphics size: " << player_graphics.size() << std::endl;
 	return player_graphics;
 }
