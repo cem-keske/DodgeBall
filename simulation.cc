@@ -188,10 +188,12 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 }
 
 bool Simulator::import_file(std::string file_path) {
-	
 	return create_simulation(active_sims()[0].execution_parameters(), {file_path});
 }
 
+bool Simulator::empty() {
+	return active_sims().empty();
+}
 
 
 /**
@@ -253,13 +255,11 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 	// if there are files to import to simulation
 	if (io_files.size() > 0) {
 		Reader reader(BEGIN);
-		if(reader.import_file(io_files[0], *this) == false)
-			success_ = false;
+		if(reader.import_file(io_files[0], *this) == true)
+			success_ = true;
 	}
 	std::cout << "Finished sim constructor" << std::endl;
 	update_graphics();
-	
-	success_ = true;
 }
 
 // ===== Public methods ===== 
