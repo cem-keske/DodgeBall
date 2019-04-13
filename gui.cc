@@ -14,7 +14,7 @@ static constexpr int default_border_thickness(5);
 
 // ===== Utility Functions =====
 
-const Color& predefined_color_chooser(Predefined_Colors color){
+const Color& predefined_color_chooser(Predefined_Color color){
 	switch(color) {
 		case RED    :	return Tools::COLOR_RED;
 		case ORANGE :	return Tools::COLOR_ORANGE;
@@ -46,7 +46,7 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	draw_border(cr, default_border_thickness);
 	Length radius(30);
 	draw_disk(Circle(radius),cr, Tools::COLOR_RED);
-	draw_disk(Circle({70,0},radius),cr, Tools::COLOR_GREEN;
+	draw_disk(Circle({70,0},radius),cr, Tools::COLOR_GREEN);
 	draw_disk(Circle({140,0},radius),cr, Tools::COLOR_YELLOW);
 	draw_disk(Circle({210,0},radius),cr, Tools::COLOR_ORANGE);
 	Rectangle rect({30,50},80,80);
