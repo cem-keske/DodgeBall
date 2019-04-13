@@ -232,7 +232,6 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 	if (io_files.size() > 0) {
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
-			exit(0);
 	}
 
 	update_graphics();
