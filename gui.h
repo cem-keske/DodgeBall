@@ -71,6 +71,7 @@ class Gui_Window : public Gtk::Window
 		void on_button_clicked_save();
 		void on_button_clicked_start_stop();
 		void on_button_clicked_step();
+		void refresh();
 		
 		Gtk::VBox the_big_box;
 		

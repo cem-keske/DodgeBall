@@ -48,10 +48,12 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
 	std::cout << "on_draw" << std::endl;
 	draw_background(cr);
+	if(Simulator::empty() == false){
+		draw_all_player_graphics(cr);
+		draw_all_rectangle_graphics(cr);
+		draw_all_ball_graphics(cr);
+	}
 	
-	draw_all_player_graphics(cr);
-	draw_all_rectangle_graphics(cr);
-	draw_all_ball_graphics(cr);
 	
 	draw_border(cr, default_border_thickness);	
 	return true;
@@ -182,8 +184,12 @@ Gui_Window::~Gui_Window()
 {
 }
 
+void Gui_Window::refresh(){
+	on_draw(get_window()->create_cairo_context(););
+}
 bool Gui_Window::on_draw(const Cairo::RefPtr<Cairo::Context>& cr){
-	get_window()->create_cairo_context();
+	Gtk::Window::on_draw(cr);
+	
 	return true;
 }
 
@@ -225,9 +231,8 @@ void Gui_Window::on_button_clicked_open(){
 	int response = file_dialog.run();
 	
 	if(response == Gtk::RESPONSE_OK){
-		if(Simulator::import_file(file_dialog.get_filename()))
-			label_message.set_text("Game ready to run");
-	}
+	Simulator::import_file(file_dialog.get_filename());
+	refresh();
 	std::cout <<button_open.get_label() << std::endl;
 }
 
