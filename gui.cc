@@ -153,7 +153,7 @@ Gui_Window::Gui_Window() :
 	button_save("Save"),
 	button_start_stop("Start"),
 	button_step("Step"),
-	label_message("No Message")
+	label_message("No game to run")
 {
 	set_title("DodgeBall");
 	//init button panel
