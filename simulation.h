@@ -54,17 +54,22 @@ class Simulator{
 		static bool create_simulation(std::unordered_map<std::string, bool> const&
 									  exec_parameters, 
 									  std::vector<std::string> const& io_files);							  
-		static bool import_file(std::string std);
+		static bool import_file(const std::string&);
 		static bool empty();
+		static std::string active_simulation_state();
+		
 		/**
 		 * Accessors to simulation's geometry 
-		 */							  		
+		 */							  			
 		static vec_player_graphics fetch_player_graphics(); 
 		static vec_ball_bodies fetch_ball_bodies();
 		static vec_obstacle_bodies fetch_obstacle_bodies();
+		
+		static void save_simulation(const std::string&);
 	
 	private:
-	
+		static std::string active_simulation_state_;
+		;
 		static std::vector<Simulation>& active_sims();
 
 };	
