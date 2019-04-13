@@ -43,8 +43,9 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
+	std::cout << "on_draw" << std::endl;
 	draw_all_player_bodies(cr);
-	draw_background(cr);
+	/*draw_background(cr);
 	draw_border(cr, default_border_thickness);
 	Length radius(30);
 	draw_disk(Circle(radius),cr, Tools::COLOR_RED);
@@ -57,6 +58,8 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	draw_arc({70,0},radius/4,radius,0.93*M_PI,cr);
 	draw_arc({140,0},radius/4,radius,1.4*M_PI,cr);
 	draw_arc({210,0},radius/4,radius,1.90*M_PI,cr);
+	std::cout << "on_draw finished" << std::endl;
+	* */
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
@@ -123,18 +126,20 @@ void Canvas::draw_rectangle(Rectangle const& original,
 
 void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
 	const vec_player_graphics& disks_and_arcs(Simulator::get_player_graphics());
-	for (auto const& circled_arc : Simulator::get_player_graphics()) {
+	std::cout << disks_and_arcs.size() << std:: endl;
+	for (auto const& circled_arc : disks_and_arcs) {
 		std::cout << "girdi" << std::endl;
 		//get the circle from the tuple and draw its disk
 		*(std::get<0>(circled_arc));
-		std::cout << "çıktı" << std::endl;
 		draw_disk(*(std::get<0>(circled_arc)), cr, 
-				  predefined_color_chooser((std::get<2>(circled_arc))));//get the color
+				  predefined_color_chooser((std::get<2>(circled_arc))));
+		std::cout << std::get<0>(circled_arc)->center().to_string() << std::endl;
+		std::cout << "çıktı" << std::endl;
+		//get the color
 		
 		//get the arc angle from the tuple and draw the arc
-
 	}
-	
+	std::cout << "all player bodies finished" << std:: endl;
 }
 
 
