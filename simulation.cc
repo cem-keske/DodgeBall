@@ -257,7 +257,7 @@ const vec_player_graphics& Simulation::get_player_graphics() const {
 		
 		std::shared_ptr<const Circle> ptr_to_body(&players_[i].body());
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives());
-		player_graphics.emplace_back(ptr_to_body, player_color);		
+		player_graphics.emplace_back(ptr_to_body, arc_angle, player_color);		
 		
 	}
 	
