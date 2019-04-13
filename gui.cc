@@ -119,6 +119,10 @@ void Canvas::draw_rectangle(Rectangle const& original,
 	cr->restore();				 
 }
 
+void Canvas::draw_all_player_bodies() {
+	const vec_player_graphics&()
+}
+
 
 
 
