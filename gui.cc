@@ -202,6 +202,7 @@ void Gui_Window::add_button_panel_components(){
 void Gui_Window::on_button_clicked_exit(){
 	
 	std::cout << button_exit.get_label() << std::endl;
+	exit(0);
 }
 
 void Gui_Window::on_button_clicked_open(){
