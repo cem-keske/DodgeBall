@@ -213,7 +213,7 @@ class Circle {
 	public:
 		
 		// ===== Constructors =====
-		 
+		
 		Circle(Length radius); //at origin
 		Circle(Coordinate const& center, Length radius);
 		

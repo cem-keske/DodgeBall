@@ -14,6 +14,24 @@
 #include <unordered_map>
 #include <memory>
 
+typedef std::vector<std::pair<std::shared_ptr<const Circle>,
+							  size_t>> 						vec_player_graphics;
+typedef std::vector<std::shared_ptr<const Circle>> vec_ball_bodies;
+typedef std::vector<std::shared_ptr<Rectangle>> vec_obstacle_bodies;
+
+
+/**
+ * Enumeration of colors that will be used to determine player colors with respect to
+ * lives left. Choice of color for other objects are left to 
+ * */
+enum class Predefined_Colors {
+	RED,
+	ORANGE,
+	YELLOW,
+	GREEN
+};
+
+
 
 /**
  * This is a helper class to make it possible to move the declaration of Simulation 
@@ -34,9 +52,9 @@ class Simulator{
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  		
-		static const std::vector<std::pair<Circle, Color>>& get_player_bodies(); 
-		static const std::vector<Circle>& get_ball_bodies();
-		static const std::vector<Rectangle>& get_obstacle_bodies();
+		static const vec_player_graphics& get_player_bodies(); 
+		static const vec_ball_bodies& get_ball_bodies();
+		static const vec_obstacle_bodies& get_obstacle_bodies();
 };	
 
 #endif

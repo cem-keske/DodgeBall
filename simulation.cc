@@ -12,11 +12,12 @@
 #include "ball.h"
 #include "tools.h"
 #include "assert.h"
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <array>
-#include <fstream>
+
 
 
 /// SIMULATION ///
@@ -69,9 +70,9 @@ class Simulation {
 		
 		bool test_collisions();
 		
-		const std::vector<std::pair<Circle, Color>>& get_player_bodies() const;
-		const std::vector<Circle>& get_ball_bodies() const;
-		const std::vector<Rectangle>& get_obstacle_bodies() const;
+		const vec_player_graphics& get_player_graphics() const;
+		const vec_ball_bodies& get_ball_bodies() const;
+		const vec_obstacle_bodies& get_obstacle_bodies() const;
 		
 		void update_bodies();
 
@@ -189,17 +190,17 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-const std::vector<std::pair<Circle, Color>>& Simulator::get_player_bodies() {
+const vec_player_graphics& Simulator::get_player_bodies() {
 		
-	return active_sims[0].get_player_bodies();
+	return active_sims[0].get_player_graphics();
 }
 
-const std::vector<Circle>& Simulator::get_ball_bodies() {
+const vec_ball_bodies& Simulator::get_ball_bodies() {
 	
 	return active_sims[0].get_ball_bodies();
 }
 
-const std::vector<Rectangle>& Simulator::get_obstacle_bodies() {
+const vec_obstacle_bodies& Simulator::get_obstacle_bodies() {
 	
 	return active_sims[0].get_obstacle_bodies();
 	
@@ -251,15 +252,26 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
-const std::vector<std::pair<Circle, Color>>& Simulation::get_player_bodies() const {
+const vec_player_graphics& Simulation::get_player_bodies() const {
+	
+	size_t nb_players(players_.size());
+	
+	for(size_t i(0); i < nb_players; ++i) {
+		
+		
+		
+		
+		
+	}
+	
 	return player_bodies_;
 }
 
-const std::vector<Circle>& Simulation::get_ball_bodies() const {
+const vec_ball_bodies& Simulation::get_ball_bodies() const {
 	return ball_bodies_;
 }
 
-const std::vector<Rectangle>& Simulation::get_obstacle_bodies() const {
+const vec_obstacle_bodies& Simulation::get_obstacle_bodies() const {
 	return obstacle_bodies_;
 }
 
@@ -427,7 +439,7 @@ void Simulation::update_bodies() {
 void Simulation::update_player_bodies() {
 
 	player_bodies_.clear();	// clear all bodies
-
+	
 	for (const auto& player : active_sims[0].players()) {	// reconstruct needed ones
 		player_bodies_.push_back(std::make_pair(player.body(), 
 											   player_colors[player.lives()]));
@@ -437,10 +449,16 @@ void Simulation::update_player_bodies() {
 
 void Simulation::update_ball_bodies() {
 	
-	ball_bodies_.clear();
+	size_t nb_balls(balls().size());
 	
-	for (const auto& ball : active_sims[0].balls()) {
-		ball_bodies_.push_back(ball.geometry());
+	//allocate memory before updating
+	if(ball_bodies_.size() > nb_balls)
+		ball_bodies_.resize(nb_balls, Circle(0));
+	else 
+		ball_bodies_.reserve(nb_balls);
+	
+	for (size_t i(0); i < nb_balls; ++i) {
+		ball_bodies_.at(i) = balls().at(i).geometry();
 	}
 	
 }
