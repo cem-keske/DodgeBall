@@ -39,16 +39,20 @@ void Canvas::draw(){
 
 void Canvas::refresh()
 {
+	//redraw the table
 	
+	on_draw(get_window()->create_cairo_context());
 }
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
 	std::cout << "on_draw" << std::endl;
 	draw_background(cr);
+	
 	draw_all_player_graphics(cr);
 	draw_all_rectangle_graphics(cr);
 	draw_all_ball_graphics(cr);
+	
 	draw_border(cr, default_border_thickness);	
 	return true;
 }
@@ -156,7 +160,7 @@ Gui_Window::Gui_Window() :
 	button_save("Save"),
 	button_start_stop("Start"),
 	button_step("Step"),
-	label_message("No game to run")
+	label_message(Simulator::active_simulation_state())
 {
 	set_title("DodgeBall");
 	//init button panel
@@ -176,6 +180,11 @@ Gui_Window::Gui_Window() :
 
 Gui_Window::~Gui_Window()
 {
+}
+
+bool Gui_Window::on_draw(const Cairo::RefPtr<Cairo::Context>& cr){
+	get_window()->create_cairo_context();
+	return true;
 }
 
 void Gui_Window::connect_buttons_to_handlers(){

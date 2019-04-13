@@ -65,6 +65,7 @@ class Gui_Window : public Gtk::Window
 
 	protected:
 		
+		virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 		void on_button_clicked_exit();
 		void on_button_clicked_open();
 		void on_button_clicked_save();
