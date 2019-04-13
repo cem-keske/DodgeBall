@@ -60,9 +60,9 @@ class Simulator{
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  		
-		static const std::shared_ptr<vec_player_graphics>& fetch_player_graphics(); 
-		static const std::shared_ptr<vec_ball_bodies>& fetch_ball_bodies();
-		static const std::shared_ptr<vec_obstacle_bodies>& fetch_obstacle_bodies();
+		static const vec_player_graphics& fetch_player_graphics(); 
+		static const vec_ball_bodies& fetch_ball_bodies();
+		static const vec_obstacle_bodies& fetch_obstacle_bodies();
 };	
 
 #endif

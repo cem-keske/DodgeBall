@@ -41,9 +41,9 @@ class Simulation {
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
 
-		std::shared_ptr<vec_player_graphics> player_graphics_;		
-		std::shared_ptr<vec_ball_bodies> ball_bodies_;		
-		std::shared_ptr<vec_obstacle_bodies> obstacle_bodies_;		
+		vec_player_graphics player_graphics_;		
+		vec_ball_bodies ball_bodies_;		
+		vec_obstacle_bodies obstacle_bodies_;		
 
 
 	public:
@@ -52,7 +52,7 @@ class Simulation {
 		
 		Simulation(std::unordered_map<std::string, bool> const&, 
 				   std::vector<std::string> const&);
-		
+	    ~Simulation();
 		// ===== Public Methods =====
 		
 		bool success() const;
@@ -70,9 +70,9 @@ class Simulation {
 		
 		bool test_collisions();
 		
-		const std::shared_ptr<vec_player_graphics>& player_graphics() const;
-		const std::shared_ptr<vec_ball_bodies>& ball_bodies() const;
-		const std::shared_ptr<vec_obstacle_bodies>& obstacle_bodies() const;
+		const vec_player_graphics& player_graphics() const;
+		const vec_ball_bodies& ball_bodies() const;
+		const vec_obstacle_bodies& obstacle_bodies() const;
 		
 		void update_graphics();
 				
@@ -171,6 +171,7 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 		if (active_sims.back().success())
 			active_sims.erase(active_sims.begin());
 			// old sim is destroyed. new sim is moved to index 0
+			std::cout << "Sim discarded." << std::endl;
 	}								
 	assert(active_sims.size()==1);
 }
@@ -179,17 +180,17 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-const std::shared_ptr<vec_player_graphics>& Simulator::fetch_player_graphics() {
+const vec_player_graphics& Simulator::fetch_player_graphics() {
 		
 	return active_sims[0].player_graphics();
 }
 
-const std::shared_ptr<vec_ball_bodies>& Simulator::fetch_ball_bodies() {
+const vec_ball_bodies& Simulator::fetch_ball_bodies() {
 
 	return active_sims[0].ball_bodies();
 }
 
-const std::shared_ptr<vec_obstacle_bodies>& Simulator::fetch_obstacle_bodies() {
+const vec_obstacle_bodies& Simulator::fetch_obstacle_bodies() {
 	
 	return active_sims[0].obstacle_bodies();
 	
@@ -203,11 +204,7 @@ const std::shared_ptr<vec_obstacle_bodies>& Simulator::fetch_obstacle_bodies() {
 
 Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_parameters,
 					   std::vector<std::string>const& io_files) 
-					   : execution_parameters_(execution_parameters),
-						 player_graphics_(new vec_player_graphics),
-						 ball_bodies_(new vec_ball_bodies),
-						 obstacle_bodies_(new vec_obstacle_bodies)
-					   {
+					   : execution_parameters_(execution_parameters) {
 		// set base types to debug values. They must be properly initialised during
 		// file import.															 
 		nb_cells_ = 0;
@@ -245,6 +242,10 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 	update_graphics();
 }
 
+Simulation::~Simulation(){
+	std::cout << "Inside simulation destructor." << std::endl;
+}
+
 // ===== Public methods ===== 
 
 
@@ -255,22 +256,15 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
 
-const std::shared_ptr<vec_player_graphics>& Simulation::player_graphics() const {
+const vec_player_graphics& Simulation::player_graphics() const {
 	return player_graphics_;
 }
 
-const std::shared_ptr<vec_ball_bodies>& Simulation::ball_bodies() const {
+const vec_ball_bodies& Simulation::ball_bodies() const {
 	return ball_bodies_;
 }
 
-const std::shared_ptr<vec_obstacle_bodies>& Simulation::obstacle_bodies() const {
-
-	size_t nb_obstacles(obstacles().size());
-	
-	// Create and allocate the vector to be returned
-	vec_obstacle_bodies obstacle_bodies;
-	obstacle_bodies.reserve(nb_obstacles);
-	
+const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
 
 	return obstacle_bodies_;
 }
@@ -285,7 +279,7 @@ void Simulation::update_player_graphics() {
 		
 	size_t nb_players(players().size());
 	
-	player_graphics_->resize(nb_players);	// resize to nb_players : we need only this
+	player_graphics_.resize(nb_players);	// resize to nb_players : we need only this
 											// many graphic objects.
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
@@ -300,7 +294,7 @@ void Simulation::update_player_graphics() {
 		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
-		(*player_graphics_)[i] = std::make_tuple(ptr_to_body, arc_angle, player_color);	
+		player_graphics_[i] = std::make_tuple(ptr_to_body, arc_angle, player_color);	
 		
 	}
 }
@@ -309,12 +303,12 @@ void Simulation::update_ball_bodies() {
 	
 	size_t nb_balls(balls().size());
 
-	ball_bodies_->resize(nb_balls);
+	ball_bodies_.resize(nb_balls);
 	
 	for(size_t i(0); i < nb_balls; ++i) {
 		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
 
-		(*ball_bodies_)[i] = ptr_to_body;	
+		ball_bodies_[i] = ptr_to_body;	
 	}
 }
 
@@ -322,13 +316,13 @@ void Simulation::update_obstacle_bodies() {
 	
 	size_t nb_obstacles(obstacles().size());
 
-	obstacle_bodies_->resize(nb_obstacles);
+	obstacle_bodies_.resize(nb_obstacles);
 	
 	size_t counter(0);
 	for(const auto& obs : obstacles()) {
 		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
 
-		(*obstacle_bodies_)[counter] = ptr_to_body;		
+		obstacle_bodies_[counter] = ptr_to_body;		
 		++counter;
 	}
 }
