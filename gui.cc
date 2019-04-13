@@ -129,18 +129,21 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 		draw_arc(circ.center(), circle_arc_ratio * circ.radius(), circ.radius(), 
 				 arc_angle,cr);
 	}
+	std::cout << "All players drawn. " << std::endl;
 }
 
 void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& rectangle : Simulator::fetch_obstacle_bodies()){
 		draw_rectangle(rectangle, cr);
 	}
+		std::cout << "All rectangles drawn. " << std::endl;
 }
 
 void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& circle : Simulator::fetch_ball_bodies()){
 		draw_disk(circle, cr);
 	}	
+	std::cout << "All balls drawn. " << std::endl;
 }
 
 
