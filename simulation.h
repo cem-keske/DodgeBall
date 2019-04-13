@@ -60,7 +60,7 @@ class Simulator{
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  		
-		static const vec_player_graphics& get_player_bodies(); 
+		static const vec_player_graphics& get_player_graphics(); 
 		static const vec_ball_bodies& get_ball_bodies();
 		static const vec_obstacle_bodies& get_obstacle_bodies();
 };	

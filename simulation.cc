@@ -176,7 +176,7 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-const vec_player_graphics& Simulator::get_player_bodies() {
+const vec_player_graphics& Simulator::get_player_graphics() {
 		
 	return active_sims[0].get_player_graphics();
 }
