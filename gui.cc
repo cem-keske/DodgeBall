@@ -122,7 +122,7 @@ void Canvas::draw_rectangle(Rectangle const& original,
 }
 
 void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
-	std::cout << Simulator::get_player_graphics().size() << std::endl;
+	const vec_player_graphics& disks_and_arcs(Simulator::get_player_graphics());
 	for (auto const& circled_arc : Simulator::get_player_graphics()) {
 		std::cout << "girdi" << std::endl;
 		//get the circle from the tuple and draw its disk
