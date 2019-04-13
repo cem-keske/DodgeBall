@@ -131,7 +131,7 @@ void Canvas::draw_rectangle(Rectangle const& original,
 
 void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 	
-	for (auto const& circled_arc : *Simulator::fetch_player_graphics()) {
+	for (auto const& circled_arc : Simulator::fetch_player_graphics()) {
 		//get the circle, color and angle from the tuple
 		Circle const& circ(*(std::get<0>(circled_arc)));
 		Color const& color(predefined_color_chooser(std::get<2>(circled_arc)));
@@ -145,13 +145,13 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 }
 
 void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
-	for (auto const& rectangle : *Simulator::fetch_obstacle_bodies()){
+	for (auto const& rectangle : Simulator::fetch_obstacle_bodies()){
 		draw_rectangle(*rectangle, cr);
 	}
 }
 
 void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
-	for (auto const& circle : *Simulator::fetch_ball_bodies()){
+	for (auto const& circle : Simulator::fetch_ball_bodies()){
 		draw_disk(*circle, cr);
 	}	
 }

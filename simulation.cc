@@ -20,7 +20,7 @@
 #include <cmath>
 
 
-/// SIMULATION ///
+/// SIMULATION class decleration ///
 
 class Simulation {	
 	
@@ -93,7 +93,7 @@ class Simulation {
 };
 
 
-/// READER ///
+/// READER class declaration///
 /**
  * This class will be useful when reading a data from files.
  * It can be used to read specific datas and initialize the current simulation.
