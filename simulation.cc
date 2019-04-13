@@ -228,12 +228,15 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		}
 	}
 	
-	Reader reader(BEGIN);
-	if(reader.import_file(io_files[0], *this) == false)
-		exit(0);
-	success_ = true; 	// succcessful initialisation
-	
+	// if there are files to import to simulation
+	if (io_files.size() > 0) {
+		Reader reader(BEGIN);
+		if(reader.import_file(io_files[0], *this) == false)
+			exit(0);
+	}
+
 	update_graphics();
+	success_ = true; 	// succcessful initialisation
 }
 
 // ===== Public methods ===== 
@@ -291,8 +294,7 @@ void Simulation::update_player_graphics() {
 		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
-		(*player_graphics_)[i] = std::make_tuple(std::move(ptr_to_body), 
-												 arc_angle, player_color);	
+		(*player_graphics_)[i] = std::make_tuple(ptr_to_body, arc_angle, player_color);	
 		
 	}
 }
@@ -305,7 +307,8 @@ void Simulation::update_ball_bodies() {
 	
 	for(size_t i(0); i < nb_balls; ++i) {
 		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
-		(*ball_bodies_)[i] = std::move(ptr_to_body);	
+
+		(*ball_bodies_)[i] = ptr_to_body;	
 	}
 }
 
@@ -318,7 +321,8 @@ void Simulation::update_obstacle_bodies() {
 	size_t counter(0);
 	for(const auto& obs : obstacles()) {
 		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
-		(*obstacle_bodies_)[counter] = std::move(ptr_to_body);		
+
+		(*obstacle_bodies_)[counter] = ptr_to_body;		
 		++counter;
 	}
 }
