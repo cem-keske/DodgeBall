@@ -153,7 +153,7 @@ Gui_Window::Gui_Window() :
 	button_save("Save"),
 	button_start_stop("Start"),
 	button_step("Step"),
-	label_message("No Message")
+	label_message("No game to run")
 {
 	set_title("DodgeBall");
 	//init button panel
@@ -203,8 +203,18 @@ void Gui_Window::on_button_clicked_exit(){
 }
 
 void Gui_Window::on_button_clicked_open(){
-
+	Gtk::FileChooserDialog file_dialog("Please open a file", 
+										Gtk::FILE_CHOOSER_ACTION_OPEN); 
+	file_dialog.set_transient_for(*this);
+		
+	file_dialog.add_button("Open", Gtk::RESPONSE_OK);
+	file_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
 	
+	int response = dialog.run();
+	
+	if(response = Gtk::RESPONSE_OK){
+		Simulator::import_file(dialog.get_filename());
+	}
 	std::cout <<button_open.get_label() << std::endl;
 }
 
