@@ -46,9 +46,7 @@ int main(int argc, char* argv[]) {
 	Simulator::create_simulation(execution_parameters, io_files);
 	
 	if(execution_parameters["Error"] == false) open_gui();
-	
-	//simulation->save("out.txt");
-	
+		
 }
 
 /// ===== FUNCTION DEFINITIONS ===== ///

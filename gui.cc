@@ -50,19 +50,6 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	draw_all_rectangle_graphics(cr);
 	draw_all_ball_graphics(cr);
 	draw_border(cr, default_border_thickness);	
-	/*Length radius(30);
-	draw_disk(Circle(radius),cr, Tools::COLOR_RED);
-	draw_disk(Circle({70,0},radius),cr, Tools::COLOR_GREEN);
-	draw_disk(Circle({140,0},radius),cr, Tools::COLOR_YELLOW);
-	draw_disk(Circle({210,0},radius),cr, Tools::COLOR_ORANGE);
-	Rectangle rect({30,50},80,80);
-	draw_rectangle(rect,cr);
-	draw_arc({0,0},radius/4,radius,0.45*M_PI,cr);
-	draw_arc({70,0},radius/4,radius,0.93*M_PI,cr);
-	draw_arc({140,0},radius/4,radius,1.4*M_PI,cr);
-	draw_arc({210,0},radius/4,radius,1.90*M_PI,cr);
-	*/
-
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){

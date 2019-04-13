@@ -153,46 +153,52 @@ class Reader {
 
 /// ===== SIMULATOR ===== ///
 
-/**
- * This vector will hold up to two simulation instances. During reading of a new 
- * simulation (with Open button) it will be pushed back in this vector. In case of
- * a successful reading, new simulation is moved to active_sims[0].
- */
-static std::vector<Simulation> active_sims;
+
+std::vector<Simulation>& Simulator::active_sims() {
+	/**
+	 * This vector will hold up to two simulation instances. During reading of a new 
+	 * simulation (with Open button) it will be pushed back in this vector. In case of
+	 * a successful reading, new simulation is moved to active_sims[0].
+	 */
+	static std::vector<Simulation> active_sims;
+	return active_sims;
+
+}
 
 void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 									  execution_parameters, 
 									  std::vector<std::string> const& io_files)	{
 				 
-	if (active_sims.empty()) {
-		active_sims.push_back(Simulation(execution_parameters, io_files));
+	if (active_sims().empty()) {
+		active_sims().push_back(Simulation(execution_parameters, io_files));
 	} else {
-		active_sims.push_back(Simulation(execution_parameters, io_files));
-		if (active_sims.back().success())
-			active_sims.erase(active_sims.begin());
+		active_sims().push_back(Simulation(execution_parameters, io_files));
+		if (active_sims().back().success())
+			active_sims().erase(active_sims().begin());
 			// old sim is destroyed. new sim is moved to index 0
 			std::cout << "Sim discarded." << std::endl;
 	}								
 	assert(active_sims.size()==1);
+	std::cout << "Finished create sim" << std::endl;
 }
 
 /**
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-const vec_player_graphics& Simulator::fetch_player_graphics() {
-		
-	return active_sims[0].player_graphics();
+vec_player_graphics Simulator::fetch_player_graphics() {
+	return active_sims()[0].player_graphics();
 }
 
-const vec_ball_bodies& Simulator::fetch_ball_bodies() {
+vec_ball_bodies Simulator::fetch_ball_bodies() {
+	std::cout << "fetch_ball active_sims[0].success_ = " << active_sims()[0].success() << std::endl;
 
-	return active_sims[0].ball_bodies();
+	return active_sims()[0].ball_bodies();
 }
 
-const vec_obstacle_bodies& Simulator::fetch_obstacle_bodies() {
+vec_obstacle_bodies Simulator::fetch_obstacle_bodies() {
 	
-	return active_sims[0].obstacle_bodies();
+	return active_sims()[0].obstacle_bodies();
 	
 }
 
@@ -236,10 +242,12 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 	if (io_files.size() > 0) {
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
-			success_ = true;
+			success_ = false;
 	}
-
+	std::cout << "Finished sim constructor" << std::endl;
 	update_graphics();
+	
+	success_ = true;
 }
 
 Simulation::~Simulation(){
@@ -287,7 +295,7 @@ void Simulation::update_player_graphics() {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
-		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
+		std::shared_ptr<const Circle> ptr_to_body (&(players_[i].body()));
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
 		
 		// alpha = 2*pi * (1 - cooldown / max cooldown) 
