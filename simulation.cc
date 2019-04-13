@@ -19,7 +19,6 @@
 #include <array>
 
 
-
 /// SIMULATION ///
 
 class Simulation {	
@@ -74,8 +73,6 @@ class Simulation {
 		const vec_ball_bodies& get_ball_bodies() const;
 		const vec_obstacle_bodies& get_obstacle_bodies() const;
 		
-		void update_bodies();
-
 		bool save(const std::string &o_file_path) const;
 		
 	private:
@@ -85,10 +82,6 @@ class Simulation {
 		bool detect_all_ball_obstacle_collisions() const;		
 		bool detect_initial_player_collisions() const ;
 		bool detect_initial_ball_collisions() const ;
-
-		void update_player_bodies();
-		void update_ball_bodies();
-		void update_obstacle_bodies();
 };
 
 
@@ -152,13 +145,6 @@ class Reader {
 
 /// ===== SIMULATOR ===== ///
 
-// Predefined colors for players with respect to their lives left.
-static const std::array<Color, MAX_TOUCH> player_colors = {Tools::color_red(), 
-														   Tools::color_orange(),
-														   Tools::color_yellow(), 
-														   Tools::color_green()};
-
-
 /**
  * This vector will hold up to two simulation instances. During reading of a new 
  * simulation (with Open button) it will be pushed back in this vector. In case of
@@ -182,8 +168,6 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 	
 	if(execution_parameters.at("Error")) return;	// All is done for Error mode.
 	
-	active_sims[0].update_bodies();		// generate initial geometrical state
-
 }
 
 /**
@@ -252,9 +236,10 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
+
 const vec_player_graphics& Simulation::get_player_graphics() const {
 	
-	size_t nb_players(players_.size());
+	size_t nb_players(players().size());
 	
 	// Create and allocate the vector to be returned
 	vec_player_graphics player_graphics;
@@ -262,21 +247,44 @@ const vec_player_graphics& Simulation::get_player_graphics() const {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
-		
-		
-		
+		std::shared_ptr<const Circle> ptr_to_body(&players_[i].body());
+		auto player_color = static_cast<Predefined_Color>(players_[i].lives());
+		player_graphics.emplace_back(ptr_to_body, player_color);		
 		
 	}
 	
-	return player_bodies_;
+	return std::move(player_graphics);
 }
 
 const vec_ball_bodies& Simulation::get_ball_bodies() const {
-	return ball_bodies_;
+
+	size_t nb_balls(balls().size());
+	
+	// Create and allocate the vector to be returned
+	vec_ball_bodies ball_bodies;
+	ball_bodies.reserve(nb_balls);
+	
+	for(size_t i(0); i < nb_balls; ++i) {
+		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
+		ball_bodies.emplace_back(ptr_to_body);	
+	}
+	
+	return std::move(ball_bodies);
 }
 
 const vec_obstacle_bodies& Simulation::get_obstacle_bodies() const {
-	return obstacle_bodies_;
+
+	size_t nb_obstacles(obstacles().size());
+	
+	// Create and allocate the vector to be returned
+	vec_obstacle_bodies obstacle_bodies;
+	obstacle_bodies.reserve(nb_obstacles);
+	
+	for(const auto& obs : obstacles()) {
+		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
+		obstacle_bodies.emplace_back(ptr_to_body);		
+	}
+	return std::move(obstacle_bodies);
 }
 
 
@@ -428,53 +436,6 @@ bool Simulation::test_collisions() {
 		return false;
 		
 	return true;
-}
-
-
-/**
- * Updates all body vectors 
- */
-void Simulation::update_bodies() {
-	update_player_bodies();
-	update_ball_bodies();
-	update_obstacle_bodies();
-}
-
-void Simulation::update_player_bodies() {
-
-	player_bodies_.clear();	// clear all bodies
-	
-	for (const auto& player : active_sims[0].players()) {	// reconstruct needed ones
-		player_bodies_.push_back(std::make_pair(player.body(), 
-											   player_colors[player.lives()]));
-	}
-	
-}
-
-void Simulation::update_ball_bodies() {
-	
-	size_t nb_balls(balls().size());
-	
-	//allocate memory before updating
-	if(ball_bodies_.size() > nb_balls)
-		ball_bodies_.resize(nb_balls, Circle(0));
-	else 
-		ball_bodies_.reserve(nb_balls);
-	
-	for (size_t i(0); i < nb_balls; ++i) {
-		ball_bodies_.at(i) = balls().at(i).geometry();
-	}
-	
-}
-
-void Simulation::update_obstacle_bodies() {
-	
-	obstacle_bodies_.clear();
-	
-	for(const auto& obs : obstacle_bodies_) {
-		obstacle_bodies_.push_back(obs);
-	}
-	
 }
 
 /**

@@ -15,25 +15,25 @@
 #include <memory>
 
 /**
- * We have decided to use shared_ptr to avoid unnecessary copying of relatively 
- * heavier Circle and Rectangle objects.
- */
-typedef std::vector<std::pair<std::shared_ptr<const Circle>,
-							  Predefined_Colors>>  	vec_player_graphics;
-typedef std::vector<std::shared_ptr<const Circle>> 	vec_ball_bodies;
-typedef std::vector<std::shared_ptr<Rectangle>>   	vec_obstacle_bodies;
-
-
-/**
  * Enumeration of colors that will be used to determine player colors with respect to
  * lives left. Choice of color for other objects are left to the user.
  * */
-enum class Predefined_Colors {
+enum Predefined_Color : unsigned{
 	RED,
 	ORANGE,
 	YELLOW,
 	GREEN
 };
+
+/**
+ * We have decided to use shared_ptr to avoid unnecessary copying of relatively 
+ * heavier Circle and Rectangle objects.
+ */
+typedef std::vector<std::pair<std::shared_ptr<const Circle>,
+							  Predefined_Color>>  			vec_player_graphics;
+typedef std::vector<std::shared_ptr<const Circle>> 			vec_ball_bodies;
+typedef std::vector<std::shared_ptr<const Rectangle>>		vec_obstacle_bodies;
+
 
 
 
