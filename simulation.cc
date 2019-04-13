@@ -194,7 +194,8 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 }
 
 bool Simulator::import_file(const std::string& file_path) {
-	return create_simulation(active_sims()[0].execution_parameters(), {file_path});
+	std::vector<std::string> io_files = {file_path};
+	return create_simulation(active_sims()[0].execution_parameters(), io_files);
 }
 
 bool Simulator::empty() {
