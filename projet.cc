@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 	else if (io_files.size() > 0) {
 		Simulator::create_simulation(execution_parameters, io_files);
 		open_gui();
-	} else {
+	} else {				
 		open_gui();
 	}
 		
