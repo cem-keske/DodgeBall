@@ -160,16 +160,14 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 				 
 	if (active_sims.empty()) {
 		active_sims.push_back(Simulation(execution_parameters, io_files));
-		std::cout << "Sim[0] created." << std::endl;
 	} else {
 		active_sims.push_back(Simulation(execution_parameters, io_files));
 		if (active_sims.back().success())
 			active_sims.erase(active_sims.begin());
-			std::cout << "Other sim" << std::endl;
 			// old sim is destroyed. new sim is moved to index 0
 	}								
 	assert(active_sims.size()==1);
-	std::cout << active_sims[0].success() << std::endl;
+	std::cout << "sim read success: " << active_sims[0].success() << std::endl;
 }
 
 /**
