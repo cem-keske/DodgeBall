@@ -43,6 +43,7 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
+	draw_all_player_bodies(cr);
 	draw_background(cr);
 	draw_border(cr, default_border_thickness);
 	Length radius(30);
@@ -121,12 +122,14 @@ void Canvas::draw_rectangle(Rectangle const& original,
 }
 
 void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
-	const vec_player_graphics& circles_and_arcs(Simulator::get_player_graphics());
-	
-	for (auto const& circled_arc : circles_and_arcs) {
+	std::cout << Simulator::get_player_graphics().size() << std::endl;
+	for (auto const& circled_arc : Simulator::get_player_graphics()) {
+		std::cout << "girdi" << std::endl;
 		//get the circle from the tuple and draw its disk
+		*(std::get<0>(circled_arc));
+		std::cout << "çıktı" << std::endl;
 		draw_disk(*(std::get<0>(circled_arc)), cr, 
-				  predefined_color_chooser((std::get<2>(circled_arc)));//get the color
+				  predefined_color_chooser((std::get<2>(circled_arc))));//get the color
 		
 		//get the arc angle from the tuple and draw the arc
 
