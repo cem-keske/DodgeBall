@@ -96,10 +96,6 @@ void Canvas::draw_rectangle(Rectangle const& original,
 							Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.top_left()));
-	std::cout << original.top_left().to_string() << std::endl;
-	std::cout << center.to_string() << std::endl;
-	std::cout << converted.to_string() << std::endl;
-	std::cout << (original.top_left() + center).to_string() << std::endl;
 	cr->set_source_rgb(color.r, color.g, color.b);
 	cr->rectangle(converted.x,converted.y,original.base(),original.height());
 	
