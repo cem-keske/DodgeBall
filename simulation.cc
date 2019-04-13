@@ -70,7 +70,7 @@ class Simulation {
 		
 		bool test_collisions();
 		
-		const vec_player_graphics& get_player_graphics() const;
+		vec_player_graphics get_player_graphics() const;
 		const vec_ball_bodies& get_ball_bodies() const;
 		const vec_obstacle_bodies& get_obstacle_bodies() const;
 		const std::vector<Arc>& get_player_arcs() const;
@@ -239,7 +239,7 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
 
-const vec_player_graphics& Simulation::get_player_graphics() const {
+vec_player_graphics Simulation::get_player_graphics() const {
 	
 	size_t nb_players(players().size());
 	
@@ -255,13 +255,13 @@ const vec_player_graphics& Simulation::get_player_graphics() const {
 		// alpha = 2*pi * (1 - cooldown / max cooldown) 
 		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 		
-		std::shared_ptr<const Circle> ptr_to_body(&players_[i].body());
+		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives());
 		player_graphics.emplace_back(ptr_to_body, arc_angle, player_color);		
 		
 	}
 	
-	return std::move(player_graphics);
+	return player_graphics;
 }
 
 const vec_ball_bodies& Simulation::get_ball_bodies() const {
