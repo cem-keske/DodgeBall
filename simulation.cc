@@ -246,7 +246,13 @@ const vec_player_graphics& Simulation::get_player_graphics() const {
 	vec_player_graphics player_graphics;
 	player_graphics.reserve(nb_players);
 	
+	double arc_angle;	// angle of the arc corresponding to cooldown counter 
+						// of a player
+	
 	for(size_t i(0); i < nb_players; ++i) {
+		
+		// alpha = 2*pi * (1 - cooldown / max cooldown) 
+		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 		
 		std::shared_ptr<const Circle> ptr_to_body(&players_[i].body());
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives());
