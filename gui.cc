@@ -212,8 +212,9 @@ void Gui_Window::on_button_clicked_open(){
 	
 	int response = file_dialog.run();
 	
-	if(response = Gtk::RESPONSE_OK){
-		Simulator::import_file(file_dialog.get_filename());
+	if(response == Gtk::RESPONSE_OK){
+		if(Simulator::import_file(file_dialog.get_filename()))
+			label_message.set_text("Game ready to run");
 	}
 	std::cout <<button_open.get_label() << std::endl;
 }
