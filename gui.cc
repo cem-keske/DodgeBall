@@ -202,12 +202,12 @@ void Gui_Window::connect_buttons_to_handlers(){
 }
 
 void Gui_Window::add_button_panel_components(){
-	interaction_box.add(button_exit);
-	interaction_box.add(button_open);
-	interaction_box.add(button_save);
-	interaction_box.add(button_start_stop);
-	interaction_box.add(button_step);
-	interaction_box.add(label_message);
+	interaction_box.pack_start(button_exit);
+	interaction_box.pack_start(button_open);
+	interaction_box.pack_start(button_save);
+	interaction_box.pack_start(button_start_stop);
+	interaction_box.pack_start(button_step);
+	interaction_box.pack_start(label_message);
 }
 
 void Gui_Window::on_button_clicked_exit(){
@@ -216,6 +216,7 @@ void Gui_Window::on_button_clicked_exit(){
 }
 
 void Gui_Window::on_button_clicked_open(){
+
 	
 	std::cout <<button_open.get_label() << std::endl;
 }
