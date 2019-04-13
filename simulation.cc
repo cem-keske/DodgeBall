@@ -166,27 +166,30 @@ std::vector<Simulation>& Simulator::active_sims() {
 
 }
 
-void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
-									  execution_parameters, 
-									  std::vector<std::string> const& io_files)	{
-				 
+bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
+								  execution_parameters, 
+								  std::vector<std::string> const& io_files)	{
+	bool success(false);
+	
 	if (active_sims().empty()) {
 		active_sims().push_back(Simulation(execution_parameters, io_files));
+		success = active_sims()[0].success();
 	} else {
 		active_sims().push_back(Simulation(execution_parameters, io_files));
-		if (active_sims().back().success())
+		if ((success = active_sims().back().success()))	// assignment intentional
 			active_sims().erase(active_sims().begin());
 			// old sim is destroyed. new sim is moved to index 0
 			std::cout << "Sim discarded." << std::endl;
 	}								
 	assert(active_sims.size()==1);
 	std::cout << "Finished create sim" << std::endl;
+	
+	return success;
 }
 
 bool Simulator::import_file(std::string file_path) {
 	
-	create_simulation(active_sims()[0].execution_parameters(), {file_path});
-	return active_sims()[0].success();
+	return create_simulation(active_sims()[0].execution_parameters(), {file_path});
 }
 
 

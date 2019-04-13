@@ -42,10 +42,16 @@ int main(int argc, char* argv[]) {
 	init_execution_parameters(cmd_parameters, execution_parameters);
 	}	//cmd_parameters' lifetime expired, we don't need it anymore
 	
-	//Simulation simulation(execution_parameters, io_files);
-	Simulator::create_simulation(execution_parameters, io_files);
 	
-	if(execution_parameters["Error"] == false) open_gui();
+	if(execution_parameters["Error"] == true) 
+		//Simulation simulation(execution_parameters, io_files);
+		Simulator::create_simulation(execution_parameters, io_files);
+	else if (io_files.size() > 0) {
+		Simulator::create_simulation(execution_parameters, io_files);
+		open_gui();
+	} else {
+		open_gui();
+	}
 		
 }
 
