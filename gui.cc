@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cairomm/context.h>
 
+static constexpr int default_border_thickness(3);
 
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
@@ -29,6 +30,8 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
+	draw_background(cr);
+	draw_border(cr, default_border_thickness);
 	Length radius(30);
 	draw_disk(Circle(radius),cr,{1,0.0,0.0});
 	Rectangle rect({30,50},80,80);
@@ -40,6 +43,27 @@ Coordinate Canvas::convert_coordinate(Coordinate const& pos){
 	return {center.x + pos.x , center.y - pos.y };
 }
 
+void Canvas::draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
+							 Color const& background_color){
+	cr->save();
+	cr->set_source_rgb(background_color.r, background_color.g, background_color.b);
+	cr->paint();
+	cr->restore();					 
+}
+
+void Canvas::draw_border(const Cairo::RefPtr<Cairo::Context>& cr,
+						 Length thickness,
+					     Color const& border_color){
+	cr->save();
+	cr->set_line_width(thickness);
+	cr->set_source_rgb(border_color.r, border_color.g, border_color.b);
+	Gtk::Allocation alloc(get_allocation());
+	const int x(alloc.get_width());
+	const int y(alloc.get_height());
+	cr->rectangle(0, 0, x, y );
+	cr->stroke();
+	cr->restore();
+}
 void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr, 
 					   Color const& color){
 	cr->save();

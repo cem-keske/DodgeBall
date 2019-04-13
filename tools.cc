@@ -272,6 +272,12 @@ const Color Tools::color_blue() {return {0.19, 0.38, 0.92};}
 
 const Color Tools::color_brown() {return {0.349,0.153,0.125};}
 
+const Color Tools::color_black() {return {0,0,0};}
+
+const Color Tools::color_white() {return {1,1,1};}
+
+
+
 bool Tools::intersect(const Rectangle& rect_one, const Rectangle& rect_two, 
 					  Length tolerance) {
 	// rectangle intersection to write

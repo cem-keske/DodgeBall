@@ -240,7 +240,9 @@ namespace Tools {
 		const Color color_green();
 		const Color color_blue();	
 		const Color color_brown();
-	
+		const Color color_black();
+		const Color color_white();
+		
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);
 		bool intersect(Rectangle const&, Circle const&, Length tolerance);
