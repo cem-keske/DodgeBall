@@ -73,6 +73,8 @@ class Simulation {
 		const std::unique_ptr<vec_player_graphics>& player_graphics() const;
 		const std::unique_ptr<vec_ball_bodies>& ball_bodies() const;
 		const std::unique_ptr<vec_obstacle_bodies>& obstacle_bodies() const;
+		
+		void update_graphics();
 				
 		bool save(const std::string &o_file_path) const;
 		
@@ -85,6 +87,8 @@ class Simulation {
 		bool detect_initial_ball_collisions() const ;
 		
 		void update_player_graphics();
+		void update_ball_bodies(); 
+		void update_obstacle_bodies(); 
 
 };
 
@@ -198,9 +202,12 @@ const std::unique_ptr<vec_obstacle_bodies>& Simulator::fetch_obstacle_bodies() {
 // ===== Constructor ===== 
 
 Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_parameters,
-					   std::vector<std::string>const& io_files) : execution_parameters_
-																 (execution_parameters)
-																 {
+					   std::vector<std::string>const& io_files) 
+					   : execution_parameters_(execution_parameters),
+						 player_graphics_(new vec_player_graphics),
+						 ball_bodies_(new vec_ball_bodies),
+						 obstacle_bodies_(new vec_obstacle_bodies)
+					   {
 		// set base types to debug values. They must be properly initialised during
 		// file import.															 
 		nb_cells_ = 0;
@@ -226,7 +233,6 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		exit(0);
 	success_ = true; 	// succcessful initialisation
 
-
 }
 
 // ===== Public methods ===== 
@@ -239,47 +245,15 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
 
-std::unique_ptr<vec_player_graphics> Simulation::player_graphics() const {
-	
-	size_t nb_players(players().size());
-	
-	// Create and allocate the vector to be returned
-	std::unique_ptr<vec_player_graphics> player_graphics(new vec_player_graphics);
-	player_graphics->reserve(nb_players);
-	
-	double arc_angle;	// angle of the arc corresponding to cooldown counter 
-						// of a player
-	
-	for(size_t i(0); i < nb_players; ++i) {
-		
-		// alpha = 2*pi * (1 - cooldown / max cooldown) 
-		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
-		
-		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
-		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
-		player_graphics->emplace_back(ptr_to_body, arc_angle, player_color);		
-		
-	}
-	return player_graphics;
+const std::unique_ptr<vec_player_graphics>& Simulation::player_graphics() const {
+	return player_graphics_;
 }
 
 const std::unique_ptr<vec_ball_bodies>& Simulation::ball_bodies() const {
-
-	size_t nb_balls(balls().size());
-	
-	// Create and allocate the vector to be returned
-	vec_ball_bodies ball_bodies;
-	ball_bodies.reserve(nb_balls);
-	
-	for(size_t i(0); i < nb_balls; ++i) {
-		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
-		ball_bodies.emplace_back(ptr_to_body);	
-	}
-	
 	return ball_bodies_;
 }
 
-std::unique_ptr<vec_obstacle_bodies> Simulation::obstacle_bodies() const {
+const std::unique_ptr<vec_obstacle_bodies>& Simulation::obstacle_bodies() const {
 
 	size_t nb_obstacles(obstacles().size());
 	
@@ -287,18 +261,21 @@ std::unique_ptr<vec_obstacle_bodies> Simulation::obstacle_bodies() const {
 	vec_obstacle_bodies obstacle_bodies;
 	obstacle_bodies.reserve(nb_obstacles);
 	
-	for(const auto& obs : obstacles()) {
-		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
-		obstacle_bodies.emplace_back(ptr_to_body);		
-	}
+
 	return obstacle_bodies_;
+}
+
+void Simulation::update_graphics() {
+	update_player_graphics();
+	update_ball_bodies();
+	update_obstacle_bodies();
 }
 
 void Simulation::update_player_graphics() {
 		
 	size_t nb_players(players().size());
 	
-	player_graphics->resize(nb_players);	// resize to nb_players : we need only this
+	player_graphics_->resize(nb_players);	// resize to nb_players : we need only this
 											// many graphic objects.
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
@@ -306,15 +283,42 @@ void Simulation::update_player_graphics() {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
-		// alpha = 2*pi * (1 - cooldown / max cooldown) 
-		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
-		
-		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
+		std::unique_ptr<const Circle> ptr_to_body(&(players_[i].body()));
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
 		
+		// alpha = 2*pi * (1 - cooldown / max cooldown) 
+		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
+
 		// modify existing values
-		player_graphics[i] = ptr_to_body, arc_angle, player_color;	
+		(*player_graphics_)[i] = std::make_tuple(std::move(ptr_to_body), 
+												 arc_angle, player_color);	
 		
+	}
+}
+
+void Simulation::update_ball_bodies() {
+	
+	size_t nb_balls(balls().size());
+
+	ball_bodies_->resize(nb_balls);
+	
+	for(size_t i(0); i < nb_balls; ++i) {
+		std::unique_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
+		(*ball_bodies_)[i] = std::move(ptr_to_body);	
+	}
+}
+
+void Simulation::update_obstacle_bodies() {
+	
+	size_t nb_obstacles(obstacles().size());
+
+	obstacle_bodies_->resize(nb_obstacles);
+	
+	size_t counter(0);
+	for(const auto& obs : obstacles()) {
+		std::unique_ptr<const Rectangle> ptr_to_body(&(obs.second));
+		(*obstacle_bodies_)[counter] = std::move(ptr_to_body);		
+		++counter;
 	}
 }
 
