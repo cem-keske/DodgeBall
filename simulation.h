@@ -55,6 +55,7 @@ class Simulator{
 									  exec_parameters, 
 									  std::vector<std::string> const& io_files);							  
 		static bool import_file(std::string std);
+		static bool empty();
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  		
