@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cairomm/context.h>
 
+static constexpr int default_border_thickness(5);
 
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
@@ -29,16 +30,46 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
-	draw_disk(Circle(100),get_window()->create_cairo_context(),{1,0.0,0.0});
-	Rectangle rect({-50,-50},20,20);
+	draw_background(cr);
+	draw_border(cr, default_border_thickness);
+	Length radius(30);
+	draw_disk(Circle(radius),cr, Tools::color_red());
+	draw_disk(Circle({70,0},radius),cr, Tools::color_green());
+	draw_disk(Circle({140,0},radius),cr, Tools::color_yellow());
+	draw_disk(Circle({210,0},radius),cr, Tools::color_orange());
+	Rectangle rect({30,50},80,80);
 	draw_rectangle(rect,cr);
-	draw_arc({0,0},10,100,M_PI_4,cr);
+	draw_arc({0,0},radius/4,radius,0.45*M_PI,cr);
+	draw_arc({70,0},radius/4,radius,0.93*M_PI,cr);
+	draw_arc({140,0},radius/4,radius,1.4*M_PI,cr);
+	draw_arc({210,0},radius/4,radius,1.90*M_PI,cr);
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
-	return center.symmetric_x_axis()+pos;
+	return {center.x + pos.x , center.y - pos.y };
 }
 
+void Canvas::draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
+							 Color const& background_color){
+	cr->save();
+	cr->set_source_rgb(background_color.r, background_color.g, background_color.b);
+	cr->paint();
+	cr->restore();					 
+}
+
+void Canvas::draw_border(const Cairo::RefPtr<Cairo::Context>& cr,
+						 Length thickness,
+					     Color const& border_color){
+	cr->save();
+	cr->set_line_width(thickness);
+	cr->set_source_rgb(border_color.r, border_color.g, border_color.b);
+	Gtk::Allocation alloc(get_allocation());
+	const int x(alloc.get_width());
+	const int y(alloc.get_height());
+	cr->rectangle(0, 0, x, y );
+	cr->stroke();
+	cr->restore();
+}
 void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr, 
 					   Color const& color){
 	cr->save();
@@ -49,28 +80,29 @@ void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context
 	cr->fill();		   
 	cr->restore();
 }
-void Canvas::draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
-			   Length radius, const Cairo::RefPtr<Cairo::Context>& cr,
-			   Color const& color){
+void Canvas::draw_arc(Coordinate const& original,Length thickness,Length outer_radius, 
+					  Angle alpha, const Cairo::RefPtr<Cairo::Context>& cr,
+					  Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original));
 	cr->set_line_width(thickness);
 	cr->set_source_rgb(color.r, color.g, color.b);
-	cr->arc(converted.x, converted.y, radius, -M_PI_2 , alpha-M_PI_2);
-	cr->stroke_preserve();
-	cr->fill();		   
+	cr->arc(converted.x, converted.y,(outer_radius-thickness/2.0)+1,3*M_PI_2,alpha+3*M_PI_2);
+	cr->stroke();	   
 	cr->restore();
 }
 void Canvas::draw_rectangle(Rectangle const& original, 
-					     const Cairo::RefPtr<Cairo::Context>& cr, bool fill,
-					     Color const& color){
+							const Cairo::RefPtr<Cairo::Context>& cr, bool fill,
+							Color const& color){
 	cr->save();
 	Coordinate converted(convert_coordinate(original.top_left()));
 	cr->set_source_rgb(color.r, color.g, color.b);
-	cr->rectangle(converted.x, converted.y, original.base(), original.height());
-	cr->stroke_preserve();
+	cr->rectangle(converted.x,converted.y,original.base(),original.height());
+	
 	if(fill)
 		cr->fill();	
+	else
+		cr->stroke();
 	cr->restore();				 
 }
 
