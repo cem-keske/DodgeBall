@@ -10,7 +10,7 @@
 #include <cmath>
 #include <cairomm/context.h>
 
-static constexpr int default_border_thickness(3);
+static constexpr int default_border_thickness(5);
 
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
@@ -33,10 +33,16 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	draw_background(cr);
 	draw_border(cr, default_border_thickness);
 	Length radius(30);
-	draw_disk(Circle(radius),cr,{1,0.0,0.0});
+	draw_disk(Circle(radius),cr, Tools::color_red());
+	draw_disk(Circle({70,0},radius),cr, Tools::color_green());
+	draw_disk(Circle({140,0},radius),cr, Tools::color_yellow());
+	draw_disk(Circle({210,0},radius),cr, Tools::color_orange());
 	Rectangle rect({30,50},80,80);
 	draw_rectangle(rect,cr);
-	draw_arc({0,0},radius/4,radius,0.73*M_PI,cr);
+	draw_arc({0,0},radius/4,radius,0.45*M_PI,cr);
+	draw_arc({70,0},radius/4,radius,0.93*M_PI,cr);
+	draw_arc({140,0},radius/4,radius,1.4*M_PI,cr);
+	draw_arc({210,0},radius/4,radius,1.90*M_PI,cr);
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
