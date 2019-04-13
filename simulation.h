@@ -54,7 +54,7 @@ class Simulator{
 		static void create_simulation(std::unordered_map<std::string, bool> const&
 									  exec_parameters, 
 									  std::vector<std::string> const& io_files);							  
-		
+		static bool import_file(std::string std);
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  		

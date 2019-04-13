@@ -56,6 +56,7 @@ class Simulation {
 		// ===== Public Methods =====
 		
 		bool success() const;
+		const std::unordered_map<std::string, bool> & execution_parameters() const;
 		const std::vector<Player>& players() const;
 		const std::vector<Ball>& balls() const;
 		const Rectangle_map& obstacles() const;
@@ -182,6 +183,14 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 	std::cout << "Finished create sim" << std::endl;
 }
 
+bool Simulator::import_file(std::string file_path) {
+	
+	create_simulation(active_sims()[0].execution_parameters(), {file_path});
+	return active_sims()[0].success();
+}
+
+
+
 /**
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
@@ -263,6 +272,10 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
+const std::unordered_map<std::string, bool> & Simulation::execution_parameters() const
+{
+	return execution_parameters_;
+}		
 
 const vec_player_graphics& Simulation::player_graphics() const {
 	return player_graphics_;
