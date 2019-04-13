@@ -13,8 +13,8 @@
 
 /// ===== TYPEDEF ===== ///
 /**
- * We have decided to use shared_ptr to make it possible for the gui to 
- * reach the bodies and be aware of their eventual dissappearence from the simulation.
+ * This datastructure will serve to hold geometrical representations of obstacles in
+ * an ordered manner. 
  */
 typedef std::map<std::pair<size_t, size_t>, Rectangle> Rectangle_map;
 

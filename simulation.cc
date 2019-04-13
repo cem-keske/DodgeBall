@@ -252,9 +252,13 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
-const vec_player_graphics& Simulation::get_player_bodies() const {
+const vec_player_graphics& Simulation::get_player_graphics() const {
 	
 	size_t nb_players(players_.size());
+	
+	// Create and allocate the vector to be returned
+	vec_player_graphics player_graphics;
+	player_graphics.reserve(nb_players);
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
