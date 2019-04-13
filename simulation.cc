@@ -167,7 +167,6 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 			// old sim is destroyed. new sim is moved to index 0
 	}								
 	assert(active_sims.size()==1);
-	std::cout << "sim read success: " << active_sims[0].success() << std::endl;
 }
 
 /**
