@@ -427,7 +427,7 @@ void Simulation::update_bodies() {
 void Simulation::update_player_bodies() {
 
 	player_bodies_.clear();	// clear all bodies
-
+	
 	for (const auto& player : active_sims[0].players()) {	// reconstruct needed ones
 		player_bodies_.push_back(std::make_pair(player.body(), 
 											   player_colors[player.lives()]));
@@ -437,10 +437,16 @@ void Simulation::update_player_bodies() {
 
 void Simulation::update_ball_bodies() {
 	
-	ball_bodies_.clear();
+	size_t nb_balls(balls().size());
 	
-	for (const auto& ball : active_sims[0].balls()) {
-		ball_bodies_.push_back(ball.geometry());
+	//allocate memory before updating
+	if(ball_bodies_.size() > nb_balls)
+		ball_bodies_.resize(nb_balls, Circle(0));
+	else 
+		ball_bodies_.reserve(nb_balls);
+	
+	for (size_t i(0); i < nb_balls; ++i) {
+		ball_bodies_.at(i) = balls().at(i).geometry();
 	}
 	
 }
