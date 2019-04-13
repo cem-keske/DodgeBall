@@ -120,7 +120,7 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 	
 	for (auto const& circled_arc : Simulator::fetch_player_graphics()) {
 		//get the circle, color and angle from the tuple
-		Circle const& circ(*(std::get<0>(circled_arc)));
+		Circle const& circ((std::get<0>(circled_arc)));
 		Color const& color(predefined_color_chooser(std::get<2>(circled_arc)));
 		Angle arc_angle(std::get<1>(circled_arc));
 		
@@ -133,13 +133,13 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 
 void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& rectangle : Simulator::fetch_obstacle_bodies()){
-		draw_rectangle(*rectangle, cr);
+		draw_rectangle(rectangle, cr);
 	}
 }
 
 void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& circle : Simulator::fetch_ball_bodies()){
-		draw_disk(*circle, cr);
+		draw_disk(circle, cr);
 	}	
 }
 
@@ -210,10 +210,10 @@ void Gui_Window::on_button_clicked_open(){
 	file_dialog.add_button("Open", Gtk::RESPONSE_OK);
 	file_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
 	
-	int response = dialog.run();
+	int response = file_dialog.run();
 	
 	if(response = Gtk::RESPONSE_OK){
-		Simulator::import_file(dialog.get_filename());
+		Simulator::import_file(file_dialog.get_filename());
 	}
 	std::cout <<button_open.get_label() << std::endl;
 }
