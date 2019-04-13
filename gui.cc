@@ -45,7 +45,7 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
 	std::cout << "on_draw" << std::endl;
 	draw_all_player_bodies(cr);
-	/*draw_background(cr);
+	draw_background(cr);
 	draw_border(cr, default_border_thickness);
 	Length radius(30);
 	draw_disk(Circle(radius),cr, Tools::COLOR_RED);
@@ -59,7 +59,7 @@ bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	draw_arc({140,0},radius/4,radius,1.4*M_PI,cr);
 	draw_arc({210,0},radius/4,radius,1.90*M_PI,cr);
 	std::cout << "on_draw finished" << std::endl;
-	* */
+
 	return true;
 }
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
