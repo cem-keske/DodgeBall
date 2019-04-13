@@ -198,10 +198,8 @@ bool Simulator::create_simulation(std::vector<std::string> const& io_files)	{
 			std::swap(active_sims()[0], active_sims()[1]);
 			active_sims().pop_back();
 			// old sim is destroyed. new sim is moved to index 0
-			std::cout << "Sim discarded." << std::endl;
 	}								
 	assert(active_sims.size()==1);
-	std::cout << "Finished create sim" << std::endl;
 	return success;
 }
 
@@ -284,7 +282,6 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		if(reader.import_file(io_files[0], *this) == true)
 			success_ = true;
 	}
-	std::cout << "Finished sim constructor" << std::endl;
 	update_graphics();
 }
 
