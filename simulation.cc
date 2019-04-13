@@ -41,9 +41,9 @@ class Simulation {
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
 
-		std::unique_ptr<vec_player_graphics> player_graphics_;		
-		std::unique_ptr<vec_ball_bodies> ball_bodies_;		
-		std::unique_ptr<vec_obstacle_bodies> obstacle_bodies_;		
+		std::shared_ptr<vec_player_graphics> player_graphics_;		
+		std::shared_ptr<vec_ball_bodies> ball_bodies_;		
+		std::shared_ptr<vec_obstacle_bodies> obstacle_bodies_;		
 
 
 	public:
@@ -70,9 +70,9 @@ class Simulation {
 		
 		bool test_collisions();
 		
-		const std::unique_ptr<vec_player_graphics>& player_graphics() const;
-		const std::unique_ptr<vec_ball_bodies>& ball_bodies() const;
-		const std::unique_ptr<vec_obstacle_bodies>& obstacle_bodies() const;
+		const std::shared_ptr<vec_player_graphics>& player_graphics() const;
+		const std::shared_ptr<vec_ball_bodies>& ball_bodies() const;
+		const std::shared_ptr<vec_obstacle_bodies>& obstacle_bodies() const;
 		
 		void update_graphics();
 				
@@ -179,17 +179,17 @@ void Simulator::create_simulation(std::unordered_map<std::string, bool> const&
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-const std::unique_ptr<vec_player_graphics>& Simulator::fetch_player_graphics() {
+const std::shared_ptr<vec_player_graphics>& Simulator::fetch_player_graphics() {
 		
 	return active_sims[0].player_graphics();
 }
 
-const std::unique_ptr<vec_ball_bodies>& Simulator::fetch_ball_bodies() {
+const std::shared_ptr<vec_ball_bodies>& Simulator::fetch_ball_bodies() {
 
 	return active_sims[0].ball_bodies();
 }
 
-const std::unique_ptr<vec_obstacle_bodies>& Simulator::fetch_obstacle_bodies() {
+const std::shared_ptr<vec_obstacle_bodies>& Simulator::fetch_obstacle_bodies() {
 	
 	return active_sims[0].obstacle_bodies();
 	
@@ -228,12 +228,15 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		}
 	}
 	
-	Reader reader(BEGIN);
-	if(reader.import_file(io_files[0], *this) == false)
-		exit(0);
-	success_ = true; 	// succcessful initialisation
-	
+	// if there are files to import to simulation
+	if (io_files.size() > 0) {
+		Reader reader(BEGIN);
+		if(reader.import_file(io_files[0], *this) == false)
+			exit(0);
+	}
+
 	update_graphics();
+	success_ = true; 	// succcessful initialisation
 }
 
 // ===== Public methods ===== 
@@ -246,15 +249,15 @@ const std::vector<Ball>& Simulation::balls() const {return balls_;}
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
 
 
-const std::unique_ptr<vec_player_graphics>& Simulation::player_graphics() const {
+const std::shared_ptr<vec_player_graphics>& Simulation::player_graphics() const {
 	return player_graphics_;
 }
 
-const std::unique_ptr<vec_ball_bodies>& Simulation::ball_bodies() const {
+const std::shared_ptr<vec_ball_bodies>& Simulation::ball_bodies() const {
 	return ball_bodies_;
 }
 
-const std::unique_ptr<vec_obstacle_bodies>& Simulation::obstacle_bodies() const {
+const std::shared_ptr<vec_obstacle_bodies>& Simulation::obstacle_bodies() const {
 
 	size_t nb_obstacles(obstacles().size());
 	
@@ -284,15 +287,14 @@ void Simulation::update_player_graphics() {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
-		std::unique_ptr<const Circle> ptr_to_body(&(players_[i].body()));
+		std::shared_ptr<const Circle> ptr_to_body(&(players_[i].body()));
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
 		
 		// alpha = 2*pi * (1 - cooldown / max cooldown) 
 		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
-		(*player_graphics_)[i] = std::make_tuple(std::move(ptr_to_body), 
-												 arc_angle, player_color);	
+		(*player_graphics_)[i] = std::make_tuple(ptr_to_body, arc_angle, player_color);	
 		
 	}
 }
@@ -304,8 +306,8 @@ void Simulation::update_ball_bodies() {
 	ball_bodies_->resize(nb_balls);
 	
 	for(size_t i(0); i < nb_balls; ++i) {
-		std::unique_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
-		(*ball_bodies_)[i] = std::move(ptr_to_body);	
+		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
+		(*ball_bodies_)[i] = ptr_to_body;	
 	}
 }
 
@@ -317,8 +319,8 @@ void Simulation::update_obstacle_bodies() {
 	
 	size_t counter(0);
 	for(const auto& obs : obstacles()) {
-		std::unique_ptr<const Rectangle> ptr_to_body(&(obs.second));
-		(*obstacle_bodies_)[counter] = std::move(ptr_to_body);		
+		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
+		(*obstacle_bodies_)[counter] = ptr_to_body;		
 		++counter;
 	}
 }
