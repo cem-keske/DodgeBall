@@ -220,7 +220,18 @@ void Gui_Window::on_button_clicked_open(){
 }
 
 void Gui_Window::on_button_clicked_save(){
+	Gtk::FileChooserDialog file_dialog("Please open a file", 
+										Gtk::FILE_CHOOSER_ACTION_OPEN); 
+	file_dialog.set_transient_for(*this);
+		
+	file_dialog.add_button("Open", Gtk::RESPONSE_OK);
+	file_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
 	
+	int response = file_dialog.run();
+	
+	if(response == Gtk::RESPONSE_OK){
+		//Simulator::output_file(file_dialog.get_filename());
+	}
 	std::cout << button_save.get_label() << std::endl;
 }
 
