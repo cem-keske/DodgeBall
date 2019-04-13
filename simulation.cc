@@ -230,6 +230,9 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
 			exit(0);
+		else
+			success_ = true;
+		
 	}
 	
 	// if there are files to import to simulation
@@ -237,8 +240,6 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
 			success_ = true;
-		else
-			success_ = false;
 	}
 
 	update_graphics();
