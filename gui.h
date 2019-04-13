@@ -8,20 +8,20 @@
 
 /// CANVAS ///
 
+
+
 /**
  * Drawing canvas for gui.
  */
 class Canvas : public Gtk::DrawingArea
 {
 	public:
-
 		Canvas();
 		virtual ~Canvas();
 		void clear();
 		void draw();
 
 	protected:
-	
 		bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
   
 	private:
@@ -31,8 +31,7 @@ class Canvas : public Gtk::DrawingArea
 		void refresh();
 	public:
 		void draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
-							 Color const& background_color = Tools::COLOR_WHITE);	
-							 
+							 Color const& background_color = Tools::COLOR_WHITE);						 
 		void draw_border(const Cairo::RefPtr<Cairo::Context>& cr, Length thicnkess,
 						 Color const& border_color = Tools::COLOR_BLACK);	
 		/**

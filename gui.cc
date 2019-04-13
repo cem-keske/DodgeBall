@@ -12,6 +12,18 @@
 
 static constexpr int default_border_thickness(5);
 
+// ===== Utility Functions =====
+
+const Color& predefined_color_chooser(Predefined_Colors color){
+	switch(color) {
+		case RED    :	return Tools::COLOR_RED;
+		case ORANGE :	return Tools::COLOR_ORANGE;
+		case GREEN  :	return Tools::COLOR_GREEN;
+		case YELLOW :	return Tools::COLOR_YELLOW;
+	}
+}
+
+
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX), sim_running(false) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
 }
@@ -87,7 +99,8 @@ void Canvas::draw_arc(Coordinate const& original,Length thickness,Length outer_r
 	Coordinate converted(convert_coordinate(original));
 	cr->set_line_width(thickness);
 	cr->set_source_rgb(color.r, color.g, color.b);
-	cr->arc(converted.x, converted.y,(outer_radius-thickness/2.0)+1,3*M_PI_2,alpha+3*M_PI_2);
+	cr->arc(converted.x, converted.y,
+			(outer_radius-thickness/2.0)+1, 3*M_PI_2 , alpha + 3*M_PI_2);
 	cr->stroke();	   
 	cr->restore();
 }

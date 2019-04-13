@@ -213,9 +213,10 @@ class Circle {
 	public:
 		
 		// ===== Constructors =====
-		
+		 
 		Circle(Length radius); //at origin
 		Circle(Coordinate const& center, Length radius);
+		Circle(Circle const& circle);
 		
 		// ===== Accessors =====
 		
@@ -227,45 +228,50 @@ class Circle {
 		void center(Coordinate const&);
 		void radius(Length);
 };
-
+/// ARC ///
+/**
+ * A circular arc with a beginning and end point. 
+ * Angles are in radians and in[0, 2*pi] by convention!!!
+ */
 class Arc : public Circle {
 	private:
-		Angle a1;
-		Angle a2;
+		Angle begin_;
+		Angle end_;
 	 
 	 public:
 		
 		// ===== Constructors =====
 		
-		Arc(Circle const& circ, Angle a1, Angle a2);
-		Arc(Coordinate const& center, Length radius, Angle a1, Angle arc_length);
+		Arc(Circle const&, Angle begin_, Angle end_);
+		//Default direction for this constructor is counter-clockwise!
+		Arc(Coordinate const& center, Length radius, Angle begin_, Angle arc_length);
 		
+		// ===== Accessors =====
 		
-		
+		Angle begin() const;
+		Angle end() const;
+		Angle arc_length() const;	
 };
 
 
 /// ===== NAMESPACES FOR UTILITY FUNCTIONS ===== ///
 
 namespace Tools {	
-			
-		// some color constants
-		constexpr Color COLOR_RED 		= {1.0,0.0,0.0};
-		constexpr Color COLOR_ORANGE 	= {1.0,0.28,0.09};
-		constexpr Color COLOR_YELLOW 	= {1.0,0.91,0.0};
-		constexpr Color COLOR_GREEN 	= {0.0,0.94,0.0};
-		constexpr Color COLOR_BLUE 		= {0.19,0.38,0.92};
-		constexpr Color COLOR_BROWN 	= {0.349,0.153,0.125};
-		constexpr Color COLOR_BLACK 	= {0.0,0.0,0.0};
-		constexpr Color COLOR_WHITE 	= {1.0,1.0,1.0};
-		
-
+	
+		//some color constants
+		constexpr Color COLOR_RED 		= {1.0,		0.0,	0.0};
+		constexpr Color COLOR_ORANGE 	= {1.0,		0.28,	0.09};
+		constexpr Color COLOR_YELLOW 	= {1.0,		0.91,	0.0};
+		constexpr Color COLOR_GREEN 	= {0.0,		0.94,	0.0};
+		constexpr Color COLOR_BLUE 		= {0.19,	0.38,	0.92};
+		constexpr Color COLOR_BROWN 	= {0.349,	0.153,	0.125};
+		constexpr Color COLOR_BLACK 	= {0.0,		0.0,	0.0};
+		constexpr Color COLOR_WHITE 	= {1.0,		1.0,	1.0};
 		
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);
 		bool intersect(Rectangle const&, Circle const&, Length tolerance);
 		double distance(Coordinate const&, Coordinate const&);
-		
 };
 
 
