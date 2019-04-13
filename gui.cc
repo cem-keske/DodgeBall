@@ -126,11 +126,10 @@ void Canvas::draw_rectangle(Rectangle const& original,
 
 void Canvas::draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr) {
 	const vec_player_graphics& disks_and_arcs(Simulator::get_player_graphics());
-	std::cout << disks_and_arcs.size() << std:: endl;
+	std::cout << "D_and_a size: " << disks_and_arcs.size() << std:: endl;
 	for (auto const& circled_arc : disks_and_arcs) {
 		std::cout << "girdi" << std::endl;
 		//get the circle from the tuple and draw its disk
-		*(std::get<0>(circled_arc));
 		draw_disk(*(std::get<0>(circled_arc)), cr, 
 				  predefined_color_chooser((std::get<2>(circled_arc))));
 		std::cout << std::get<0>(circled_arc)->center().to_string() << std::endl;
