@@ -307,6 +307,7 @@ void Simulation::update_ball_bodies() {
 	
 	for(size_t i(0); i < nb_balls; ++i) {
 		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
+
 		(*ball_bodies_)[i] = ptr_to_body;	
 	}
 }
@@ -320,6 +321,7 @@ void Simulation::update_obstacle_bodies() {
 	size_t counter(0);
 	for(const auto& obs : obstacles()) {
 		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
+
 		(*obstacle_bodies_)[counter] = ptr_to_body;		
 		++counter;
 	}
