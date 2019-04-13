@@ -34,8 +34,8 @@ enum Predefined_Color : unsigned{
  * and the preferred color for the player (according to lives left)
  */
 typedef std::vector<std::tuple<Circle, Angle, Predefined_Color>> vec_player_graphics;
-typedef std::vector<const Circle>		 		 vec_ball_bodies;
-typedef std::vector<std::shared_ptr<const Rectangle>>			 vec_obstacle_bodies;
+typedef std::vector<Circle>		vec_ball_bodies;
+typedef std::vector<Rectangle>	vec_obstacle_bodies;
 
 class Simulation; //forward declaration necessary
 /**

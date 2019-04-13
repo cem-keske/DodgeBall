@@ -287,22 +287,23 @@ void Simulation::update_player_graphics() {
 		
 	size_t nb_players(players().size());
 	
-	player_graphics_.resize(nb_players);	// resize to nb_players : we need only this
-											// many graphic objects.
+	// resize to nb_players : we need only this many instances. fill if necessary with
+	// dummies
+	player_graphics_.resize(nb_players, std::make_tuple(Circle(0), 0, RED));	
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
 						// of a player
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
-		std::shared_ptr<const Circle> ptr_to_body (&(players_[i].body()));
+		auto body(players_[i].body());
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
 		
 		// alpha = 2*pi * (1 - cooldown / max cooldown) 
 		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
-		player_graphics_[i] = std::make_tuple(ptr_to_body, arc_angle, player_color);	
+		player_graphics_[i] = std::make_tuple(body, arc_angle, player_color);	
 		
 	}
 }
@@ -310,27 +311,27 @@ void Simulation::update_player_graphics() {
 void Simulation::update_ball_bodies() {
 	
 	size_t nb_balls(balls().size());
-
-	ball_bodies_.resize(nb_balls);
+	
+	// resize ball_bodies_ and fill with dummies if necessary
+	ball_bodies_.resize(nb_balls, Circle(0));
 	
 	for(size_t i(0); i < nb_balls; ++i) {
-		std::shared_ptr<const Circle> ptr_to_body(&balls_[i].geometry());	
+		Circle body(balls_[i].geometry());	
 
-		ball_bodies_[i] = ptr_to_body;	
+		ball_bodies_[i] = body;	
 	}
 }
 
 void Simulation::update_obstacle_bodies() {
 	
 	size_t nb_obstacles(obstacles().size());
-
-	obstacle_bodies_.resize(nb_obstacles);
+	
+	// resize obstacle_bodies_ and fill with dummies if necessary
+	obstacle_bodies_.resize(nb_obstacles, Rectangle({0,0}, {0,0}));
 	
 	size_t counter(0);
 	for(const auto& obs : obstacles()) {
-		std::shared_ptr<const Rectangle> ptr_to_body(&(obs.second));
-
-		obstacle_bodies_[counter] = ptr_to_body;		
+		obstacle_bodies_[counter] = obs.second;		
 		++counter;
 	}
 }
