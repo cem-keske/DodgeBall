@@ -60,9 +60,9 @@ class Simulator{
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  		
-		static vec_player_graphics* get_player_graphics(); 
-		static vec_ball_bodies get_ball_bodies();
-		static vec_obstacle_bodies get_obstacle_bodies();
+		static const std::unique_ptr<vec_player_graphics>& fetch_player_graphics(); 
+		static const std::unique_ptr<vec_ball_bodies>& fetch_ball_bodies();
+		static const std::unique_ptr<vec_obstacle_bodies>& fetch_obstacle_bodies();
 };	
 
 #endif
