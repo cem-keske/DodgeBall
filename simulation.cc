@@ -76,6 +76,8 @@ class Simulation {
 		const vec_obstacle_bodies& obstacle_bodies() const;
 		
 		void update_graphics();
+		
+		bool is_over() const;
 				
 		bool save(const std::string &o_file_path) const;
 		
@@ -175,7 +177,7 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 		active_sims().push_back(Simulation(execution_parameters, io_files));
 		success = active_sims()[0].success();
 		if(success == false) {
-			active_sims().pop_back();
+			active_sims().pop_back();		// erase all data in case of bad file
 		}
 	} else {
 		active_sims().push_back(Simulation(execution_parameters, io_files));
@@ -191,7 +193,7 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 	return success;
 }
 
-bool Simulator::import_file(std::string file_path) {
+bool Simulator::import_file(const std::string& file_path) {
 	return create_simulation(active_sims()[0].execution_parameters(), {file_path});
 }
 
@@ -199,6 +201,14 @@ bool Simulator::empty() {
 	return active_sims().empty();
 }
 
+std::string Simulator::active_simulation_state() {
+	if(active_sims().empty())
+		return "No game to run";
+	if(active_sims()[0].success())
+		if(active_sims()[0].is_over())
+			return "Game's over!";
+		return "Game ready to run";
+}
 
 /**
  * Returns a vector containing player bodies along with their remeaning life counters
@@ -209,8 +219,6 @@ vec_player_graphics Simulator::fetch_player_graphics() {
 }
 
 vec_ball_bodies Simulator::fetch_ball_bodies() {
-	std::cout << "fetch_ball active_sims[0].success_ = " << active_sims()[0].success() << std::endl;
-
 	return active_sims()[0].ball_bodies();
 }
 
@@ -218,6 +226,10 @@ vec_obstacle_bodies Simulator::fetch_obstacle_bodies() {
 	
 	return active_sims()[0].obstacle_bodies();
 	
+}
+
+void Simulator::save_simulation(const std::string &file_path) {
+	active_sims()[0].save(file_path);
 }
 
 
@@ -500,6 +512,11 @@ bool Simulation::test_collisions() {
 		return false;
 		
 	return true;
+}
+
+bool Simulation::is_over() const {
+	// to write
+	return false;
 }
 
 /**
