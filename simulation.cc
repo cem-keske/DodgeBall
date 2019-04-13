@@ -174,6 +174,9 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 	if (active_sims().empty()) {
 		active_sims().push_back(Simulation(execution_parameters, io_files));
 		success = active_sims()[0].success();
+		if(success == false) {
+			active_sims().pop_back();
+		}
 	} else {
 		active_sims().push_back(Simulation(execution_parameters, io_files));
 		if (active_sims().back().success())	// assignment intentional
