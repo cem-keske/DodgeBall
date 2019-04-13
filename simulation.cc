@@ -176,14 +176,15 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 		success = active_sims()[0].success();
 	} else {
 		active_sims().push_back(Simulation(execution_parameters, io_files));
-		if ((success = active_sims().back().success()))	// assignment intentional
-			active_sims().erase(active_sims().begin());
+		if (active_sims().back().success())	// assignment intentional
+			std::swap(active_sims()[0], active_sims()[1]);
+			active_sims().pop_back();
 			// old sim is destroyed. new sim is moved to index 0
 			std::cout << "Sim discarded." << std::endl;
 	}								
 	assert(active_sims.size()==1);
 	std::cout << "Finished create sim" << std::endl;
-	
+	success = active_sims()[0].success();
 	return success;
 }
 
