@@ -34,9 +34,7 @@ class Simulation {
 		Length marge_jeu_;
 		Length marge_lecture_;
 		bool success_;
-		
-		std::unordered_map<std::string, bool> execution_parameters_;
-		
+				
 		Map map_;
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
@@ -50,13 +48,11 @@ class Simulation {
 	
 		// ===== Constructor =====
 		
-		Simulation(std::unordered_map<std::string, bool> const&, 
-				   std::vector<std::string> const&);
+		Simulation(std::vector<std::string> const&);
 
 		// ===== Public Methods =====
 		
 		bool success() const;
-		const std::unordered_map<std::string, bool> & execution_parameters() const;
 		const std::vector<Player>& players() const;
 		const std::vector<Ball>& balls() const;
 		const Rectangle_map& obstacles() const;
@@ -156,32 +152,49 @@ class Reader {
 
 /// ===== SIMULATOR ===== ///
 
-
-std::vector<Simulation>& Simulator::active_sims() {
-	/**
-	 * This vector will hold up to two simulation instances. During reading of a new 
-	 * simulation (with Open button) it will be pushed back in this vector. In case of
-	 * a successful reading, new simulation is moved to active_sims[0].
-	 */
-	static std::vector<Simulation> active_sims;
-	return active_sims;
-
+void Simulator::exec_parameters(const std::unordered_map<std::string, bool>& 
+								exec_param) {
+	execution_parameters() = exec_param;
 }
 
-bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
-								  execution_parameters, 
-								  std::vector<std::string> const& io_files)	{
-	bool success(false);
+const std::unordered_map<std::string, bool>& Simulator::exec_parameters() {
+	return execution_parameters();
+}
+
+/**
+ * Wrapper function that contains the static execution_parameters field. For internal
+ * use of Simulator class only.
+ */
+std::unordered_map<std::string, bool>& Simulator::execution_parameters() {
+	static std::unordered_map<std::string, bool> execution_parameters_;
+	return execution_parameters_;
+}
+
+/**
+ * Wrapper function for active simulations.
+ * This vector will hold up to two simulation instances. During reading of a new 
+ * simulation (with Open button) it will be pushed back in this vector. In case of
+ * a successful reading, new simulation is moved to active_sims[0].
+ */
+std::vector<Simulation>& Simulator::active_sims() {
+
+	static std::vector<Simulation> active_sims_;
+	return active_sims_;
+}
+
+bool Simulator::create_simulation(std::vector<std::string> const& io_files)	{
 	
+	bool success(false);
+
 	if (active_sims().empty()) {
-		active_sims().push_back(Simulation(execution_parameters, io_files));
+		active_sims().emplace_back(Simulation(io_files));
 		success = active_sims()[0].success();
 		if(success == false) {
 			active_sims().pop_back();		// erase all data in case of bad file
 		}
 	} else {
-		active_sims().push_back(Simulation(execution_parameters, io_files));
-		if (active_sims().back().success())	// assignment intentional
+		active_sims().push_back(Simulation(io_files));
+		if (active_sims().back().success())
 			std::swap(active_sims()[0], active_sims()[1]);
 			active_sims().pop_back();
 			// old sim is destroyed. new sim is moved to index 0
@@ -189,13 +202,12 @@ bool Simulator::create_simulation(std::unordered_map<std::string, bool> const&
 	}								
 	assert(active_sims.size()==1);
 	std::cout << "Finished create sim" << std::endl;
-	success = active_sims()[0].success();
 	return success;
 }
 
 bool Simulator::import_file(const std::string& file_path) {
 	std::vector<std::string> io_files = {file_path};
-	return create_simulation(active_sims()[0].execution_parameters(), io_files);
+	return create_simulation(io_files);
 }
 
 bool Simulator::empty() {
@@ -239,9 +251,7 @@ void Simulator::save_simulation(const std::string &file_path) {
 
 // ===== Constructor ===== 
 
-Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_parameters,
-					   std::vector<std::string>const& io_files) 
-					   : execution_parameters_(execution_parameters) {
+Simulation::Simulation(std::vector<std::string>const& io_files) {
 		// set base types to debug values. They must be properly initialised during
 		// file import.															 
 		nb_cells_ = 0;
@@ -253,20 +263,19 @@ Simulation::Simulation(std::unordered_map<std::string,bool>const& execution_para
 		marge_lecture_ = -1.;
 		success_ = false;
 
-	if(execution_parameters_["Error"]) {	//
+	if(Simulator::exec_parameters().at("Error")) {	//
 		if(io_files.empty()) { 
 			#ifndef NDEBUG
 			std::cout << "No input file. Exiting...";
 			#endif
 			exit(0);
 		}
-
+		
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
 			exit(0);
 		else
 			success_ = true;
-		
 	}
 	
 	// if there are files to import to simulation
@@ -287,11 +296,6 @@ const std::vector<Player>& Simulation::players() const {return players_;}
 const std::vector<Ball>& Simulation::balls() const {return balls_;}
 
 const Rectangle_map& Simulation::obstacles() const {return map_.obstacle_bodies();}
-
-const std::unordered_map<std::string, bool> & Simulation::execution_parameters() const
-{
-	return execution_parameters_;
-}		
 
 const vec_player_graphics& Simulation::player_graphics() const {
 	return player_graphics_;
@@ -587,7 +591,7 @@ void Reader::reader_state(ReaderState reader_state) {reader_state_ = reader_stat
  * from "file_adress" to the given "simulation" object.
  * 
  * Failures due to reading are traited depending on the execution parameters of
- * "simulation" object.
+ * simulator.
  * eg. The program stops if an error is occured in Error mode, waits for another input
  * if not in error mode.
  */

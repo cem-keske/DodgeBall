@@ -47,13 +47,18 @@ class Simulation; //forward declaration necessary
 class Simulator{
 
 	public:
+		
+		/// sets execution parameters to be used for all simulation
+		static void exec_parameters(const std::unordered_map<std::string, bool>&);
+		
+		/// corresponding accessor
+		static const std::unordered_map<std::string, bool>& exec_parameters();
+	
 		/**
 		 * Creates a new simulation. If not successful, the previous state of the
 		 * game is conserved. 
 		 */
-		static bool create_simulation(std::unordered_map<std::string, bool> const&
-									  exec_parameters, 
-									  std::vector<std::string> const& io_files);							  
+		static bool create_simulation(std::vector<std::string> const& io_files);							  
 		static bool import_file(const std::string&);
 		static bool empty();
 		static std::string active_simulation_state();
@@ -68,8 +73,8 @@ class Simulator{
 		static void save_simulation(const std::string&);
 	
 	private:
+		static std::unordered_map<std::string, bool>& execution_parameters();
 		static std::string active_simulation_state_;
-		;
 		static std::vector<Simulation>& active_sims();
 
 };	
