@@ -29,11 +29,7 @@ class Canvas : public Gtk::DrawingArea
 		Coordinate convert_coordinate(Coordinate const&);
 		bool sim_running;
 		void refresh();
-	public:
-		void draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
-							 Color const& background_color = Tools::COLOR_WHITE);						 
-		void draw_border(const Cairo::RefPtr<Cairo::Context>& cr, Length thicnkess,
-						 Color const& border_color = Tools::COLOR_BLACK);	
+		void draw_all_player_bodies(const Cairo::RefPtr<Cairo::Context>& cr);
 		/**
 		 * All the arguments given to the functions below must be the original shapes
 		 * in the simulation. (these functions also converts coordinates).
@@ -46,6 +42,12 @@ class Canvas : public Gtk::DrawingArea
 		void draw_rectangle(Rectangle const& original, 
 							const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true,
 							Color const & color = Tools::COLOR_BROWN);
+	public:
+		void draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
+							 Color const& background_color = Tools::COLOR_WHITE);						 
+		void draw_border(const Cairo::RefPtr<Cairo::Context>& cr, Length thicnkess,
+						 Color const& border_color = Tools::COLOR_BLACK);	
+		
 };
 
 /// GUI WINDOW ///
