@@ -31,22 +31,22 @@ class Canvas : public Gtk::DrawingArea
 		void refresh();
 	public:
 		void draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
-							 Color const& background_color = Tools::color_white());	
+							 Color const& background_color = Tools::COLOR_WHITE);	
 							 
 		void draw_border(const Cairo::RefPtr<Cairo::Context>& cr, Length thicnkess,
-						 Color const& border_color = Tools::color_black());	
+						 Color const& border_color = Tools::COLOR_BLACK);	
 		/**
 		 * All the arguments given to the functions below must be the original shapes
 		 * in the simulation. (these functions also converts coordinates).
 		 */ 
 		void draw_disk(Circle const& original, const Cairo::RefPtr<Cairo::Context>& cr, 
-					   Color const& color = Tools::color_blue());
+					   Color const& color = Tools::COLOR_BLUE);
 		void draw_arc(Coordinate const& original, Length thickness, Angle alpha, 
 					  Length outer_radius, const Cairo::RefPtr<Cairo::Context>& cr,
-					  Color const& color = Tools::color_blue());
+					  Color const& color = Tools::COLOR_BLUE);
 		void draw_rectangle(Rectangle const& original, 
-						 const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true,
-					     Color const & color = Tools::color_brown());
+							const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true,
+							Color const & color = Tools::COLOR_RED);
 };
 
 /// GUI WINDOW ///

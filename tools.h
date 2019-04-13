@@ -206,7 +206,7 @@ class Rectangle {
  * A circle at a coordinate.
  */
 class Circle {
-	private:
+	protected:
 		Coordinate center_;
 		Length radius_;
 	
@@ -228,20 +228,38 @@ class Circle {
 		void radius(Length);
 };
 
+class Arc : public Circle {
+	private:
+		Angle a1;
+		Angle a2;
+	 
+	 public:
+		
+		// ===== Constructors =====
+		
+		Arc(Circle const& circ, Angle a1, Angle a2);
+		Arc(Coordinate const& center, Length radius, Angle a1, Angle arc_length);
+		
+		
+		
+};
+
 
 /// ===== NAMESPACES FOR UTILITY FUNCTIONS ===== ///
 
 namespace Tools {	
 			
-		// some color constants	
-		const Color color_red(); 		
-		const Color color_orange(); 
-		const Color color_yellow(); 
-		const Color color_green();
-		const Color color_blue();	
-		const Color color_brown();
-		const Color color_black();
-		const Color color_white();
+		// some color constants
+		constexpr Color COLOR_RED 		= {1.0,0.0,0.0};
+		constexpr Color COLOR_ORANGE 	= {1.0,0.28,0.09};
+		constexpr Color COLOR_YELLOW 	= {1.0,0.91,0.0};
+		constexpr Color COLOR_GREEN 	= {0.0,0.94,0.0};
+		constexpr Color COLOR_BLUE 		= {0.19,0.38,0.92};
+		constexpr Color COLOR_BROWN 	= {0.349,0.153,0.125};
+		constexpr Color COLOR_BLACK 	= {0.0,0.0,0.0};
+		constexpr Color COLOR_WHITE 	= {1.0,1.0,1.0};
+		
+
 		
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);
