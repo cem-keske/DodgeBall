@@ -12,6 +12,7 @@
 #include <memory>
 
 /// ===== TYPEDEF ===== ///
+
 /**
  * This datastructure will serve to hold geometrical representations of obstacles in
  * an ordered manner. 
@@ -19,9 +20,11 @@
 typedef std::map<std::pair<size_t, size_t>, Rectangle> Rectangle_map;
 
 /// ===== ENUM ===== ///
+
 /**
- * A cell is either empty or occupied by an obstacle. Enum class is preferred to ensure
- * each cell is given a value corresponding to its state (not any arbitrary boolean). 
+ * A cell is either empty or occupied by an obstacle. Enum class is preferred 
+ * to ensure each cell is given a value corresponding to its state 
+ * (not any arbitrary boolean). 
  */  
 enum class Cell : bool{
 	FREE,
@@ -29,6 +32,7 @@ enum class Cell : bool{
 };
 // We need first the enum declaration to define this type
 typedef std::vector<std::vector<Cell>> Grid; 
+
 
 /// ===== MAP ===== ///
 

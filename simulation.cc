@@ -385,7 +385,7 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
  */
 void Simulation::update(double delta_t) {
 	// stub. not implemented yet.
-	std::cout << "Simulation updating..." << std::endl;
+	std::cout << "Simulation update will be implemented" << std::endl;
 }
 
 void Simulation::update_graphics() {
@@ -603,7 +603,7 @@ bool Simulation::is_over() const {
 }
 
 /**
- * Saves the currrent state of the simulation to a given file path. Exporting will be
+ * Saves the current state of the simulation to a given file path. Exporting will be
  * done in a straightforward way so there is no need for another class as in Reader.
  */
 bool Simulation::save(const std::string &o_file_path) const {
@@ -890,7 +890,6 @@ bool Reader::read_balls(std::ifstream& in_file, Simulation& simulation){
 	
 }
 
-
 void Reader::finalise_reading(ReaderState &actual_state) {
 	actual_state=SUCCESS; 
 	std::cout << FILE_READING_SUCCESS << std::endl;
@@ -898,7 +897,7 @@ void Reader::finalise_reading(ReaderState &actual_state) {
 
 /**
  *	Prints the error state of the given reader to the console.
- * 	Must only be used to print errors. (unused ifdef #NDDEBUG)
+ * 	Must only be used to print errors. (unused ifdef #NDEBUG)
  */
 void Reader::print_error_state(ReaderState error_state) {
 	const static std::array<std::string,(SUCCESS+1)> state_strings = {

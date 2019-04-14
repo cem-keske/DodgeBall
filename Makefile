@@ -43,5 +43,5 @@ player.o: player.cc player.h tools.h
 ball.o: ball.cc ball.h tools.h
 map.o: map.cc map.h tools.h define.h
 tools.o: tools.cc tools.h
-gui.o: gui.cc gui.h simulation.h tools.h player.h map.h ball.h
+gui.o: gui.cc gui.h simulation.h tools.h player.h map.h ball.h define.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c $< -o $@ $(LINKING)

@@ -28,8 +28,8 @@ class Canvas : public Gtk::DrawingArea{
 		bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
   
 	private:
-		
-		Coordinate center;//the center coordinates of the canvas in gui's coord. system
+		//the center coordinates of the canvas in gui's coordinate system
+		Coordinate center;
 		
 		/**
 		 * Takes a cartesian coordinate and returns a new coordinate in gui's
@@ -42,7 +42,7 @@ class Canvas : public Gtk::DrawingArea{
 		// ===== Graphics-Draw Methods =====
 		
 		void draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
-							 Color const& background_color = Tools::COLOR_WHITE);						 
+							 Color const& background_color = Tools::COLOR_WHITE);						  
 		void draw_border(const Cairo::RefPtr<Cairo::Context>& cr, Length thicnkess,
 						 Color const& border_color = Tools::COLOR_BLACK);
 		void draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
@@ -51,7 +51,7 @@ class Canvas : public Gtk::DrawingArea{
 		
 		/**
 		 * All the arguments given to the functions below must be the original shapes
-		 * in the simulation. (these functions also converts coordinates).
+		 * in the simulation (these functions occupy the coordinate conversion).
 		 */ 
 		void draw_disk(Circle const& original, const Cairo::RefPtr<Cairo::Context>& cr, 
 					   Color const& color = Tools::COLOR_BLUE);
@@ -61,11 +61,6 @@ class Canvas : public Gtk::DrawingArea{
 		void draw_rectangle(Rectangle const& original, 
 							const Cairo::RefPtr<Cairo::Context>& cr, bool fill = true,
 							Color const & color = Tools::COLOR_BROWN);
-		/**
-		 * The refresh method for the animation window. This function will also call 
-		 * the update method of simulation in further iplementations.
-		 */
-		void refresh();
 };
 
 /// GUI WINDOW ///
@@ -128,12 +123,9 @@ class Gui_Window : public Gtk::Window
 		void add_button_panel_components();
 		void connect_buttons_to_handlers();
 		
-		/**
-		 * Refreshes all gui components using the current simulation.
-		 */
+		// ===== Refresher =====
+		
 		void refresh();
-		
-		
 		
 		// ===== Interaction Methods =====
 		

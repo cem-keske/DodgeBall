@@ -260,33 +260,7 @@ void Circle::radius(Length radius) {
 	radius_ = radius;
 }
 
-/// ===== ARC ===== ///
 
-// ===== Constructors =====
-
-Arc::Arc(Circle const& circle, Angle begin, Angle end)
-		 :Circle(circle), begin_(begin), end_(end) {}
-														
-Arc::Arc(Coordinate const& center, Length radius, Angle begin, Angle arc_length) 
-		:Circle(center,radius), begin_(begin){
-	Angle end = begin_ + arc_length;
-	end_ = (end > M_PI*2) ? end - M_PI*2 : end; 
-}
-		
-// ===== Accessors & Manipulators =====
-		
-Angle Arc::begin() const{
-	return begin_;
-}
-
-Angle Arc::end() const{
-	return end_;
-}
-
-Angle Arc::arc_length() const{
-	Angle diff (end_ - begin_);
-	return (diff<0) ? diff + M_PI * 2 : diff; 
-}
 
 /// ===== Tools namespace ===== ///
 

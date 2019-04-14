@@ -196,7 +196,7 @@ class Rectangle {
 		
 		// ===== Utilities =====
 		/**
-		 * Points on borders considered like inside the rectangle.
+		 * Points on borders considered inside the rectangle.
 		 */
 		bool contains(Coordinate const&) const;
 };
@@ -227,30 +227,6 @@ class Circle {
 		
 		void center(Coordinate const&);
 		void radius(Length);
-};
-/// ARC ///
-/**
- * A circular arc with a beginning and end point. 
- * Angles are in radians and in[0, 2*pi] by convention!!!
- */
-class Arc : public Circle {
-	private:
-		Angle begin_;
-		Angle end_;
-	 
-	 public:
-		
-		// ===== Constructors =====
-		
-		Arc(Circle const&, Angle begin_, Angle end_);
-		//Default direction for this constructor is counter-clockwise!
-		Arc(Coordinate const& center, Length radius, Angle begin_, Angle arc_length);
-		
-		// ===== Accessors =====
-		
-		Angle begin() const;
-		Angle end() const;
-		Angle arc_length() const;	
 };
 
 

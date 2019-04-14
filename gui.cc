@@ -11,9 +11,14 @@
 #include <cmath>
 #include <cairomm/context.h>
 
+// ===== Constants for the module gui =====
+
 static constexpr int default_border_thickness(3);
-static constexpr double circle_arc_ratio(0.35);
-static constexpr int delta_t_ms((int)(DELTA_T * 1000));
+static constexpr double circle_arc_ratio(0.35);	//between radius and arc's thickness
+static constexpr int delta_t_ms((int)(DELTA_T * 1000)); //DELTA_T converted to ms
+static constexpr double starting_angle(M_PI_2*3); 	//the angle where the arcs start
+
+
 
 // ===== Utility Functions =====
 
@@ -26,6 +31,7 @@ const Color& predefined_color_chooser(Predefined_Color color){
 	}
 	return Tools::COLOR_BLACK;
 }
+
 /**
  * Returns the label string to show corresponding to the given simulation state.
  * 
@@ -48,44 +54,46 @@ bool file_exists(const std::string& file_path){
 
 
 
+
 /// ===== CANVAS ===== ///
+
+
 
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
 }
 
-void Canvas::refresh()
-{
-	//redraw the table
-	
-	on_draw(get_window()->create_cairo_context());
-}
 
-bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{	
+bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr){
+		
 	draw_background(cr);
-	if(Simulator::empty() == false){
+	if(Simulator::empty() == false) {
 		draw_all_player_graphics(cr);
 		draw_all_rectangle_graphics(cr);
 		draw_all_ball_graphics(cr);
 	}
-	
-	
 	draw_border(cr, default_border_thickness);	
 	return true;
 }
+
 Coordinate Canvas::convert_coordinate(Coordinate const& pos){
 	return {center.x + pos.x , center.y - pos.y };
 }
 
-void Canvas::draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
-							 Color const& background_color){
+/**
+ * Default value for color is white.
+ */
+void Canvas::draw_background(const Cairo::RefPtr<Cairo::Context>& cr, 
+						Color const& background_color){
 	cr->save();
 	cr->set_source_rgb(background_color.r, background_color.g, background_color.b);
 	cr->paint();
 	cr->restore();					 
 }
 
+/**
+ * Default value for color is black.
+ */
 void Canvas::draw_border(const Cairo::RefPtr<Cairo::Context>& cr,
 						 Length thickness,
 					     Color const& border_color){
@@ -99,6 +107,10 @@ void Canvas::draw_border(const Cairo::RefPtr<Cairo::Context>& cr,
 	cr->stroke();
 	cr->restore();
 }
+
+/**
+ * Default value for color is blue.
+ */
 void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context>& cr, 
 					   Color const& color){
 	cr->save();
@@ -108,11 +120,13 @@ void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context
 	cr->fill();		   
 	cr->restore();
 }
+
+/**
+ * Default value for color is blue.
+ */
 void Canvas::draw_arc(Coordinate const& original,Length thickness,Length outer_radius, 
 					  Angle alpha, const Cairo::RefPtr<Cairo::Context>& cr,
 					  Color const& color){
-	static double starting_angle(M_PI_2*3);
-	
 	cr->save();
 	Coordinate converted(convert_coordinate(original));
 	cr->set_line_width(thickness);
@@ -122,6 +136,11 @@ void Canvas::draw_arc(Coordinate const& original,Length thickness,Length outer_r
 	cr->stroke();	   
 	cr->restore();
 }
+
+/**
+ * Default value for color is blue.
+ * Default value for 'fill' is true.
+ */
 void Canvas::draw_rectangle(Rectangle const& original, 
 							const Cairo::RefPtr<Cairo::Context>& cr, bool fill,
 							Color const& color){
@@ -137,13 +156,16 @@ void Canvas::draw_rectangle(Rectangle const& original,
 	cr->restore();				 
 }
 
+/**
+ * Draws graphics for players requesting the shapes to draw from the simulation module. 
+ */
 void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 	
 	for (auto const& circled_arc : Simulator::fetch_player_graphics()) {
 		//get the circle, color and angle from the tuple
-		Circle const& circ((std::get<0>(circled_arc)));
+		Circle const& circ((std::get<0>(circled_arc))); 	//circle at '0'
+		Angle arc_angle(std::get<1>(circled_arc)); 			//angle at '1'
 		Color const& color(predefined_color_chooser(std::get<2>(circled_arc)));
-		Angle arc_angle(std::get<1>(circled_arc));
 		
 		draw_disk(circ, cr, color);
 
@@ -152,12 +174,18 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 	}
 }
 
+/**
+ * Draws graphics for rectangles requesting the shapes to draw from simulation. 
+ */
 void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& rectangle : Simulator::fetch_obstacle_bodies()){
 		draw_rectangle(rectangle, cr);
 	}
 }
 
+/**
+ * Draws graphics for balls requesting the circles to draw from simulation.
+ */
 void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 	for (auto const& circle : Simulator::fetch_ball_bodies()){
 		draw_disk(circle, cr);
@@ -166,7 +194,7 @@ void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
 
 
 
-//--------------------------------------
+/// ===== GUI_WINDOW ===== ///
 
 Gui_Window::Gui_Window() :
 	button_exit("Exit"),
@@ -175,14 +203,14 @@ Gui_Window::Gui_Window() :
 	button_start_stop("Start"),
 	button_step("Step"),
 	label_message(state_to_string(Simulator::active_simulation_state())),
-	timer_running(false)
-{
+	timer_running(false) {
+	
 	set_title("DodgeBall");
-	//init button panel
+	//initialize the button panel
 	interaction_box.set_layout(Gtk::ButtonBoxStyle::BUTTONBOX_START);
 	add_button_panel_components();
 	connect_buttons_to_handlers();
-	//init canvas
+	//initialize the canvas
 	sim_arena.add(canvas);
 	//add components to the big box
 	the_big_box.add(interaction_box);
@@ -194,35 +222,8 @@ Gui_Window::Gui_Window() :
 }
 
 
-void Gui_Window::refresh(){
-	Simulation_State state(Simulator::active_simulation_state());
-	label_message.set_text(state_to_string(state));
-	
-	//draw all subcomponents
-	on_draw(get_window()->create_cairo_context());
-}
 
-void Gui_Window::connect_buttons_to_handlers(){
-	button_exit.signal_clicked().connect(sigc::mem_fun(*this,
-										   &Gui_Window::on_button_clicked_exit));
-	button_open.signal_clicked().connect(sigc::mem_fun(*this,
-										   &Gui_Window::on_button_clicked_open));         
-	button_save.signal_clicked().connect(sigc::mem_fun(*this,
-										   &Gui_Window::on_button_clicked_save));  
-	button_start_stop.signal_clicked().connect(sigc::mem_fun(*this,
-										   &Gui_Window::on_button_clicked_start_stop));	  
-	button_step.signal_clicked().connect(sigc::mem_fun(*this,
-										   &Gui_Window::on_button_clicked_step));
-}
-
-void Gui_Window::add_button_panel_components(){
-	interaction_box.pack_start(button_exit);
-	interaction_box.pack_start(button_open);
-	interaction_box.pack_start(button_save);
-	interaction_box.pack_start(button_start_stop);
-	interaction_box.pack_start(button_step);
-	interaction_box.pack_start(label_message);
-}
+// ===== Button Handlers =====
 
 void Gui_Window::on_button_clicked_exit(){
 	exit(0);
@@ -247,8 +248,7 @@ void Gui_Window::on_button_clicked_open(){
 		} else {
 			std::cout << "Unsuccesful import" << std::endl;
 		}
-	}
-	
+	}	
 }
 
 void Gui_Window::on_button_clicked_save(){
@@ -302,7 +302,6 @@ void Gui_Window::on_button_clicked_start_stop(){
 		if (stop_timer())
 			button_start_stop.set_label(labels[0]);
 	}
-	
 }
 
 void Gui_Window::on_button_clicked_step(){
@@ -312,8 +311,10 @@ void Gui_Window::on_button_clicked_step(){
 	} else {
 		std::cout << "Nowhere to step..." << std::endl;
 	}
-
 }
+
+
+// ===== Timer Utilites =====
 
 
 bool Gui_Window::timer_tick(){
@@ -344,6 +345,60 @@ bool Gui_Window::stop_timer(){
 	timer_running = false;
 	return true;
 }
+
+
+// ===== Other Utility Methods =====
+
+
+void Gui_Window::connect_buttons_to_handlers(){
+	button_exit.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_exit));
+	button_open.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_open));         
+	button_save.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_save));  
+	button_start_stop.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_start_stop));	  
+	button_step.signal_clicked().connect(sigc::mem_fun(*this,
+										   &Gui_Window::on_button_clicked_step));
+}
+
+void Gui_Window::add_button_panel_components(){
+	interaction_box.pack_start(button_exit);
+	interaction_box.pack_start(button_open);
+	interaction_box.pack_start(button_save);
+	interaction_box.pack_start(button_start_stop);
+	interaction_box.pack_start(button_step);
+	interaction_box.pack_start(label_message);
+}
+
+
+
+
+// ===== Refresher =====
+
+
+/**
+ * Refreshes the gui window and all subcomponents using the current simulation.
+ * 
+ * !!! This function does not occupy calling the update method of the simulation !!!
+ * !!! Simulation should be updated explicitly before calling this function !!!
+ */
+void Gui_Window::refresh(){
+	
+	//change the message shown if necessary
+	Simulation_State state(Simulator::active_simulation_state());
+	label_message.set_text(state_to_string(state));
+	
+	//draw all subcomponents
+	on_draw(get_window()->create_cairo_context());
+}
+
+
+
+
+
+// ===== Interaction Methods =====
 
 bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text){
 	Gtk::MessageDialog msg_dialog(*this, message, true, Gtk::MESSAGE_WARNING,
