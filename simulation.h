@@ -19,11 +19,20 @@
  * Enumeration of colors that will be used to determine player colors with respect to
  * lives left. Choice of color for other objects are left to the user.
  * */
-enum Predefined_Color : unsigned{
+enum Predefined_Color {
 	RED,
 	ORANGE,
 	YELLOW,
 	GREEN
+};
+
+/**
+ * Enumeration of possiible simulation states.
+ */
+enum Simulation_State {
+	NO_GAME,
+	GAME_READY,
+	GAME_OVER
 };
 
 /**
@@ -61,7 +70,7 @@ class Simulator{
 		static bool create_simulation(std::vector<std::string> const& io_files);							  
 		static bool import_file(const std::string&);
 		static bool empty();
-		static std::string active_simulation_state();
+		static Simulation_State active_simulation_state();
 		
 		/**
 		 * Accessors to simulation's geometry 
