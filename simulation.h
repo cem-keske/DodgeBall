@@ -18,7 +18,7 @@
 /**
  * Enumeration of colors that will be used to determine player colors with respect to
  * lives left. Choice of color for other objects are left to the user.
- * */
+ */
 enum Predefined_Color {
 	RED,
 	ORANGE,
@@ -36,10 +36,8 @@ enum Simulation_State {
 	GAME_OVER
 };
 
+
 /**
- * We have decided to use shared_ptr to avoid unnecessary copying of relatively 
- * heavier Circle and Rectangle objects.
- * 
  * Tuple constains the circle corresponding to player body, angle of cooldown arc
  * and the preferred color for the player (according to lives left)
  */
@@ -79,6 +77,9 @@ class Simulator{
 		static vec_player_graphics fetch_player_graphics(); 
 		static vec_ball_bodies fetch_ball_bodies();
 		static vec_obstacle_bodies fetch_obstacle_bodies();
+		
+		static void update_active_sim();
+		static void update_all_sims();
 		
 		static void save_simulation(const std::string&);
 	

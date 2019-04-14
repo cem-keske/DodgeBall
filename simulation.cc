@@ -71,6 +71,7 @@ class Simulation {
 		const vec_ball_bodies& ball_bodies() const;
 		const vec_obstacle_bodies& obstacle_bodies() const;
 		
+		void update();
 		void update_graphics();
 		
 		bool is_over() const;
@@ -243,6 +244,24 @@ vec_obstacle_bodies Simulator::fetch_obstacle_bodies() {
 	
 }
 
+/**
+ * Updates the active simulation (at index 0 of active_sims_) 
+ */
+void Simulator::update_active_sim() {
+	active_sims()[0].update();
+}
+
+/**
+ * Update all active sims. Multiple active simulations are not implemented yet, so this
+ * function behaves the  same as the one above.
+ */
+void Simulator::update_all_sims() {
+	for (auto& sim: active_sims()) {
+		sim.update();
+	}
+}
+
+
 void Simulator::save_simulation(const std::string &file_path) {
 	active_sims()[0].save(file_path);
 }
@@ -310,6 +329,13 @@ const vec_ball_bodies& Simulation::ball_bodies() const {
 const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
 
 	return obstacle_bodies_;
+}
+
+/**
+ * Updates the simulation and makes all necessary calculation
+ */
+void Simulation::update() {
+	// stub. not implemented yet.
 }
 
 void Simulation::update_graphics() {
