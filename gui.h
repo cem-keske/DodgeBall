@@ -39,7 +39,8 @@ class Canvas : public Gtk::DrawingArea{
 		
 		
 		
-		// ===== Graphic-Draw Methods =====
+		// ===== Graphics-Draw Methods =====
+		
 		void draw_background(const Cairo::RefPtr<Cairo::Context>& cr,
 							 Color const& background_color = Tools::COLOR_WHITE);						 
 		void draw_border(const Cairo::RefPtr<Cairo::Context>& cr, Length thicnkess,
@@ -47,6 +48,7 @@ class Canvas : public Gtk::DrawingArea{
 		void draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
 		void draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
 		void draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr);
+		
 		/**
 		 * All the arguments given to the functions below must be the original shapes
 		 * in the simulation. (these functions also converts coordinates).
@@ -81,13 +83,20 @@ class Gui_Window : public Gtk::Window
 	
 		// ===== Elements of the Window =====
 		
-		Gtk::VBox the_big_box; //the main container
+		//The main container
+		Gtk::VBox the_big_box; 
+		
 		
 		Gtk::HButtonBox interaction_box;
 		Gtk::Box		sim_arena;
 		
 		Canvas 			canvas;
 		
+		/**
+		 * Interaction panel components.
+		 * Utility methods must be updated after adding a new component here.
+		 * 
+		 */ 
 		Gtk::Button 	button_exit;
 		Gtk::Button 	button_open;
 		Gtk::Button		button_save;
@@ -97,25 +106,35 @@ class Gui_Window : public Gtk::Window
 	
 	protected:
 		
-		// ===== Event Handlers =====
+		// ===== Button Handlers =====
+		
 		void on_button_clicked_exit();
 		void on_button_clicked_open();
 		void on_button_clicked_save();
 		void on_button_clicked_start_stop();
 		void on_button_clicked_step();
 		
+		// ===== Timer Utilites =====
+		
+		bool timer_tick();
+		bool timer_running;
+		void toggle_simulation_running();
+		
+		
+		// ===== Utility Methods =====
+		
+		void add_button_panel_components();
+		void connect_buttons_to_handlers();
+		
+		/**
+		 * Refreshes all gui components using the current simulation.
+		 */
 		void refresh();
 		
 		
 		
-		// ===== Utility Methods =====
-		void add_button_panel_components();
-		void connect_buttons_to_handlers();
-		
 		// ===== Interaction Methods =====
-		/*
-		 * Returns true if the user is sure.
-		 */ 
+		
 		bool ask_if_sure(std::string const& message,std::string const& title);
 		void show_warning(const std::string& message,const std::string& text = "");
 		

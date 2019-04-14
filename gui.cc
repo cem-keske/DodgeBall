@@ -14,7 +14,6 @@
 static constexpr int default_border_thickness(3);
 static constexpr double circle_arc_ratio(0.35);
 
-
 // ===== Utility Functions =====
 
 const Color& predefined_color_chooser(Predefined_Color color){
@@ -26,19 +25,16 @@ const Color& predefined_color_chooser(Predefined_Color color){
 	}
 	return Tools::COLOR_BLACK;
 }
-
-const std::string& state_to_string(Simulation_State active_state){
-	static std::string state_strings[] = {	"Error! Cannot resolve the state!",
-											"No game to run",
-											"Game ready to run",
-											"Game's over !",
-											"Cannot complete the game !" };
-	switch(active_state){
-		case PLAYER_TRAPPED : return state_strings[4];
-		case GAME_OVER		: return state_strings[3];
-		case GAME_READY 	: return state_strings[2];
-		case NO_GAME 		: return state_strings[1];
-		default 			: return state_strings[0];
+/**
+ * Returns the label string to show corresponding to the given simulation state.
+ * 
+ */
+std::string state_to_string(Simulation_State active_state){
+	switch(active_state){		
+		case NO_GAME 		: return "No game to run";
+		case GAME_READY 	: return "Game ready to run";
+		case GAME_OVER		: return "Game's over !";
+		default 			: return "Error! Cannot resolve the state!";
 	}
 	
 }
@@ -177,7 +173,8 @@ Gui_Window::Gui_Window() :
 	button_save("Save"),
 	button_start_stop("Start"),
 	button_step("Step"),
-	label_message(state_to_string(Simulator::active_simulation_state()))
+	label_message(state_to_string(Simulator::active_simulation_state())),
+	timer_running(false);
 {
 	set_title("DodgeBall");
 	//init button panel
@@ -286,18 +283,16 @@ void Gui_Window::on_button_clicked_save(){
 void Gui_Window::on_button_clicked_start_stop(){
 	static std::string labels[] = {"Start","Stop"};
 	
-	//Print stub on the console
-	std::cout << button_start_stop.get_label()
-			  << " button pressed but function not yet implemented :(" << std::endl;
+	
 	
 	//Make no action if there's no game to run
-	if(Simulator::active_simulation_state() != GAME_READY)
+	if(Simulator::active_simulation_state() != GAME_READY) {
+		std::cout << "There's no active game to start or stop." << std::endl;
 		return;
+	}
+	std::cout << button_start_stop.get_label() << " button pressed." << std::endl;
 	
-	
-	
-	//toggle_simulation_running();  NOT YET IMPLEMENTED
-	
+	toggle_simulation_running();
 	
 	//change the label after a succesful run.
 	button_start_stop.set_label((button_start_stop.get_label()==labels[0]) ? 
@@ -309,6 +304,16 @@ void Gui_Window::on_button_clicked_step(){
 	std::cout << button_step.get_label()
 			  << " button pressed but function not yet implemented :(" << std::endl;
 }
+
+
+bool Gui_Window::timer_tick(){
+	
+	return timer_running;
+}
+
+
+void start_timer();
+void stop_timer();
 
 bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text){
 	Gtk::MessageDialog msg_dialog(*this, message, true, Gtk::MESSAGE_WARNING,

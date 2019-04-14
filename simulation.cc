@@ -20,12 +20,12 @@
 #include <cmath>
 
 
-/// SIMULATION class decleration ///
+/// ===== SIMULATION ===== class declaration ///
 
 class Simulation {	
 	
 	private:
-		
+		// ===== Fields =====
 		size_t nb_cells_;
 		Length player_radius_;
 		Length player_speed_;
@@ -43,13 +43,13 @@ class Simulation {
 		vec_ball_bodies ball_bodies_;		
 		vec_obstacle_bodies obstacle_bodies_;		
 
-
 	public:
 	
 		// ===== Constructor =====
 		
 		Simulation(std::vector<std::string> const&);
 
+		
 		// ===== Public Methods =====
 		
 		bool success() const;
@@ -67,15 +67,23 @@ class Simulation {
 		
 		bool test_collisions();
 		
+		
+		// ===== Accessor Methods for Graphics =====
+		
 		const vec_player_graphics& player_graphics() const;
 		const vec_ball_bodies& ball_bodies() const;
 		const vec_obstacle_bodies& obstacle_bodies() const;
 		
+		
+		// ===== Updaters =====
+		
 		void update();
 		void update_graphics();
 		
-		bool is_over() const;
-				
+		
+		// ===== Utilities =====
+		
+		bool is_over() const;		
 		bool save(const std::string &o_file_path) const;
 		
 	private:
@@ -93,10 +101,12 @@ class Simulation {
 };
 
 
-/// READER class declaration///
+/// ===== READER ===== class declaration ///
+
 /**
- * This class will be useful when reading a data from files.
+ * This class is used when reading a data from files.
  * It can be used to read specific datas and initialize the current simulation.
+ * (eg. only import new players to the current simulation)
  */
 
 enum ReaderState {
@@ -144,11 +154,13 @@ class Reader {
 		static bool read_balls(std::ifstream&, Simulation&);
 		static void finalise_reading(ReaderState &actual_state);
 		static void print_error_state(ReaderState); /// for debugging
-
-		// ===== Private Methods =====
-	
 	
 };
+
+
+
+
+//======================== Definitions ========================//
 
 
 /// ===== SIMULATOR ===== ///
@@ -173,15 +185,17 @@ std::unordered_map<std::string, bool>& Simulator::execution_parameters() {
 
 /**
  * Wrapper function for active simulations.
- * This vector will hold up to two simulation instances. During reading of a new 
- * simulation (with Open button) it will be pushed back in this vector. In case of
- * a successful reading, new simulation is moved to active_sims[0].
+ * This vector holds up to two simulation instances. During reading of a new 
+ * simulation (with Open button) it will be added in this vector.
+ * Note that in case of a successful reading, the new simulation object is moved to 
+ * active_sims[0] and the data in the previous simulation is lost.
  */
 std::vector<Simulation>& Simulator::active_sims() {
 
 	static std::vector<Simulation> active_sims_;
 	return active_sims_;
 }
+
 
 bool Simulator::create_simulation(std::vector<std::string> const& io_files)	{
 	

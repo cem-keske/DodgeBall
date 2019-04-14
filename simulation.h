@@ -56,7 +56,7 @@ class Simulator{
 
 	public:
 		
-		/// sets execution parameters to be used for all simulation
+		/// sets execution parameters to be used for all simulation objects
 		static void exec_parameters(const std::unordered_map<std::string, bool>&);
 		
 		/// corresponding accessor
@@ -67,6 +67,7 @@ class Simulator{
 		 * game is conserved. 
 		 */
 		static bool create_simulation(std::vector<std::string> const& io_files);							  
+		
 		static bool import_file(const std::string&);
 		static bool empty();
 		static Simulation_State active_simulation_state();
