@@ -239,11 +239,15 @@ void Gui_Window::on_button_clicked_open(){
 	
 	if(response == Gtk::RESPONSE_OK){
 		std::cout << "File chosen" << std::endl;
-		if(Simulator::import_file(file_dialog.get_filename()))
+		if(Simulator::import_file(file_dialog.get_filename())){
 			std::cout << "Imported succesfully" << std::endl;
+			//refresh the window after importing
+			refresh();
+		} else {
+			std::cout << "Unsuccesful import" << std::endl;
+		}
 	}
-	//refresh the window after importing
-	refresh();
+	
 }
 
 void Gui_Window::on_button_clicked_save(){
@@ -282,10 +286,20 @@ void Gui_Window::on_button_clicked_save(){
 void Gui_Window::on_button_clicked_start_stop(){
 	static std::string labels[] = {"Start","Stop"};
 	
-	
-	//print on the console and change the label
+	//Print stub on the console
 	std::cout << button_start_stop.get_label()
 			  << " button pressed but function not yet implemented :(" << std::endl;
+	
+	//Make no action if there's no game to run
+	if(Simulator::active_simulation_state() != GAME_READY)
+		return;
+	
+	
+	
+	//toggle_simulation_running();  NOT YET IMPLEMENTED
+	
+	
+	//change the label after a succesful run.
 	button_start_stop.set_label((button_start_stop.get_label()==labels[0]) ? 
 								 labels[1] : labels[0]);
 }
