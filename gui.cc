@@ -13,6 +13,7 @@
 
 static constexpr int default_border_thickness(3);
 static constexpr double circle_arc_ratio(0.35);
+static constexpr int delta_t_ms((int)(DELTA_T * 1000));
 
 // ===== Utility Functions =====
 
@@ -34,6 +35,7 @@ std::string state_to_string(Simulation_State active_state){
 		case NO_GAME 		: return "No game to run";
 		case GAME_READY 	: return "Game ready to run";
 		case GAME_OVER		: return "Game's over !";
+		case PLAYER_TRAPPED : return "Cannot complete the game!";
 		default 			: return "Error! Cannot resolve the state!";
 	}
 	
@@ -174,7 +176,7 @@ Gui_Window::Gui_Window() :
 	button_start_stop("Start"),
 	button_step("Step"),
 	label_message(state_to_string(Simulator::active_simulation_state())),
-	timer_running(false);
+	timer_running(false)
 {
 	set_title("DodgeBall");
 	//init button panel
@@ -194,7 +196,10 @@ Gui_Window::Gui_Window() :
 
 
 void Gui_Window::refresh(){
-	label_message.set_text(state_to_string(Simulator::active_simulation_state()));
+	Simulation_State state(Simulator::active_simulation_state());
+	label_message.set_text(state_to_string(state));
+	
+	//draw all subcomponents
 	on_draw(get_window()->create_cairo_context());
 }
 
@@ -250,7 +255,6 @@ void Gui_Window::on_button_clicked_open(){
 void Gui_Window::on_button_clicked_save(){
 	if(Simulator::active_simulation_state() == NO_GAME){
 		show_warning("There's no active simulation to save!");
-		refresh();
 		return;
 	}
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
@@ -283,20 +287,20 @@ void Gui_Window::on_button_clicked_save(){
 void Gui_Window::on_button_clicked_start_stop(){
 	static std::string labels[] = {"Start","Stop"};
 	
-	
-	
-	//Make no action if there's no game to run
-	if(Simulator::active_simulation_state() != GAME_READY) {
-		std::cout << "There's no active game to start or stop." << std::endl;
-		return;
-	}
 	std::cout << button_start_stop.get_label() << " button pressed." << std::endl;
 	
-	toggle_simulation_running();
+	bool action_executed(false);
+	
+	//call the correct handler
+	if(button_start_stop.get_label() == labels[0])
+		action_executed = start_handler();
+	else
+		action_executed = stop_handler();
 	
 	//change the label after a succesful run.
-	button_start_stop.set_label((button_start_stop.get_label()==labels[0]) ? 
-								 labels[1] : labels[0]);
+	if(action_executed)
+		button_start_stop.set_label((button_start_stop.get_label() == labels[0]) ? 
+									 labels[1] : labels[0]);
 }
 
 void Gui_Window::on_button_clicked_step(){
@@ -307,13 +311,31 @@ void Gui_Window::on_button_clicked_step(){
 
 
 bool Gui_Window::timer_tick(){
-	
+	Simulator::update_active_sim(DELTA_T);
+	refresh(); //refresh the gui window after updating the simulation
+	if(Simulator::active_simulation_state() != GAME_READY) //when there's no sim to run
+		on_button_clicked_start_stop(); //click the button so the game can stop
 	return timer_running;
 }
 
 
-void start_timer();
-void stop_timer();
+bool Gui_Window::start_timer(){
+	if(timer_running)
+		return false;
+	
+	//timer was not running	, so start the action
+	
+	Glib::signal_timeout().connect(sigc::mem_fun(*this, &Gui_Window::timer_tick,
+												  delta_t_ms));
+	timer_running = true;
+	return true;
+}
+bool Gui_Window::stop_timer(){
+	if(timer_running == false)
+		return false; //timer is not running
+	timer running = false;
+	return true;
+}
 
 bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text){
 	Gtk::MessageDialog msg_dialog(*this, message, true, Gtk::MESSAGE_WARNING,
