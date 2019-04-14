@@ -410,8 +410,8 @@ void Simulation::update_player_graphics() {
 		auto body(players_[i].body());
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
 		
-		// alpha = 2*pi * (1 - cooldown / max cooldown) 
-		arc_angle = 2*M_PI*(1. - players_[i].cooldown()/(double) MAX_COUNT);
+		// alpha = 2*pi * (cooldown / max cooldown) 
+		arc_angle = 2*M_PI*(players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
 		player_graphics_[i] = std::make_tuple(body, arc_angle, player_color);	
