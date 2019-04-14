@@ -27,14 +27,20 @@ const Color& predefined_color_chooser(Predefined_Color color){
 	return Tools::COLOR_BLACK;
 }
 
-const std::string& convert_state_to_string(SimState active_state){
+const std::string& state_to_string(Simulation_State active_state){
+	static std::string state_strings[] = {	"Error! Cannot resolve the state!",
+											"No game to run",
+											"Game ready to run",
+											"Game's over !",
+											"Cannot complete the game !" };
 	switch(active_state){
-		case NO_GAME 		: return "No game to run";
-		case GAME_READY 	: return "Game ready to run"
-		case GAME_OVER		: return "Game's over !"
-		case PLAYER_TRAPPED : return "Cannot complete the game !"
-		default : NO_GAME;
+		case PLAYER_TRAPPED : return state_strings[4];
+		case GAME_OVER		: return state_strings[3];
+		case GAME_READY 	: return state_strings[2];
+		case NO_GAME 		: return state_strings[1];
+		default 			: return state_strings[0];
 	}
+	
 }
 
 bool file_exists(const std::string& file_path){
@@ -171,7 +177,7 @@ Gui_Window::Gui_Window() :
 	button_save("Save"),
 	button_start_stop("Start"),
 	button_step("Step"),
-	label_message(Simulator::active_simulation_state())
+	label_message(state_to_string(Simulator::active_simulation_state()))
 {
 	set_title("DodgeBall");
 	//init button panel
@@ -191,7 +197,7 @@ Gui_Window::Gui_Window() :
 
 
 void Gui_Window::refresh(){
-	label_message.set_text(Simulator::active_simulation_state());
+	label_message.set_text(state_to_string(Simulator::active_simulation_state()));
 	on_draw(get_window()->create_cairo_context());
 }
 
@@ -241,7 +247,11 @@ void Gui_Window::on_button_clicked_open(){
 }
 
 void Gui_Window::on_button_clicked_save(){
-	if(Simulator::active_game_state())
+	if(Simulator::active_simulation_state() == NO_GAME){
+		show_warning("There's no active simulation to save!");
+		refresh();
+		return;
+	}
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
 										Gtk::FILE_CHOOSER_ACTION_SAVE); 
 	//Put the dialog on our window
@@ -298,6 +308,13 @@ bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text
 	
 	int response = msg_dialog.run();
 	return (response==Gtk::RESPONSE_OK);
+}
+
+void Gui_Window::show_warning(const std::string& message, const std::string& text){
+	Gtk::MessageDialog msg_dialog(*this, message, false, Gtk::MESSAGE_WARNING,
+								  Gtk::BUTTONS_OK);
+	msg_dialog.set_secondary_text(text);
+	msg_dialog.run();
 }
 
 

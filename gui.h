@@ -117,6 +117,7 @@ class Gui_Window : public Gtk::Window
 		 * Returns true if the user is sure.
 		 */ 
 		bool ask_if_sure(std::string const& message,std::string const& title);
+		void show_warning(const std::string& message,const std::string& text = "");
 		
 		
 };
