@@ -77,7 +77,7 @@ class Simulation {
 		
 		// ===== Updaters =====
 		
-		void update();
+		void update(double delta_t);
 		void update_graphics();
 		
 		
@@ -109,6 +109,10 @@ class Simulation {
  * (eg. only import new players to the current simulation)
  */
 
+/**
+ * Enums directly related to a class are declared along with the class, and not on the
+ * top of the document, to improve readability and modularity of the code.
+ */
 enum ReaderState {
 	BEGIN,
 	READ_NB_CELLS,
@@ -140,7 +144,7 @@ class Reader {
 		// ===== Public Methods =====
 		
 		bool import_file(std::string const&, Simulation&);
-		bool read_file(std::ifstream&, Simulation&,bool = false);
+		bool read_file(std::ifstream&, Simulation&,bool only_one_state = false);
 		
 	
 	private:
@@ -165,6 +169,8 @@ class Reader {
 
 /// ===== SIMULATOR ===== ///
 
+
+
 void Simulator::exec_parameters(const std::unordered_map<std::string, bool>& 
 								exec_param) {
 	execution_parameters() = exec_param;
@@ -172,6 +178,16 @@ void Simulator::exec_parameters(const std::unordered_map<std::string, bool>&
 
 const std::unordered_map<std::string, bool>& Simulator::exec_parameters() {
 	return execution_parameters();
+}
+
+/**
+ * We plan on making it possible to run multiple simulations simultaneously. This 
+ * function will then return the index in active_sims() of the function currently
+ * displayed in gui
+ */
+size_t& Simulator::current_sim_index() {
+	static size_t current_sim_index_(0);	// initalized to indicate first sim
+	return current_sim_index_;
 }
 
 /**
@@ -196,28 +212,38 @@ std::vector<Simulation>& Simulator::active_sims() {
 	return active_sims_;
 }
 
-
+/**
+ * Creates a new simulation with give io file(s) and replaces the current sim. 
+ * 
+ * This function when modified in the future will enable us to implement multiple 
+ * simultaneous simulations. 
+ */
 bool Simulator::create_simulation(std::vector<std::string> const& io_files)	{
 	
 	bool success(false);
 
 	if (active_sims().empty()) {
 		active_sims().emplace_back(Simulation(io_files));
-		success = active_sims()[0].success();
+		success = active_sims()[current_sim_index()].success();
 		if(success == false) {
 			active_sims().pop_back();		// erase all data in case of bad file
 		}
 	} else {
 		active_sims().push_back(Simulation(io_files));
 		if (active_sims().back().success())
-			std::swap(active_sims()[0], active_sims()[1]);
+			std::swap(active_sims()[current_sim_index()], active_sims().back());
 			active_sims().pop_back();
-			// old sim is destroyed. new sim is moved to index 0
+			// for the moment old sim is destroyed. new sim is moved to index of the 
+			// precedent.
 	}								
 	assert(active_sims.size()==1);
 	return success;
 }
 
+/**
+ * Imports an input file path and passes the call to create a new simulation with the
+ * file on given path.
+ */
 bool Simulator::import_file(const std::string& file_path) {
 	std::vector<std::string> io_files = {file_path};
 	return create_simulation(io_files);
@@ -234,8 +260,8 @@ bool Simulator::empty() {
 Simulation_State Simulator::active_simulation_state() {
 	if(active_sims().empty())
 		return NO_GAME;
-	if(active_sims()[0].success())
-		if(active_sims()[0].is_over())
+	if(active_sims()[current_sim_index()].success())
+		if(active_sims()[current_sim_index()].is_over())
 			return GAME_OVER;
 		return GAME_READY;
 }
@@ -244,40 +270,42 @@ Simulation_State Simulator::active_simulation_state() {
  * Returns a vector containing player bodies along with their remeaning life counters
  * (for gui draw and color determination, respectively). 
  */
-vec_player_graphics Simulator::fetch_player_graphics() {
-	return active_sims()[0].player_graphics();
+const vec_player_graphics& Simulator::fetch_player_graphics() {
+	return active_sims()[current_sim_index()].player_graphics();
 }
 
-vec_ball_bodies Simulator::fetch_ball_bodies() {
-	return active_sims()[0].ball_bodies();
+const vec_ball_bodies& Simulator::fetch_ball_bodies() {
+	return active_sims()[current_sim_index()].ball_bodies();
 }
 
-vec_obstacle_bodies Simulator::fetch_obstacle_bodies() {
+const vec_obstacle_bodies& Simulator::fetch_obstacle_bodies() {
 	
-	return active_sims()[0].obstacle_bodies();
+	return active_sims()[current_sim_index()].obstacle_bodies();
 	
 }
 
 /**
  * Updates the active simulation (at index 0 of active_sims_) 
  */
-void Simulator::update_active_sim() {
-	active_sims()[0].update();
+void Simulator::update_active_sim(double delta_t) {
+	active_sims()[current_sim_index()].update(delta_t);
 }
 
 /**
  * Update all active sims. Multiple active simulations are not implemented yet, so this
  * function behaves the  same as the one above.
  */
-void Simulator::update_all_sims() {
+void Simulator::update_all_sims(double delta_t) {
 	for (auto& sim: active_sims()) {
-		sim.update();
+		sim.update(delta_t);
 	}
 }
 
-
+/**
+ * Saves the current simulation to given path 
+ */
 void Simulator::save_simulation(const std::string &file_path) {
-	active_sims()[0].save(file_path);
+	active_sims()[current_sim_index()].save(file_path);
 }
 
 
@@ -348,7 +376,7 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
 /**
  * Updates the simulation and makes all necessary calculation
  */
-void Simulation::update() {
+void Simulation::update(double delta_t) {
 	// stub. not implemented yet.
 }
 
@@ -864,7 +892,7 @@ void Reader::finalise_reading(ReaderState &actual_state) {
  *	Prints the error state of the given reader to the console.
  * 	Must only be used to print errors. (unused ifdef #NDDEBUG)
  */
-void print_error_state(ReaderState error_state) {
+void Reader::print_error_state(ReaderState error_state) {
 	const static std::array<std::string,(SUCCESS+1)> state_strings = {
 	"BEGIN","READ_CELLS","READ_PLAYERS","READ OBSTACLES","READ_BALLS","SUCCESS"
 };

@@ -45,6 +45,8 @@ typedef std::vector<std::tuple<Circle, Angle, Predefined_Color>> vec_player_grap
 typedef std::vector<Circle>		vec_ball_bodies;
 typedef std::vector<Rectangle>	vec_obstacle_bodies;
 
+
+
 class Simulation; //forward declaration necessary
 /**
  * This is a helper class to make it possible to move the declaration of Simulation 
@@ -75,18 +77,28 @@ class Simulator{
 		/**
 		 * Accessors to simulation's geometry 
 		 */							  			
-		static vec_player_graphics fetch_player_graphics(); 
-		static vec_ball_bodies fetch_ball_bodies();
-		static vec_obstacle_bodies fetch_obstacle_bodies();
+		static const vec_player_graphics& fetch_player_graphics(); 
+		static const vec_ball_bodies& fetch_ball_bodies();
+		static const vec_obstacle_bodies& fetch_obstacle_bodies();
 		
-		static void update_active_sim();
-		static void update_all_sims();
+		static void update_active_sim(double delta_t);
+		static void update_all_sims(double delta_t);
 		
 		static void save_simulation(const std::string&);
 	
 	private:
+		
+		/**
+		 * Static wrapper functions containing data fields for internal use of 
+		 * simulator.
+		 * 
+		 * Static fields are wrapped to ensure proper initialization.(we encountered
+		 * buggy behaviour otherwise as there are no default constructor for them)
+		 * 
+		 * current_sim_index is also wrapped for style reasons to make the code uniform
+		 */
+		static size_t& current_sim_index();
 		static std::unordered_map<std::string, bool>& execution_parameters();
-		static std::string active_simulation_state_;
 		static std::vector<Simulation>& active_sims();
 
 };	
