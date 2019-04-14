@@ -237,7 +237,7 @@ bool Simulator::create_simulation(std::vector<std::string> const& io_files)	{
 		}
 	} else {
 		active_sims().push_back(Simulation(io_files));
-		if (active_sims().back().success())
+		if ((success = active_sims().back().success())) // assigment intentional
 			std::swap(active_sims()[current_sim_index()], active_sims().back());
 			active_sims().pop_back();
 			// for the moment old sim is destroyed. new sim is moved to index of the 
