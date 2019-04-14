@@ -276,7 +276,7 @@ void Gui_Window::on_button_clicked_step(){
 }
 
 bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text){
-	Gtk::MessageDialog msg_dialog(*this, message, true, Gtk::MESSAGE_INFO,
+	Gtk::MessageDialog msg_dialog(*this, message, true, Gtk::MESSAGE_WARNING,
 								  Gtk::BUTTONS_NONE);
 	
 	//Add dialog buttons
