@@ -105,7 +105,6 @@ void Canvas::draw_disk(Circle const& original,const Cairo::RefPtr<Cairo::Context
 	Coordinate converted(convert_coordinate(original.center()));
 	cr->set_source_rgb(color.r,color.g,color.b);
 	cr->arc(converted.x, converted.y, original.radius(), 0, M_PI * 2);
-	cr->stroke_preserve();
 	cr->fill();		   
 	cr->restore();
 }
@@ -119,7 +118,7 @@ void Canvas::draw_arc(Coordinate const& original,Length thickness,Length outer_r
 	cr->set_line_width(thickness);
 	cr->set_source_rgb(color.r, color.g, color.b);
 	cr->arc(converted.x, converted.y,
-			(outer_radius-thickness/2.0)+1, starting_angle , starting_angle + alpha);
+			(outer_radius-thickness/2.0), starting_angle , starting_angle + alpha);
 	cr->stroke();	   
 	cr->restore();
 }

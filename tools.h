@@ -260,7 +260,7 @@ namespace Tools {
 	
 		//some color constants
 		constexpr Color COLOR_RED 		= {1.0,		0.0,	0.0};
-		constexpr Color COLOR_ORANGE 	= {0.86,	0.53,	0.09};
+		constexpr Color COLOR_ORANGE 	= {1.0,		0.53,	0.09};
 		constexpr Color COLOR_YELLOW 	= {1.0,		0.91,	0.0};
 		constexpr Color COLOR_GREEN 	= {0.0,		0.94,	0.0};
 		constexpr Color COLOR_BLUE 		= {0.19,	0.38,	0.92};
