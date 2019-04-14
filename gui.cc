@@ -29,9 +29,12 @@ const Color& predefined_color_chooser(Predefined_Color color){
 
 const std::string& convert_state_to_string(SimState active_state){
 	switch(active_state){
-		case 
+		case NO_GAME 		: return "No game to run";
+		case GAME_READY 	: return "Game ready to run"
+		case GAME_OVER		: return "Game's over !"
+		case PLAYER_TRAPPED : return "Cannot complete the game !"
+		default : NO_GAME;
 	}
-	return "No game to run";
 }
 
 bool file_exists(const std::string& file_path){
