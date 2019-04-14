@@ -27,6 +27,13 @@ const Color& predefined_color_chooser(Predefined_Color color){
 	return Tools::COLOR_BLACK;
 }
 
+const std::string& convert_state_to_string(SimState active_state){
+	switch(active_state){
+		case 
+	}
+	return "No game to run";
+}
+
 bool file_exists(const std::string& file_path){
 	std::ifstream file_to_check(file_path);
 	return file_to_check.good();
@@ -231,6 +238,7 @@ void Gui_Window::on_button_clicked_open(){
 }
 
 void Gui_Window::on_button_clicked_save(){
+	if(Simulator::active_game_state())
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
 										Gtk::FILE_CHOOSER_ACTION_SAVE); 
 	//Put the dialog on our window
