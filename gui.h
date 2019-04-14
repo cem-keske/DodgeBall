@@ -112,8 +112,8 @@ class Gui_Window : public Gtk::Window
 		void on_button_clicked_open();
 		void on_button_clicked_save();
 		void on_button_clicked_start_stop();
-		bool start_handler();
-		bool stop_handler();
+		bool start_timer();
+		bool stop_timer();
 		void on_button_clicked_step();
 		
 		// ===== Timer Utilites =====

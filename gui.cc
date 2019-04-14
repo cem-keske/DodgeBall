@@ -289,32 +289,41 @@ void Gui_Window::on_button_clicked_start_stop(){
 	
 	std::cout << button_start_stop.get_label() << " button pressed." << std::endl;
 	
-	bool action_executed(false);
+	
+	if(Simulator::active_simulation_state() == NO_GAME) {
+		std::cout << "No game to start or stop" << std::endl;
+		return;
+	}
 	
 	//call the correct handler
-	if(button_start_stop.get_label() == labels[0])
-		action_executed = start_handler();
-	else
-		action_executed = stop_handler();
+	if(button_start_stop.get_label() == labels[0]) {
+		if (start_timer()) 
+			button_start_stop.set_label(labels[1]);
+	} else {
+		if (stop_timer())
+			button_start_stop.set_label(labels[0]);
+	}
 	
-	//change the label after a succesful run.
-	if(action_executed)
-		button_start_stop.set_label((button_start_stop.get_label() == labels[0]) ? 
-									 labels[1] : labels[0]);
 }
 
 void Gui_Window::on_button_clicked_step(){
-	refresh();
-	std::cout << button_step.get_label()
-			  << " button pressed but function not yet implemented :(" << std::endl;
+	if(Simulator::active_simulation_state() == GAME_READY){
+		Simulator::update_active_sim(DELTA_T);
+		refresh();
+	} else {
+		std::cout << "Nowhere to step..." << std::endl;
+	}
+
 }
 
 
 bool Gui_Window::timer_tick(){
-	Simulator::update_active_sim(DELTA_T);
-	refresh(); //refresh the gui window after updating the simulation
-	if(Simulator::active_simulation_state() != GAME_READY) //when there's no sim to run
-		on_button_clicked_start_stop(); //click the button so the game can stop
+	if(timer_running == true){
+		Simulator::update_active_sim(DELTA_T);
+		refresh(); //refresh the gui window after updating the simulation
+		if(Simulator::active_simulation_state() != GAME_READY) //when there's no sim to run
+			stop_timer();
+	}
 	return timer_running;
 }
 
@@ -325,15 +334,15 @@ bool Gui_Window::start_timer(){
 	
 	//timer was not running	, so start the action
 	
-	Glib::signal_timeout().connect(sigc::mem_fun(*this, &Gui_Window::timer_tick,
-												  delta_t_ms));
+	Glib::signal_timeout().connect(sigc::mem_fun(*this, &Gui_Window::timer_tick),
+												  delta_t_ms);
 	timer_running = true;
 	return true;
 }
 bool Gui_Window::stop_timer(){
 	if(timer_running == false)
 		return false; //timer is not running
-	timer running = false;
+	timer_running = false;
 	return true;
 }
 
