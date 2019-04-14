@@ -38,7 +38,14 @@ class Simulation {
 		Map map_;
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
-
+		
+		/**
+		 * In order to hide the inner modules from the gui we decided to use custom
+		 * data structures for each object to be drawn. For the time being they copy
+		 * the geometrical data of each player, ball and obstacle. 
+		 * 
+		 * We intend to implement a better way to pass on these values without copying.  
+		 */
 		vec_player_graphics player_graphics_;		
 		vec_ball_bodies ball_bodies_;		
 		vec_obstacle_bodies obstacle_bodies_;		
