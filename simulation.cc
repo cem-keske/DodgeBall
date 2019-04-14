@@ -274,15 +274,16 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 			exit(0);
 		else
 			success_ = true;
+	} else {
+		
+		// if there are files to import to simulation
+		if (io_files.size() > 0) {
+			Reader reader(BEGIN);
+			if(reader.import_file(io_files[0], *this) == true)
+				success_ = true;
+		}
+		update_graphics();
 	}
-	
-	// if there are files to import to simulation
-	if (io_files.size() > 0) {
-		Reader reader(BEGIN);
-		if(reader.import_file(io_files[0], *this) == true)
-			success_ = true;
-	}
-	update_graphics();
 }
 
 // ===== Public methods ===== 

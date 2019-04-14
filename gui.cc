@@ -6,11 +6,12 @@
  */
 #include "define.h"
 #include "gui.h"
+#include <fstream>
 #include <iostream>
 #include <cmath>
 #include <cairomm/context.h>
 
-static constexpr int default_border_thickness(5);
+static constexpr int default_border_thickness(3);
 static constexpr double circle_arc_ratio(0.35);
 
 
@@ -26,6 +27,14 @@ const Color& predefined_color_chooser(Predefined_Color color){
 	return Tools::COLOR_BLACK;
 }
 
+bool file_exists(const std::string& file_path){
+	std::ifstream file_to_check(file_path);
+	return file_to_check.good();
+}
+
+
+
+/// ===== CANVAS ===== ///
 
 Canvas::Canvas() : center(DIM_MAX,DIM_MAX) {
 	set_size_request(DIM_MAX*2,DIM_MAX*2);
@@ -40,7 +49,6 @@ void Canvas::refresh()
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {	
-	std::cout << "on_draw for Canvas" << std::endl;
 	draw_background(cr);
 	if(Simulator::empty() == false){
 		draw_all_player_graphics(cr);
@@ -200,14 +208,10 @@ void Gui_Window::add_button_panel_components(){
 }
 
 void Gui_Window::on_button_clicked_exit(){
-	
-	std::cout << button_exit.get_label() << std::endl;
 	exit(0);
 }
 
 void Gui_Window::on_button_clicked_open(){
-	
-	
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
 										Gtk::FILE_CHOOSER_ACTION_OPEN); 
 	file_dialog.set_transient_for(*this);
@@ -217,12 +221,13 @@ void Gui_Window::on_button_clicked_open(){
 	
 	int response = file_dialog.run();
 	
-	if(response == Gtk::RESPONSE_OK)
-		Simulator::import_file(file_dialog.get_filename());
-	
+	if(response == Gtk::RESPONSE_OK){
+		std::cout << "File chosen" << std::endl;
+		if(Simulator::import_file(file_dialog.get_filename()))
+			std::cout << "Imported succesfully" << std::endl;
+	}
 	//refresh the window after importing
 	refresh();
-	std::cout <<button_open.get_label() << std::endl;
 }
 
 void Gui_Window::on_button_clicked_save(){
@@ -230,7 +235,7 @@ void Gui_Window::on_button_clicked_save(){
 										Gtk::FILE_CHOOSER_ACTION_SAVE); 
 	//Put the dialog on our window
 	file_dialog.set_transient_for(*this);
-	
+	file_dialog.set_title("Please save your file");
 	//Add dialog buttons
 	file_dialog.add_button("Save", Gtk::RESPONSE_OK);
 	file_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
@@ -238,10 +243,19 @@ void Gui_Window::on_button_clicked_save(){
 	int response = file_dialog.run();
 	
 	if(response == Gtk::RESPONSE_OK){
-		Simulator::save_simulation(file_dialog.get_filename());
+		std::string file_path(file_dialog.get_filename());
+		bool write(true); //go ahead and save - or don't save
+		if(file_exists(file_path))
+			write = ask_if_sure("This file already exists in your computer, " 
+								 "are you sure you want to overwrite it?",
+								 "The existing simulation data in this file"
+								 " will be lost.");
+		if(write){
+			Simulator::save_simulation(file_path);
+			std::cout << "Simulation saved to: " << file_path << std::endl;
+		}
 	}
 	refresh();
-	std::cout << button_save.get_label() << std::endl;
 }
 
 void Gui_Window::on_button_clicked_start_stop(){
@@ -249,17 +263,31 @@ void Gui_Window::on_button_clicked_start_stop(){
 	
 	
 	//print on the console and change the label
-	std::cout << button_start_stop.get_label() << std::endl;
+	std::cout << button_start_stop.get_label()
+			  << " button pressed but function not yet implemented :(" << std::endl;
 	button_start_stop.set_label((button_start_stop.get_label()==labels[0]) ? 
 								 labels[1] : labels[0]);
 }
 
 void Gui_Window::on_button_clicked_step(){
 	refresh();
-	std::cout << button_step.get_label() << std::endl;
+	std::cout << button_step.get_label()
+			  << " button pressed but function not yet implemented :(" << std::endl;
 }
 
-
+bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text){
+	Gtk::MessageDialog msg_dialog(*this, message, true, Gtk::MESSAGE_INFO,
+								  Gtk::BUTTONS_NONE);
+	
+	//Add dialog buttons
+	msg_dialog.set_title("Are you sure?");
+	msg_dialog.set_secondary_text(text);
+	msg_dialog.add_button("Yes, go ahead", Gtk::RESPONSE_OK);
+	msg_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+	
+	int response = msg_dialog.run();
+	return (response==Gtk::RESPONSE_OK);
+}
 
 
 

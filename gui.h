@@ -94,7 +94,9 @@ class Gui_Window : public Gtk::Window
 		Gtk::Button		button_start_stop;
 		Gtk::Button 	button_step;
 		Gtk::Label		label_message;
+	
 	protected:
+		
 		// ===== Event Handlers =====
 		void on_button_clicked_exit();
 		void on_button_clicked_open();
@@ -106,9 +108,16 @@ class Gui_Window : public Gtk::Window
 		
 		
 		
-	
+		// ===== Utility Methods =====
 		void add_button_panel_components();
 		void connect_buttons_to_handlers();
+		
+		// ===== Interaction Methods =====
+		/*
+		 * Returns true if the user is sure.
+		 */ 
+		bool ask_if_sure(std::string const& message,std::string const& title);
+		
 		
 };
 
