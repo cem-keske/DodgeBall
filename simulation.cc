@@ -212,7 +212,11 @@ bool Simulator::empty() {
 	return active_sims().empty();
 }
 
-std::string Simulator::active_simulation_state() {
+/**
+ * Returns the corresponding enum for the state of the active simulation.
+ * The case of a player being trapped is not implemented yet.
+ */
+Simulation_State Simulator::active_simulation_state() {
 	if(active_sims().empty())
 		return NO_GAME;
 	if(active_sims()[0].success())

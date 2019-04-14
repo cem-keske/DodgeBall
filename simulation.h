@@ -32,6 +32,7 @@ enum Predefined_Color {
 enum Simulation_State {
 	NO_GAME,
 	GAME_READY,
+	PLAYER_TRAPPED,
 	GAME_OVER
 };
 
