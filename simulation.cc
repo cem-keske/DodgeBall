@@ -214,11 +214,11 @@ bool Simulator::empty() {
 
 std::string Simulator::active_simulation_state() {
 	if(active_sims().empty())
-		return "No game to run";
+		return NO_GAME;
 	if(active_sims()[0].success())
 		if(active_sims()[0].is_over())
-			return "Game's over!";
-		return "Game ready to run";
+			return GAME_OVER;
+		return GAME_READY;
 }
 
 /**
