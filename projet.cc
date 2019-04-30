@@ -6,6 +6,7 @@
  */
 #include <algorithm>
 #include <memory>
+#include <iostream>
 #include "define.h"
 #include "simulation.h"
 #include "gui.h"
@@ -47,6 +48,12 @@ int main(int argc, char* argv[]) {
 	
 	if(execution_parameters["Error"] == true) { 
 		Simulator::create_simulation(io_files);
+	} else if (execution_parameters["Step"] == true) {
+		if(io_files.size() > 0) {
+			Simulator::create_simulation(io_files);
+		} else {
+			std::cout << "No I/O file. Aborting... " << std::endl; 
+		}
 	} else if (io_files.size() > 0) {
 		Simulator::create_simulation(io_files);
 		open_gui();

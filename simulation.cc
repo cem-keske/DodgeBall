@@ -335,9 +335,6 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 
 	if(Simulator::exec_parameters().at("Error")) {	//
 		if(io_files.empty()) { 
-			#ifndef NDEBUG
-			std::cout << "No input file. Exiting...";
-			#endif
 			exit(0);
 		}
 		
@@ -353,6 +350,12 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 			Reader reader(BEGIN);
 			if(reader.import_file(io_files[0], *this) == true)
 				success_ = true;
+		}
+		
+		if (Simulator::exec_parameters().at("Step")){
+			update(DELTA_T);
+			save(io_files.back());
+			return;
 		}
 		update_graphics();
 	}
