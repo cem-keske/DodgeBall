@@ -131,6 +131,7 @@ class Gui_Window : public Gtk::Window
 		
 		bool ask_if_sure(std::string const& message,std::string const& title);
 		void show_warning(const std::string& message,const std::string& text = "");
+		void show_message(const std::string& message, const std::string& text = "");
 		
 		
 };

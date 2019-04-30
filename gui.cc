@@ -161,11 +161,11 @@ void Canvas::draw_rectangle(Rectangle const& original,
  */
 void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 	
-	for (auto const& circled_arc : Simulator::fetch_player_graphics()) {
+	for (auto circled_arc : Simulator::fetch_player_graphics()) {
 		//get the circle, color and angle from the tuple
-		Circle const& circ((std::get<0>(circled_arc))); 	//circle at '0'
-		Angle arc_angle(std::get<1>(circled_arc)); 			//angle at '1'
-		Color const& color(predefined_color_chooser(std::get<2>(circled_arc)));
+		Circle const& circ((std::get<0>(*circled_arc))); 	//circle at '0'
+		Angle arc_angle(std::get<1>(*circled_arc)); 			//angle at '1'
+		Color const& color(predefined_color_chooser(std::get<2>(*circled_arc)));
 		
 		draw_disk(circ, cr, color);
 
@@ -178,8 +178,8 @@ void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
  * Draws graphics for rectangles requesting the shapes to draw from simulation. 
  */
 void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
-	for (auto const& rectangle : Simulator::fetch_obstacle_bodies()){
-		draw_rectangle(rectangle, cr);
+	for (auto rectangle : Simulator::fetch_obstacle_bodies()){
+		draw_rectangle(*rectangle, cr);
 	}
 }
 
@@ -187,8 +187,8 @@ void Canvas::draw_all_rectangle_graphics(const Cairo::RefPtr<Cairo::Context>& cr
  * Draws graphics for balls requesting the circles to draw from simulation.
  */
 void Canvas::draw_all_ball_graphics(const Cairo::RefPtr<Cairo::Context>& cr){
-	for (auto const& circle : Simulator::fetch_ball_bodies()){
-		draw_disk(circle, cr);
+	for (auto circle : Simulator::fetch_ball_bodies()){
+		draw_disk(*circle, cr);
 	}	
 }
 
@@ -230,6 +230,10 @@ void Gui_Window::on_button_clicked_exit(){
 }
 
 void Gui_Window::on_button_clicked_open(){
+	int response(0);
+	std::string file_adress("nofile");
+	
+	{
 	Gtk::FileChooserDialog file_dialog("Please open a file", 
 										Gtk::FILE_CHOOSER_ACTION_OPEN); 
 	file_dialog.set_transient_for(*this);
@@ -237,16 +241,17 @@ void Gui_Window::on_button_clicked_open(){
 	file_dialog.add_button("Open", Gtk::RESPONSE_OK);
 	file_dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
 	
-	int response = file_dialog.run();
+	response = file_dialog.run();
+	file_adress = file_dialog.get_filename();
+	}//dialog window destroyed, we don't want to see it on the screen anymore
 	
 	if(response == Gtk::RESPONSE_OK){
-		std::cout << "File chosen" << std::endl;
-		if(Simulator::import_file(file_dialog.get_filename())){
-			std::cout << "Imported succesfully" << std::endl;
+		if(Simulator::import_file(file_adress)){
+			show_message("File succesfully imported");
 			//refresh the window after importing
 			refresh();
 		} else {
-			std::cout << "Unsuccesful import" << std::endl;
+			show_warning("Unsuccesful import");
 		}
 	}	
 }
@@ -277,7 +282,7 @@ void Gui_Window::on_button_clicked_save(){
 								 " will be lost.");
 		if(write){
 			Simulator::save_simulation(file_path);
-			std::cout << "Simulation saved to: " << file_path << std::endl;
+			show_message("Simulation saved to: " + file_path);
 		}
 	}
 	refresh();
@@ -286,11 +291,8 @@ void Gui_Window::on_button_clicked_save(){
 void Gui_Window::on_button_clicked_start_stop(){
 	static std::string labels[] = {"Start","Stop"};
 	
-	std::cout << button_start_stop.get_label() << " button pressed." << std::endl;
-	
-	
 	if(Simulator::active_simulation_state() == NO_GAME) {
-		std::cout << "No game to start or stop" << std::endl;
+		show_warning("No game to start or stop!");
 		return;
 	}
 	
@@ -309,7 +311,7 @@ void Gui_Window::on_button_clicked_step(){
 		Simulator::update_active_sim(DELTA_T);
 		refresh();
 	} else {
-		std::cout << "Nowhere to step..." << std::endl;
+		show_warning("Nowhere to step... :/");
 	}
 }
 
@@ -416,6 +418,13 @@ bool Gui_Window::ask_if_sure(std::string const& message, std::string const& text
 
 void Gui_Window::show_warning(const std::string& message, const std::string& text){
 	Gtk::MessageDialog msg_dialog(*this, message, false, Gtk::MESSAGE_WARNING,
+								  Gtk::BUTTONS_OK);
+	msg_dialog.set_secondary_text(text);
+	msg_dialog.run();
+}
+
+void Gui_Window::show_message(const std::string& message, const std::string& text){
+	Gtk::MessageDialog msg_dialog(*this, message, false, Gtk::MESSAGE_INFO,
 								  Gtk::BUTTONS_OK);
 	msg_dialog.set_secondary_text(text);
 	msg_dialog.run();
