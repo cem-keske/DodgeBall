@@ -41,9 +41,10 @@ enum Simulation_State {
  * Tuple constains the circle corresponding to player body, angle of cooldown arc
  * and the preferred color for the player (according to lives left)
  */
-typedef std::vector<std::tuple<Circle, Angle, Predefined_Color>> vec_player_graphics;
-typedef std::vector<Circle>		vec_ball_bodies;
-typedef std::vector<Rectangle>	vec_obstacle_bodies;
+typedef std::vector<std::tuple<const Circle*, Angle, 
+							   Predefined_Color>> vec_player_graphics;
+typedef std::vector<const Circle*>		vec_ball_bodies;
+typedef std::vector<const Rectangle*>	vec_obstacle_bodies;
 
 
 

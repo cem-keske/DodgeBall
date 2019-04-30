@@ -18,6 +18,7 @@ class Player{
 		Circle body_;
 		Counter lives_;
 		Counter cooldown_;
+		const Player *target_;
 	
 	public:	
 	
@@ -31,12 +32,14 @@ class Player{
 		const Circle& body() const; 
 		Counter lives() const;
 		Counter cooldown() const;
+		const Player* target() const;
 
 		// ===== Manipulators =====
 
 		void position(const Coordinate&);
 		void lives(Counter);
 		void cooldown(Counter);
+		void target(const Player*);
 				
 		// ===== Methods =====
 		
