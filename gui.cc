@@ -161,11 +161,11 @@ void Canvas::draw_rectangle(Rectangle const& original,
  */
 void Canvas::draw_all_player_graphics(const Cairo::RefPtr<Cairo::Context>& cr) {
 	
-	for (auto circled_arc : Simulator::fetch_player_graphics()) {
+	for (auto const& circled_arc : Simulator::fetch_player_graphics()) {
 		//get the circle, color and angle from the tuple
-		Circle const& circ((std::get<0>(*circled_arc))); 	//circle at '0'
-		Angle arc_angle(std::get<1>(*circled_arc)); 			//angle at '1'
-		Color const& color(predefined_color_chooser(std::get<2>(*circled_arc)));
+		Circle const& circ(*(std::get<0>(circled_arc))); 	//circle at '0'
+		Angle arc_angle(std::get<1>(circled_arc)); 			//angle at '1'
+		Color const& color(predefined_color_chooser(std::get<2>(circled_arc)));
 		
 		draw_disk(circ, cr, color);
 
