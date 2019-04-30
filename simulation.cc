@@ -432,14 +432,14 @@ void Simulation::update_player_graphics() {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		
-		auto body(players_[i].body());
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
 		
 		// alpha = 2*pi * (cooldown / max cooldown) 
 		arc_angle = 2*M_PI*(players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
-		player_graphics_[i] = std::make_tuple(&body, arc_angle, player_color);	
+		player_graphics_[i] = std::make_tuple(&players_[i].body(), arc_angle, 
+											  player_color);	
 		
 	}
 }
@@ -452,9 +452,7 @@ void Simulation::update_ball_bodies() {
 	ball_bodies_.resize(nb_balls, nullptr);
 	
 	for(size_t i(0); i < nb_balls; ++i) {
-		Circle body(balls_[i].geometry());	
-
-		ball_bodies_[i] = &body;	
+		ball_bodies_[i] = &balls_[i].geometry();	
 	}
 }
 
