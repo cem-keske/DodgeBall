@@ -67,6 +67,8 @@ const Coordinate operator-(Coordinate, Coordinate const&);
 /// ===== CLASSES ===== ///
 
 
+
+
 /// VECTOR ///
 /**
  * A geometric vector on origin pointing to a coordinate.
@@ -109,6 +111,7 @@ class Vector {
 		 * (Rotated pi/2 radians in positive direction.)
 		 */
 		Vector get_perpendicular() const;
+		Vector get_unit() const;
 		
 		// ===== Manipulators =====
 		
@@ -146,6 +149,32 @@ const Vector operator*(double, Vector);
 const Vector operator*(Vector, double);
 const Vector operator/(Vector, double);
 		
+
+
+/// SEGMENT ///
+
+class Segment {
+	private:
+		Coordinate point_;
+		Vector body_;
+	
+	public:
+	
+		// ===== Constructors =====
+		
+		Segment(double x1, double y1, double x2, double y2);
+		Segment(Coordinate const& p1, Coordinate const& p2);
+		
+		// ===== Accessors =====
+		
+		Vector direction() const; //unit vector
+		Length length() const;
+		
+		// ===== Utilities =====
+		
+		Vector get_perpendicular() const; //unit vector
+		
+};
 	
 	
 /// RECTANGLE ///

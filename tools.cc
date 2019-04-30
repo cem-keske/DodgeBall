@@ -98,7 +98,7 @@ Angle Vector::angle() const{
 }
 
 void Vector::make_unit(){
-	this->length(1.0);
+	length(1.0);
 }
 
 void Vector::length(Length length){
@@ -111,6 +111,10 @@ void Vector::length(Length length){
 
 Vector Vector::get_perpendicular() const {
 	return Vector(angle() + M_PI_2);
+}
+
+Vector Vector::get_unit() const {
+	return Vector(angle());
 }
 
 std::string Vector::to_string() const {
@@ -168,6 +172,32 @@ const Vector operator*(double number, Vector vec){
 	return vec*=number;
 }
 
+/// ===== SEGMENT ===== ///
+
+// ===== Constructors =====
+
+Segment::Segment(double x1, double y1, double x2, double y2):
+				 point_(x1,y1),
+				 body_(x2 - x1, y2 - y1){}
+				 
+Segment::Segment(Coordinate const& p1, Coordinate const& p2):
+				 Segment(p1.x,p1.y,p2.x,p2.y){}
+		
+// ===== Accessors =====
+		
+Vector Segment::direction() const{
+	return body_.get_unit();
+} //unit vector
+		
+Length Segment::length() const{
+	return Tools::distance(point_, body_.pointed());
+}
+		
+// ===== Utilities =====
+		
+Vector Segment::get_perpendicular() const{
+	return body_.get_perpendicular();
+} //unit vector
 
 /// ===== Rectangle ===== ///
 
