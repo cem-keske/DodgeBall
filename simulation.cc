@@ -18,7 +18,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
-
+#include <limits>
 
 /// ===== SIMULATION ===== class declaration ///
 
@@ -100,6 +100,8 @@ class Simulation {
 		bool detect_all_ball_obstacle_collisions() const;		
 		bool detect_initial_player_collisions() const ;
 		bool detect_initial_ball_collisions() const ;
+		
+		void update_player_targets();
 		
 		void update_player_graphics();
 		void update_ball_bodies(); 
@@ -387,8 +389,7 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
  * Updates the simulation and makes all necessary calculation
  */
 void Simulation::update(double delta_t) {
-	// stub. not implemented yet.
-	std::cout << "Simulation update will be implemented" << std::endl;
+	update_player_targets();
 }
 
 void Simulation::update_graphics() {
@@ -397,13 +398,34 @@ void Simulation::update_graphics() {
 	update_obstacle_bodies();
 }
 
+/**
+ * For each player its target is determined by finding the closest player.
+ */
+void Simulation::update_player_targets() {
+	size_t players_size(players_.size());
+	for(size_t i(0); i < players_size; ++i) {
+		
+		Length min_distance(std::numeric_limits<double>::infinity());
+		
+		for(size_t j(i+1); j < players_size; ++j) {
+			Length distance(Tools::distance(players_[i].body().center(),
+											players_[j].body().center()));
+			if (distance < min_distance) {
+				min_distance = distance;
+				players_[i].target(&(players()[j]));
+			}
+		}
+	}
+}
+
+
 void Simulation::update_player_graphics() {
 		
 	size_t nb_players(players().size());
 	
 	// resize to nb_players : we need only this many instances. fill if necessary with
 	// dummies
-	player_graphics_.resize(nb_players, std::make_tuple(Circle(0), 0, RED));	
+	player_graphics_.resize(nb_players, std::make_tuple(nullptr, 0, RED));	
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
 						// of a player
@@ -417,7 +439,7 @@ void Simulation::update_player_graphics() {
 		arc_angle = 2*M_PI*(players_[i].cooldown()/(double) MAX_COUNT);
 
 		// modify existing values
-		player_graphics_[i] = std::make_tuple(body, arc_angle, player_color);	
+		player_graphics_[i] = std::make_tuple(&body, arc_angle, player_color);	
 		
 	}
 }
@@ -427,12 +449,12 @@ void Simulation::update_ball_bodies() {
 	size_t nb_balls(balls().size());
 	
 	// resize ball_bodies_ and fill with dummies if necessary
-	ball_bodies_.resize(nb_balls, Circle(0));
+	ball_bodies_.resize(nb_balls, nullptr);
 	
 	for(size_t i(0); i < nb_balls; ++i) {
 		Circle body(balls_[i].geometry());	
 
-		ball_bodies_[i] = body;	
+		ball_bodies_[i] = &body;	
 	}
 }
 
@@ -441,11 +463,11 @@ void Simulation::update_obstacle_bodies() {
 	size_t nb_obstacles(obstacles().size());
 	
 	// resize obstacle_bodies_ and fill with dummies if necessary
-	obstacle_bodies_.resize(nb_obstacles, Rectangle({0,0}, {0,0}));
+	obstacle_bodies_.resize(nb_obstacles, nullptr);
 	
 	size_t counter(0);
 	for(const auto& obs : obstacles()) {
-		obstacle_bodies_[counter] = obs.second;		
+		obstacle_bodies_[counter] = &obs.second;		
 		++counter;
 	}
 }

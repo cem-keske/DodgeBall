@@ -24,6 +24,8 @@ Counter Player::lives() const {return lives_;}
 
 Counter Player::cooldown() const {return cooldown_;}
 
+const Player* Player::target() const {return target_;}
+
 void Player::position(const Coordinate& position) {
 	body_.center(position);
 }
@@ -35,3 +37,7 @@ void Player::lives(Counter lives){
 void Player::cooldown(Counter cooldown){
 	cooldown_ = cooldown;
 };
+
+void Player::target(const Player* target) {
+	target_ = target;
+}
