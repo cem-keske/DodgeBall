@@ -4,6 +4,67 @@
  * authors:	Cem Keske
  * 			Emre Yazici
  */
+ 
+/**************************************************************************************
+
+=======>  	DDDD	OOOOOO	DDDD	GGGGGG	EEEEEE	  <================================
+			D   D	O	 O	D   D	G		E
+=======>	D    D	O	 O	D    D	G		E		  <================================
+			D	 D  O    O  D    D  G       EEEE
+=======>    D    D	O 	 O  D    D	G  GGG	E		  <================================
+			D   D	O 	 O  D   D	G    G	E
+=======>	DDDD	OOOOOO  DDDD	GGGGGG	EEEEEE 	  <================================
+
+=======================================>  	B19B	AAAAAA	 C		 E		   <=======
+											B	B	A	 A	 E		 M        
+=======================================>	B   B	A	 A	 M		 R         <=======
+											BMAY	AAAAAA	 K		 E         
+=======================================>	B   B	A	 A	 E		 Y		   <=======
+											B   B	A	 A	 S	 	 A		  
+=======================================>	2019	A	 A	 KEEEEE	 ZICIII    <=======
+
+**************************************************************************************/
+
+/**************************************************************************************
+                                                                                       
+                                                                                                                                                                           
+                                       ``.....``                                       
+                               `-/oyhmNNNNNNNNNNmdhs+/-                                
+                           `/sdNNMMMMMMMMMMMMMMMMMMMMMNNho:`                           
+                        .+hNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNNh/`                        
+                     `/hNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNy:                      
+                   `+mNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNd/                    
+                  /dMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNd:                  
+                .yNMMMMMMMhyhdNMMMMMMMMMMMMMMMMMMMMMMMMMNdhyhMMMMMMMNs`                
+               :mMMMMMMMMh   `.:odNMMNmmdddddddmNNMMNho:.`  `mMMMMMMMMd-               
+              +NMMMMMMMMM/       `./-..`````````..-:.`       oMMMMMMMMMN:              
+             /NMMMMMMMMMM:                                   oMMMMMMMMMMN:             
+            -NMMMMMMMMMMMs                                   hMMMMMMMMMMMm.            
+           `dMMMMMMMMMMMm:                                   /mMMMMMMMMMMMy            
+           /MMMMMMMMMMMd.                                     -mMMMMMMMMMMM-           
+           dMMMMMMMMMMN.                                       :MMMMMMMMMMMy           
+          `MMMMMMMMMMMh                                         mMMMMMMMMMMN           
+          -MMMMMMMMMMMs                                         hMMMMMMMMMMM`          
+          :MMMMMMMMMMMy                                         dMMMMMMMMMMM.          
+          -MMMMMMMMMMMm                                        `NMMMMMMMMMMN`          
+           NMMMMMMMMMMM/                                       oMMMMMMMMMMMd           
+           yMMMMMMMMMMMm-                                     :NMMMMMMMMMMMo           
+           -NMMMMMMMMMMMm:                                  `/NMMMMMMMMMMMN`           
+            sMMMMMMMMMMMMNy:`                             `:hMMMMMMMMMMMMM+            
+            `dMMMMMmyhmNMMMMds/.``                   `.-/ymMMMMMMMMMMMMMMy             
+             .dMMMMd/.-:sNMMMMMNmdys+`           .oyhdmMMMMMMMMMMMMMMMMMh`             
+              .hMMMMMmo..+dMMMMMMMMN-             :NMMMMMMMMMMMMMMMMMMMy`              
+               `sNMMMMMy`.:shNNNNNm+               yMMMMMMMMMMMMMMMMMNo                
+                 :dMMMMMy```.+.o+-+                +MMMMMMMMMMMMMMMMd-                 
+                  `+mMMMMms-```````                +MMMMMMMMMMMMMMm/                   
+                    `+mNMMMMNmdhddm-               +MMMMMMMMMMMNd/`                    
+                       :yNMMMMMMMMM:               +MMMMMMMMNms:                       
+                         `/smNMMMMM:               +MMMMMNds:`                         
+                             ./shmh.               -dmho/.                             
+                                                                                       
+                                                                                       
+**************************************************************************************/
+
 #include <algorithm>
 #include <memory>
 #include <iostream>
