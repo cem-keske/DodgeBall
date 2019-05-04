@@ -156,7 +156,7 @@ const Vector operator/(Vector, double);
 class Segment {
 	private:
 		Coordinate point_;
-		Vector body_;
+		Coordinate point_b;
 	
 	public:
 	
@@ -167,12 +167,15 @@ class Segment {
 		
 		// ===== Accessors =====
 		
-		Vector direction() const; //unit vector
+		const Coordinate& point_a() const;
+		const Coordinate point_b() const;
+		const Vector& body() const;
+		Vector direction() const;
 		Length length() const;
 		
 		// ===== Utilities =====
 		
-		Vector get_perpendicular() const; //unit vector
+		Vector get_perpendicular() const;
 		
 };
 	
@@ -211,7 +214,9 @@ class Rectangle {
 		Length height() const;
 		Length base() const;
 		const Coordinate& bottom_left() const;
+		const Coordinate& bottom_right() const;
 		const Coordinate& top_left() const;
+		const Coordinate& top_right() const;
 		double y_up() const;	//upper bound
 		double y_down() const;	//lower bound
 		double x_left() const;	//left bound
@@ -227,7 +232,7 @@ class Rectangle {
 		/**
 		 * Points on borders considered inside the rectangle.
 		 */
-		bool contains(Coordinate const&) const;
+		bool contains(Coordinate const&, Length tolerance) const;
 };
 
 /// CIRCLE ///
@@ -276,7 +281,11 @@ namespace Tools {
 		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
 		bool intersect(Circle const&, Circle const&, Length tolerance);
 		bool intersect(Rectangle const&, Circle const&, Length tolerance);
-		double distance(Coordinate const&, Coordinate const&);
+		bool intersect(Rectangle const&, Segment const&, Length tolerance);
+		Length distance(Coordinate const&, Coordinate const&);
+		//used for rapid calculation
+		Length dist_squared(Coordinate const&, Coordinate const&); 
+		Coordinate closest_point(Segment const&, Coordinate const&);
 };
 
 

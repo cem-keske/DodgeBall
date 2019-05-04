@@ -172,31 +172,43 @@ const Vector operator*(double number, Vector vec){
 	return vec*=number;
 }
 
-/// ===== SEGMENT ===== ///
+/// ===== Segment ===== ///
 
 // ===== Constructors =====
 
 Segment::Segment(double x1, double y1, double x2, double y2):
 				 point_(x1,y1),
-				 body_(x2 - x1, y2 - y1){}
+				 point_b(x2,y2){}
 				 
 Segment::Segment(Coordinate const& p1, Coordinate const& p2):
 				 Segment(p1.x,p1.y,p2.x,p2.y){}
 		
 // ===== Accessors =====
 		
+const Coordinate& Segment::point_a() const{
+	return point_;
+}
+
+const Coordinate Segment::point_b() const{
+	return point_b;
+}
+
 Vector Segment::direction() const{
-	return body_.get_unit();
-} //unit vector
+	return Vector(point_.x - point_b.x, point_.y - point_b.y);
+}
 		
 Length Segment::length() const{
-	return Tools::distance(point_, body_.pointed());
+	return distance(point_, point_b);
+}
+
+Length Segment::length_squared() const{
+	return dist_squared(point_, point_b);
 }
 		
 // ===== Utilities =====
 		
 Vector Segment::get_perpendicular() const{
-	return body_.get_perpendicular();
+	return direction.get_perpendicular();
 } //unit vector
 
 /// ===== Rectangle ===== ///
@@ -223,9 +235,19 @@ Length Rectangle::base() const {return base_;}
 
 const Coordinate& Rectangle::bottom_left() const {return bottom_left_;}	
 
+const Coordinate& Rectangle::bottom_right() const {
+	return Coordinate{base_,0} += bottom_left_;
+}
 const Coordinate& Rectangle::top_left() const {
 	return Coordinate{0,height_} += bottom_left_;
-}						  
+}				
+
+const Coordinate& Rectangle::top_right() const {
+	return Coordinate{base_,height_} += bottom_left_;
+}	
+
+	
+		  
 					
 					
 double Rectangle::y_up() const {
@@ -257,9 +279,9 @@ void Rectangle::base(Length base) {
 
 // ===== Utilities =====
 
-bool Rectangle::contains(Coordinate const& coord) const {
-	return (x_left() <= coord.x && coord.x <= x_right() &&
-			y_down() <= coord.y && coord.y <= y_up());
+bool Rectangle::contains(Coordinate const& coord, Length tol) const {
+	return (x_left() - tol <= coord.x && coord.x <= x_right() + tol &&
+			y_down() - tol <= coord.y && coord.y <= y_up() 	  + tol);
 };
 
 
@@ -307,14 +329,71 @@ bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length toler
 			sum_of_r + tolerance;
 }
 
-double bound(double to_bound, double min, double max) {
-	to_bound = std::min(max, to_bound);
-	to_bound = std::max(min, to_bound);		
-	return to_bound;	
+
+bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
+	Coordinate risky_point_a;
+	Coordinate risky_point_b;
+	Length tol_squared(tol*tol);
+	Length len_squared(seg.length_squared());
+	if((seg.direction().pointed().y * seg.direction().pointed().x) > 0){ 
+		//slope's positive: only check top-left and bottom-right corner
+		risky_point_a = closest_point(seg, rec.top_left());
+		risky_point_b = closest_point(seg, rec.bottom_right());
+		if(dist_squared(risky_point_a, seg.point_a()) > len_squared + tol_squared ||
+		   dist_squared(risky_point_a, seg.point_b()) > len_squared + tol_squared ||
+		   dist_squared(risky_point_b, seg.point_a()) > len_squared + tol_squared ||
+		   dist_squared(risky_point_b, seg.point_b()) > len_squared + tol_squared){
+			   return false; //the risky points are not on the segment
+		   }
+		return rec.contains(risky_point_a, tol) || rec.contains(risky_point_b, tol) ||
+			   dist_squared(risky_point_a,rec.top_left()) <= tol_squared ||
+			   dist_squared(risky_point_b,rec.bottom_right()) <= tol_squared;
+		
+	} else {
+		//slope's negative: only check bottom-left and top-right corner
+		risky_point_a = closest_point(seg, rec.bottom_left());
+		risky_point_b = closest_point(seg, rec.top_right());
+		
+		return rec.contains(risky_point_a, tol) || rec.contains(risky_point_b, tol) ||
+			   dist_squared(risky_point_a, rec.bottom_left()) <= tol_squared ||
+			   dist_squared(risky_point_b, rec.top_right()) <= tol_squared;
+	}
 }
 
-double Tools::distance(Coordinate const& c1, Coordinate const& c2){
+
+Length Tools::distance(Coordinate const& c1, Coordinate const& c2){
 	return c1.distance(c2);
+}
+
+Length Tools::dist_squared(Coordinate const& c1, Coordinate const& c2){
+	Length delta_x(c1.x-c2.x);
+	Length delta_y(c1.y-c2.y);
+	
+	return delta_x*delta_x + delta_y*delta_y;
+}
+
+
+Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
+	
+	/**
+	 * The formula to find the closest point on a segment 
+	 * to another point given is used.
+	 * 
+	 * For the graphical and mathematical demonstration:
+	 * --> desmos.com/calculator/fjawls
+	 * --> The vector AC is projected on AB to determine the point.
+	 */ 
+	Length delta_x(seg.point_a().x - seg.point_b().x);
+	Length delta_y(seg.point_a().y - seg.point_b().y);
+	Length scale_x(coord.x - seg.point_a().x);
+	Length scale_y(coord.y - seg.point_a().y);
+	
+	assert(delta_x != 0. || delta_y != 0.); //not both zero
+	
+	double vec_constant((scale_x*delta_x + scale_y*delta_y) /
+						(delta_x*delta_x + delta_y*delta_y));
+	return {seg.point_a().x + delta_x * vec_constant,
+			seg.point_a().y + delta_y * vec_constant};
 }
 
 bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length tol){
@@ -324,6 +403,13 @@ bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length t
 							 bound(center.y, rectangle.y_down(), rectangle.y_up()));
 							 
 	//the closest point to the center of the circle on the rectangle is now at (x,y)
-	return	(rectangle.contains(center) || 
+	return	(rectangle.contains(center,tol) || 
 			distance(center, closest_point) < (circle.radius() + tol));
 }
+
+double bound(double to_bound, double min, double max) {
+	to_bound = std::min(max, to_bound);
+	to_bound = std::max(min, to_bound);		
+	return to_bound;	
+}
+

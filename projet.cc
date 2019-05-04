@@ -95,6 +95,10 @@ static int open_gui();
 
 int main(int argc, char* argv[]) {
 
+	Segment seg(0,0,1,1);
+	Rectangle rec(0,0,2,2);
+	std::cout << Tools::closest_point(seg,{0,1}).to_string() << std::endl;
+	std::cout << Tools::intersect(rec,seg,0); << std::endl;
 	std::vector<std::string> io_files;
 	std::unordered_map<std::string, bool> execution_parameters;
 

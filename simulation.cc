@@ -390,6 +390,7 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
  */
 void Simulation::update(double delta_t) {
 	update_player_targets();
+	std::cout << "A sim object is updated." << std::endl;
 }
 
 void Simulation::update_graphics() {
