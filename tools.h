@@ -232,7 +232,8 @@ class Rectangle {
 		/**
 		 * Points on borders considered inside the rectangle.
 		 */
-		bool contains(Coordinate const&, Length tolerance) const;
+		bool containts(Coordinate const&) const; // zero tolerance
+		bool contains(Coordinate const&, Length tolerance = 0) const;
 };
 
 /// CIRCLE ///
@@ -278,14 +279,31 @@ namespace Tools {
 		constexpr Color COLOR_BLACK 	= {0.0,		0.0,	0.0};
 		constexpr Color COLOR_WHITE 	= {1.0,		1.0,	1.0};
 		
-		bool intersect(Rectangle const&, Rectangle const&, Length tolerance);
+		/**
+		 * WARNING!!
+		 * If a shape's into another shape, we consider the intersection exists.
+		 */ 
 		bool intersect(Circle const&, Circle const&, Length tolerance);
 		bool intersect(Rectangle const&, Circle const&, Length tolerance);
 		bool intersect(Rectangle const&, Segment const&, Length tolerance);
+		
 		Length distance(Coordinate const&, Coordinate const&);
-		//used for rapid calculation
+		//used for fast calculation
 		Length dist_squared(Coordinate const&, Coordinate const&); 
+		
+		//the segment is considered as a line
 		Coordinate closest_point(Segment const&, Coordinate const&);
+		
+		/**
+		 * Returns true if the point C is on the segment AB.
+		 * Points A, B and C must be the same line !!!
+		 */ 
+		bool can_be_on(Segment const& a_b, Coordinate const& c);
+		
+		/**
+		 * Returns true if c is between a and b.
+		 */ 
+		 bool is_between(double a, double b, double c);
 };
 
 

@@ -280,9 +280,20 @@ void Rectangle::base(Length base) {
 // ===== Utilities =====
 
 bool Rectangle::contains(Coordinate const& coord, Length tol) const {
-	return (x_left() - tol <= coord.x && coord.x <= x_right() + tol &&
-			y_down() - tol <= coord.y && coord.y <= y_up() 	  + tol);
-};
+	
+	Coordinate closest_point(bound(coord.x, x_left(), x_right()),
+							 bound(coord.y, y_down(), y_up()));		 					
+	Length tol_squared(tol*tol);				
+	
+	//the closest point to the center of the circle on the rectangle is now at (x,y)
+	return	(rectangle.contains(coord) ||
+			dist_squared(coord, closest_point) <= tol_squared);
+}
+
+bool Rectangle::contains(Coordinate const& coord) const{ //zero tolerance
+	return (x_left() <= coord.x && coord.x <= x_right() &&
+			y_down() <= coord.y && coord.y <= y_up());
+}
 
 
 /// ===== CIRCLE ===== ///
@@ -316,12 +327,6 @@ void Circle::radius(Length radius) {
 
 /// ===== Tools namespace ===== ///
 
-bool Tools::intersect(const Rectangle& rect_one, const Rectangle& rect_two, 
-					  Length tolerance) {
-	// rectangle intersection to write
-	return false;
-}
-
 bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length tolerance){
 	if (tolerance < 0) tolerance = (-tolerance); // sign of tolerance doesn't matter
 	Length sum_of_r = circ_one.radius() + circ_two.radius();
@@ -329,35 +334,30 @@ bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length toler
 			sum_of_r + tolerance;
 }
 
-
+/**
+ * See project report for the proof of why this algorithm works.
+ */ 
 bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
-	Coordinate risky_point_a;
-	Coordinate risky_point_b;
-	Length tol_squared(tol*tol);
-	Length len_squared(seg.length_squared());
-	if((seg.direction().pointed().y * seg.direction().pointed().x) > 0){ 
-		//slope's positive: only check top-left and bottom-right corner
-		risky_point_a = closest_point(seg, rec.top_left());
-		risky_point_b = closest_point(seg, rec.bottom_right());
-		if(dist_squared(risky_point_a, seg.point_a()) > len_squared + tol_squared ||
-		   dist_squared(risky_point_a, seg.point_b()) > len_squared + tol_squared ||
-		   dist_squared(risky_point_b, seg.point_a()) > len_squared + tol_squared ||
-		   dist_squared(risky_point_b, seg.point_b()) > len_squared + tol_squared){
-			   return false; //the risky points are not on the segment
-		   }
-		return rec.contains(risky_point_a, tol) || rec.contains(risky_point_b, tol) ||
-			   dist_squared(risky_point_a,rec.top_left()) <= tol_squared ||
-			   dist_squared(risky_point_b,rec.bottom_right()) <= tol_squared;
-		
-	} else {
-		//slope's negative: only check bottom-left and top-right corner
-		risky_point_a = closest_point(seg, rec.bottom_left());
-		risky_point_b = closest_point(seg, rec.top_right());
-		
-		return rec.contains(risky_point_a, tol) || rec.contains(risky_point_b, tol) ||
-			   dist_squared(risky_point_a, rec.bottom_left()) <= tol_squared ||
-			   dist_squared(risky_point_b, rec.top_right()) <= tol_squared;
+	if(rec.contains(seg.point_a(), tol) || rec.contains(seg.point_b(), tol) {
+		return true; //at least one of the corners are inside
 	}
+	Coordinate& risky_point_a;
+	Coordinate& risky_point_b;
+	if((seg.direction().pointed().y * seg.direction().pointed().x) > 0){
+		risky_point_a = seg.closest_point(rec.top_right());
+		risky_point_b = seg.closest_point(rec.bottom_left());
+	} else {
+		risky_point_a = seg.closest_point(rec.top_left());
+		risky_point_b = seg.closest_point(rec.bottom_right());
+	}
+	
+	if(rec.contains(risky_point_a, tol) == false ||
+	   rec.contains(risky_point_b, tol) == false) 
+		return false;
+		
+	//our the line intersects the rectangle area but two points are outside of the area
+	return can_be_on(seg, risky_point_a) || can_be_on(seg, risky_point_b);
+
 }
 
 
@@ -372,11 +372,10 @@ Length Tools::dist_squared(Coordinate const& c1, Coordinate const& c2){
 	return delta_x*delta_x + delta_y*delta_y;
 }
 
-
 Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
 	
 	/**
-	 * The formula to find the closest point on a segment 
+	 * The formula to find the closest point on a line 
 	 * to another point given is used.
 	 * 
 	 * For the graphical and mathematical demonstration:
@@ -396,17 +395,20 @@ Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
 			seg.point_a().y + delta_y * vec_constant};
 }
 
-bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length tol){
-	if(tol<0) tol= (-tol);
-	Coordinate center(circle.center());
-	Coordinate closest_point(bound(center.x, rectangle.x_left(), rectangle.x_right()),
-							 bound(center.y, rectangle.y_down(), rectangle.y_up()));
-							 
-	//the closest point to the center of the circle on the rectangle is now at (x,y)
-	return	(rectangle.contains(center,tol) || 
-			distance(center, closest_point) < (circle.radius() + tol));
+bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length tol){					 
+	return	(rectangle.contains(center, tol + circle.radius()));
 }
 
+bool Tools::can_be_on(Segment const& seg, Coordinate const& coord) {
+	return  is_between(seg.point_a().x, seg.point_b().x, coord.x) &&
+			is_between(seg.point_a().y, seg.point_b().y, coord.y);
+}
+
+bool Tools::is_between(double a, double b, double c){
+	double high(std::max(a,b));
+	double low(std::min(a,b));
+	return low <= c && c <= high;
+}
 double bound(double to_bound, double min, double max) {
 	to_bound = std::min(max, to_bound);
 	to_bound = std::max(min, to_bound);		
