@@ -283,8 +283,7 @@ void Rectangle::base(Length base) {
 bool Rectangle::contains(Coordinate const& coord, Length tol) const {
 	
 	Coordinate closest_point(bound(coord.x, x_left(), x_right()),
-							 bound(coord.y, y_down(), y_up()));	
-							 std::cout << "Point to check: " << closest_point.to_string() << std::endl;	 					
+							 bound(coord.y, y_down(), y_up()));	 					
 	Length tol_squared(tol*tol);				
 	
 	//the closest point to the center of the circle on the rectangle is now at (x,y)
@@ -347,27 +346,30 @@ bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
 	Coordinate risky_point_a;
 	Coordinate risky_point_b;
 	if((seg.direction().pointed().y * seg.direction().pointed().x) > 0){
-		std::cout << "1 or 3 quadrant" << std::endl;
+		std::cout << "1 or 3 quadrant, we'll try with top_left and bottom_right" << std::endl;
 		risky_point_a = closest_point(seg, rec.top_left()); //1. or 3. quadrant
 		risky_point_b = closest_point(seg, rec.bottom_right());
 	} else { //2. or 4. quadrant
+		std::cout << "2 or 4 quadrant, we'll try with top_right and bottom_left" << std::endl;
 		risky_point_a = closest_point(seg, rec.top_right());
 		risky_point_b = closest_point(seg, rec.bottom_left());
 	}
 	
-	std::cout << risky_point_a.to_string() << std::endl;
-	std::cout << risky_point_b.to_string() << std::endl;
-	
-	if(rec.contains(risky_point_a, tol) == false &&
-	   rec.contains(risky_point_b, tol) == false) {
+	bool risky_a_inside(rec.contains(risky_point_a, tol));
+	bool risky_b_inside(rec.contains(risky_point_b, tol));
+	std::cout << "Closest points : " << std::endl;
+	std::cout << risky_point_a.to_string() << std::endl << risky_point_b.to_string() << std::endl;
+		
+	if(risky_a_inside == false && risky_b_inside == false) {
 		   std::cout << "Two risky points are outside" << std::endl;
 		   return false;
-	   }
-		
-		std::cout << "at least one of the risky points are inside" << std::cout;
+	}
+	std::cout << "At least one of the risky points is inside. \n"
+				 "The line intersects the area but two ends of the segment are outside of the area" << std::endl;
+	
 	//the line intersects the rectangle area but two points are outside of the area
-	return Tools::can_be_on(seg, risky_point_a) || 
-		   Tools::can_be_on(seg, risky_point_b);
+	return (risky_a_inside && Tools::can_be_on(seg, risky_point_a)) || 
+		   (risky_b_inside && Tools::can_be_on(seg, risky_point_b));
 
 }
 
