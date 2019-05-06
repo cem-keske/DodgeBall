@@ -96,9 +96,47 @@ static int open_gui();
 int main(int argc, char* argv[]) {
 
 	Segment seg(0,0,1,1);
-	Rectangle rec(0,0,2,2);
+	Rectangle rec({0,0},2,2);
 	std::cout << Tools::closest_point(seg,{0,1}).to_string() << std::endl;
-	std::cout << Tools::intersect(rec,seg,0); << std::endl;
+	std::cout << Tools::intersect(rec,seg,0) << std::endl;
+	seg = Segment(-0.1,0, -0.1,1);
+	std::cout << Tools::closest_point(seg,{0,1}).to_string() << std::endl;
+	std::cout << Tools::intersect(rec,seg,0) << std::endl;
+	
+	std::cout << Tools::closest_point(seg,{0,1}).to_string() << std::endl;
+	std::cout << Tools::intersect(rec,seg,0.2) << std::endl;
+	
+	seg = Segment(3,0,0,3);
+	
+	std::cout << Tools::closest_point(seg,{2,2}).to_string() << std::endl;
+	std::cout << Tools::intersect(rec,seg,0.2) << std::endl;
+	seg = Segment(4.1,0,0,4.1);
+	std::cout << Tools::closest_point(seg,{2,2}).to_string() << std::endl;
+	std::cout << Tools::intersect(rec,seg,0.1/sqrt(2)- 0.00001) << std::endl;
+
+	seg= Segment(2.73, 1.09,3,0);
+	
+	std::cout << Tools::intersect(rec,seg,0.5) << std::endl;
+	
+	seg= Segment(2.500001,2.50000,2.500001,0);
+	std::cout << Tools::intersect(rec,seg,0.5) << std::endl;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	std::vector<std::string> io_files;
 	std::unordered_map<std::string, bool> execution_parameters;
 

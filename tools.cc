@@ -7,6 +7,7 @@
 #include <cmath>
 #include "tools.h"
 #include "assert.h"
+#include "iostream"
 
 /// ===== LOCAL (MODULE) FUNCTION FORWARD DECLARATIONS ===== ///
 
@@ -178,7 +179,7 @@ const Vector operator*(double number, Vector vec){
 
 Segment::Segment(double x1, double y1, double x2, double y2):
 				 point_(x1,y1),
-				 point_b(x2,y2){}
+				 point_b_(x2,y2){}
 				 
 Segment::Segment(Coordinate const& p1, Coordinate const& p2):
 				 Segment(p1.x,p1.y,p2.x,p2.y){}
@@ -190,25 +191,25 @@ const Coordinate& Segment::point_a() const{
 }
 
 const Coordinate Segment::point_b() const{
-	return point_b;
+	return point_b_;
 }
 
 Vector Segment::direction() const{
-	return Vector(point_.x - point_b.x, point_.y - point_b.y);
+	return Vector(point_.x - point_b_.x, point_.y - point_b_.y);
 }
 		
 Length Segment::length() const{
-	return distance(point_, point_b);
+	return Tools::distance(point_, point_b_);
 }
 
 Length Segment::length_squared() const{
-	return dist_squared(point_, point_b);
+	return Tools::dist_squared(point_, point_b_);
 }
 		
 // ===== Utilities =====
 		
 Vector Segment::get_perpendicular() const{
-	return direction.get_perpendicular();
+	return direction().get_perpendicular();
 } //unit vector
 
 /// ===== Rectangle ===== ///
@@ -217,7 +218,7 @@ Vector Segment::get_perpendicular() const{
 // ===== Constructors =====
 
 Rectangle::Rectangle(Coordinate const &bottom_left_, Length base, Length height)
-					:bottom_left_(bottom_left_),base_(base),height_(height) { 
+					:bottom_left_(bottom_left_), base_(base),height_(height) { 
 	assert(base>0 && height>0);
 }
 
@@ -282,15 +283,16 @@ void Rectangle::base(Length base) {
 bool Rectangle::contains(Coordinate const& coord, Length tol) const {
 	
 	Coordinate closest_point(bound(coord.x, x_left(), x_right()),
-							 bound(coord.y, y_down(), y_up()));		 					
+							 bound(coord.y, y_down(), y_up()));	
+							 std::cout << "Point to check: " << closest_point.to_string() << std::endl;	 					
 	Length tol_squared(tol*tol);				
 	
 	//the closest point to the center of the circle on the rectangle is now at (x,y)
-	return	(rectangle.contains(coord) ||
-			dist_squared(coord, closest_point) <= tol_squared);
+	return	(contains(coord) || 
+			 Tools::dist_squared(coord, closest_point) <= tol_squared);
 }
 
-bool Rectangle::contains(Coordinate const& coord) const{ //zero tolerance
+bool Rectangle::contains(Coordinate const& coord) const { //zero tolerance
 	return (x_left() <= coord.x && coord.x <= x_right() &&
 			y_down() <= coord.y && coord.y <= y_up());
 }
@@ -338,25 +340,34 @@ bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length toler
  * See project report for the proof of why this algorithm works.
  */ 
 bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
-	if(rec.contains(seg.point_a(), tol) || rec.contains(seg.point_b(), tol) {
+	
+	if(rec.contains(seg.point_a(), tol) || rec.contains(seg.point_b(), tol)) {
 		return true; //at least one of the corners are inside
 	}
-	Coordinate& risky_point_a;
-	Coordinate& risky_point_b;
+	Coordinate risky_point_a;
+	Coordinate risky_point_b;
 	if((seg.direction().pointed().y * seg.direction().pointed().x) > 0){
-		risky_point_a = seg.closest_point(rec.top_right());
-		risky_point_b = seg.closest_point(rec.bottom_left());
-	} else {
-		risky_point_a = seg.closest_point(rec.top_left());
-		risky_point_b = seg.closest_point(rec.bottom_right());
+		std::cout << "1 or 3 quadrant" << std::endl;
+		risky_point_a = closest_point(seg, rec.top_left()); //1. or 3. quadrant
+		risky_point_b = closest_point(seg, rec.bottom_right());
+	} else { //2. or 4. quadrant
+		risky_point_a = closest_point(seg, rec.top_right());
+		risky_point_b = closest_point(seg, rec.bottom_left());
 	}
 	
-	if(rec.contains(risky_point_a, tol) == false ||
-	   rec.contains(risky_point_b, tol) == false) 
-		return false;
+	std::cout << risky_point_a.to_string() << std::endl;
+	std::cout << risky_point_b.to_string() << std::endl;
+	
+	if(rec.contains(risky_point_a, tol) == false &&
+	   rec.contains(risky_point_b, tol) == false) {
+		   std::cout << "Two risky points are outside" << std::endl;
+		   return false;
+	   }
 		
-	//our the line intersects the rectangle area but two points are outside of the area
-	return can_be_on(seg, risky_point_a) || can_be_on(seg, risky_point_b);
+		std::cout << "at least one of the risky points are inside" << std::cout;
+	//the line intersects the rectangle area but two points are outside of the area
+	return Tools::can_be_on(seg, risky_point_a) || 
+		   Tools::can_be_on(seg, risky_point_b);
 
 }
 
@@ -396,7 +407,7 @@ Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
 }
 
 bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length tol){					 
-	return	(rectangle.contains(center, tol + circle.radius()));
+	return	(rectangle.contains(circle.center(), tol + circle.radius()));
 }
 
 bool Tools::can_be_on(Segment const& seg, Coordinate const& coord) {
@@ -409,6 +420,8 @@ bool Tools::is_between(double a, double b, double c){
 	double low(std::min(a,b));
 	return low <= c && c <= high;
 }
+
+
 double bound(double to_bound, double min, double max) {
 	to_bound = std::min(max, to_bound);
 	to_bound = std::max(min, to_bound);		

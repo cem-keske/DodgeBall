@@ -156,7 +156,7 @@ const Vector operator/(Vector, double);
 class Segment {
 	private:
 		Coordinate point_;
-		Coordinate point_b;
+		Coordinate point_b_;
 	
 	public:
 	
@@ -172,6 +172,7 @@ class Segment {
 		const Vector& body() const;
 		Vector direction() const;
 		Length length() const;
+		Length length_squared() const;
 		
 		// ===== Utilities =====
 		
@@ -232,8 +233,8 @@ class Rectangle {
 		/**
 		 * Points on borders considered inside the rectangle.
 		 */
-		bool containts(Coordinate const&) const; // zero tolerance
-		bool contains(Coordinate const&, Length tolerance = 0) const;
+		bool contains(Coordinate const&) const; // zero tolerance
+		bool contains(Coordinate const&, Length tol) const;
 };
 
 /// CIRCLE ///
