@@ -336,7 +336,8 @@ bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length toler
 }
 
 /**
- * See project report for the proof of why this algorithm works.
+ * Feel free to see why this algorithm works using:
+ * -> https://www.desmos.com/calculator/qtmx4wcbfj
  */ 
 bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
 	
@@ -346,27 +347,18 @@ bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
 	Coordinate risky_point_a;
 	Coordinate risky_point_b;
 	if((seg.direction().pointed().y * seg.direction().pointed().x) > 0){
-		std::cout << "1 or 3 quadrant, we'll try with top_left and bottom_right" << std::endl;
-		risky_point_a = closest_point(seg, rec.top_left()); //1. or 3. quadrant
+		risky_point_a = closest_point(seg, rec.top_left()); 	//1. or 3. quadrant
 		risky_point_b = closest_point(seg, rec.bottom_right());
-	} else { //2. or 4. quadrant
-		std::cout << "2 or 4 quadrant, we'll try with top_right and bottom_left" << std::endl;
-		risky_point_a = closest_point(seg, rec.top_right());
+	} else { 
+		risky_point_a = closest_point(seg, rec.top_right());	//2. or 4. quadrant
 		risky_point_b = closest_point(seg, rec.bottom_left());
 	}
-	
 	bool risky_a_inside(rec.contains(risky_point_a, tol));
 	bool risky_b_inside(rec.contains(risky_point_b, tol));
-	std::cout << "Closest points : " << std::endl;
-	std::cout << risky_point_a.to_string() << std::endl << risky_point_b.to_string() << std::endl;
-		
 	if(risky_a_inside == false && risky_b_inside == false) {
-		   std::cout << "Two risky points are outside" << std::endl;
+		   //two risky points are outside
 		   return false;
 	}
-	std::cout << "At least one of the risky points is inside. \n"
-				 "The line intersects the area but two ends of the segment are outside of the area" << std::endl;
-	
 	//the line intersects the rectangle area but two points are outside of the area
 	return (risky_a_inside && Tools::can_be_on(seg, risky_point_a)) || 
 		   (risky_b_inside && Tools::can_be_on(seg, risky_point_b));
@@ -392,7 +384,7 @@ Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
 	 * to another point given is used.
 	 * 
 	 * For the graphical and mathematical demonstration:
-	 * --> desmos.com/calculator/fjawls
+	 * --> https://www.desmos.com/calculator/jwttibjrxi
 	 * --> The vector AC is projected on AB to determine the point.
 	 */ 
 	Length delta_x(seg.point_a().x - seg.point_b().x);
@@ -410,6 +402,11 @@ Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
 
 bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length tol){					 
 	return	(rectangle.contains(circle.center(), tol + circle.radius()));
+}
+
+bool Tools::segment_connected(Rectangle const& rectangle, Coordinate const& a,
+							  Coordinate const& b, Length tolerance){
+	return rectangle.intersect(Segment(a.x,a.y,b.x,b.y), tolerance);	 
 }
 
 bool Tools::can_be_on(Segment const& seg, Coordinate const& coord) {
