@@ -288,6 +288,13 @@ namespace Tools {
 		bool intersect(Rectangle const&, Circle const&, Length tolerance);
 		bool intersect(Rectangle const&, Segment const&, Length tolerance);
 		
+		/**
+		 * Returns true if two coordinates can be connected by a segment without
+		 * intersecting the rectangle.
+		 */ 
+		bool segment_connected(Rectangle const& rectangle, Coordinate const& a,
+									  Coordinate const& b, Length tolerance);
+		
 		Length distance(Coordinate const&, Coordinate const&);
 		//used for fast calculation
 		Length dist_squared(Coordinate const&, Coordinate const&); 
