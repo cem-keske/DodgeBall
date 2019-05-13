@@ -19,6 +19,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 /// ===== SIMULATION ===== class declaration ///
 
@@ -106,6 +107,12 @@ class Simulation {
 		void update_player_graphics();
 		void update_ball_bodies(); 
 		void update_obstacle_bodies(); 
+		
+		void handle_ball_collisions();
+		
+		void remove_obstacle(size_t, size_t);
+		//void remove_player(size_t);
+		//void remove_ball(size_t);
 
 };
 
@@ -470,6 +477,43 @@ void Simulation::update_obstacle_bodies() {
 		++counter;
 	}
 }
+
+void Simulation::handle_ball_collisions() {
+	
+	size_t nb_balls(balls_.size());
+	size_t nb_players(players_.size());
+
+	std::vector<size_t> collided_balls;
+	
+	for(size_t i(0); i < nb_balls; ++i) {
+		
+		for(size_t j(0); j < nb_players; ++j) {
+			if(Tools::intersect(players_[j].body(), balls_[i].geometry(), marge_jeu_)){
+				std::swap(players_.back(), players_[j]);
+				players_.pop_back();
+				--nb_players;
+				--i;
+			}
+		}
+		
+		for(auto obs : obstacles()) {
+			if(Tools::intersect(obs.second, balls_[i].geometry(), marge_jeu_)){
+				map_.remove_obstacle(obs.first.first, obs.first.second);
+			}
+		}
+		
+	}
+	
+	// Sort indexes to facilitate removal from balls_ vector
+	std::sort(collided_balls.begin(), collided_balls.end());
+	
+	size_t nb_collided(collided_balls.size());
+	for(size_t i(nb_collided - 1); i >= 0; ++i) {
+		std::swap(balls_.back(), balls_.at(collided_balls[i]));
+		balls_.pop_back();
+	}
+}
+
 
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
