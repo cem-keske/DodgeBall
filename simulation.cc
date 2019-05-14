@@ -10,7 +10,6 @@
 #include "player.h"
 #include "map.h"
 #include "ball.h"
-#include "tools.h"
 #include "assert.h"
 #include <fstream>
 #include <iostream>
@@ -436,11 +435,11 @@ void Simulation::update_player_directions() {
 		bool target_seen(true);
 		
 		for(const auto& obs : obstacles()) {
-
-			bool intersects(Tools::segment_connected(obs.second, 
-													 player.body().center(), 
-													 player.target()->body().center(),
-													 player_radius_ + marge_jeu_));
+			Length tolerance_w_radius(player_radius_ + marge_jeu_);
+			bool intersects = Tools::segment_connected(obs.second, 
+													  player.body().center(), 
+													  player.target()->body().center(),
+													  tolerance_w_radius) == false;
 			if(intersects)
 				target_seen = false;
 				
