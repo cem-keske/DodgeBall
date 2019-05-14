@@ -406,7 +406,7 @@ bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length t
 
 bool Tools::segment_connected(Rectangle const& rectangle, Coordinate const& a,
 							  Coordinate const& b, Length tolerance){
-	return rectangle.intersect(Segment(a.x,a.y,b.x,b.y), tolerance);	 
+	return intersect(rectangle, Segment(a.x,a.y,b.x,b.y), tolerance);	 
 }
 
 bool Tools::can_be_on(Segment const& seg, Coordinate const& coord) {
