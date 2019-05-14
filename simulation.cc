@@ -474,6 +474,7 @@ void Simulation::update_player_graphics() {
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
 						// of a player
 	
+	
 	for(size_t i(0); i < nb_players; ++i) {
 		
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
