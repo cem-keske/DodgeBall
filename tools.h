@@ -293,7 +293,7 @@ namespace Tools {
 		 * intersecting the rectangle.
 		 */ 
 		bool segment_connected(Rectangle const& rectangle, Coordinate const& a,
-									  Coordinate const& b, Length tolerance);
+							   Coordinate const& b, Length tolerance);
 		
 		Length distance(Coordinate const&, Coordinate const&);
 		//used for fast calculation

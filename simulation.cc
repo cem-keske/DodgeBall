@@ -440,7 +440,7 @@ void Simulation::update_player_directions() {
 			bool intersects(Tools::segment_connected(obs.second, 
 													 player.body().center(), 
 													 player.target()->body().center(),
-													 player_radius_ + marge_jeu_);
+													 player_radius_ + marge_jeu_));
 			if(intersects)
 				target_seen = false;
 				
