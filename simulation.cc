@@ -18,7 +18,6 @@
 #include <vector>
 #include <array>
 #include <cmath>
-#include <limits>
 #include <algorithm>
 
 /// ===== SIMULATION ===== class declaration ///
@@ -103,6 +102,8 @@ class Simulation {
 		bool detect_initial_ball_collisions() const ;
 		
 		void update_player_targets();
+		void update_player_directions();
+		void update_player_positions();
 		
 		void update_player_graphics();
 		void update_ball_bodies(); 
@@ -397,7 +398,9 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
  */
 void Simulation::update(double delta_t) {
 	update_player_targets();
-	std::cout << "A sim object is updated." << std::endl;
+	update_player_directions();
+	
+	
 }
 
 void Simulation::update_graphics() {
@@ -413,7 +416,7 @@ void Simulation::update_player_targets() {
 	size_t players_size(players_.size());
 	for(size_t i(0); i < players_size; ++i) {
 		
-		Length min_distance(std::numeric_limits<double>::infinity());
+		Length min_distance(DIM_MAX*DIM_MAX);
 		
 		for(size_t j(i+1); j < players_size; ++j) {
 			Length distance(Tools::distance(players_[i].body().center(),
@@ -426,6 +429,40 @@ void Simulation::update_player_targets() {
 	}
 }
 
+void Simulation::update_player_directions() {
+	
+	for (auto& player : players_) {
+		
+		bool target_seen(true);
+		
+		for(const auto& obs : obstacles()) {
+
+			bool intersects(Tools::segment_connected(obs.second, 
+													 player.body().center(), 
+													 player.target()->body().center(),
+													 player_radius_ + marge_jeu_);
+			if(intersects)
+				target_seen = false;
+				
+		}
+		
+		if (target_seen)
+			player.direction(Vector (player.target()-> body().center() - 
+									 player.body().center()));
+		else {
+			/***********
+			 * 
+			 * 
+			 */
+		}
+	}
+}
+
+void Simulation::update_player_positions() {
+	for(auto& player : players_) {
+		player.move(player_speed_*player.direction());
+	}
+}
 
 void Simulation::update_player_graphics() {
 		
