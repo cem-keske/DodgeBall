@@ -24,7 +24,7 @@ const Coordinate& Player::position() const {return body_.center();}
 
 const Circle& Player::body() const {return body_;} 
 
-const Vector& Player::direction() const {return direction;}
+const Vector& Player::direction() const {return direction_;}
 
 const Player* Player::target() const {return target_;}
 
@@ -41,7 +41,7 @@ void Player::position(const Coordinate& position) {
 }
 
 void Player::direction(const Vector& direction) {
-	if(direction.length() = 1.)
+	if(direction.length() == 1.)
 		direction_ = direction;
 	else
 		direction_= direction.get_unit();
