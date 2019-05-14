@@ -94,41 +94,6 @@ static int open_gui();
 /// ===== MAIN FUNCTION ===== ///
 
 int main(int argc, char* argv[]) {
-
-	Segment seg(0,0,1,1);
-	Rectangle rec({0,0},2,2);
-	
-	std::cout << Tools::intersect(rec,seg,0) << std::endl;
-	seg = Segment(-0.1,0, -0.1,1);
-	std::cout  << Tools::intersect(rec,seg,0.2) << " : result" << std::endl<< std::endl;
-	seg = Segment(3,0,0,3);
-	std::cout << Tools::intersect(rec,seg,0.2)<< " : result" << std::endl<< std::endl;
-	seg = Segment(4.1,0,0,4.1);
-	std::cout << Tools::intersect(rec,seg,0.1/sqrt(2)- 0.00001)<< " : result" << std::endl<< std::endl;
-	seg= Segment(2.50000, 1.09,3,0);
-	std::cout<< Tools::intersect(rec,seg,0.5)<< " : result" << std::endl<< std::endl;
-	seg= Segment(-1,0,2,3);
-	std::cout  << Tools::intersect(rec,seg,0.5)<< " : result" << std::endl<< std::endl;
-	seg= Segment(-1,0,0,2.54);
-	std::cout << Tools::intersect(rec,seg,0.2)<< " : result" << std::endl<< std::endl;
-	seg= Segment(-1,0,-0.2000001,0);
-	std::cout <<  Tools::intersect(rec,seg,0.2)<< " : result" << std::endl << std::endl;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	std::vector<std::string> io_files;
 	std::unordered_map<std::string, bool> execution_parameters;

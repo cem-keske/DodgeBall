@@ -9,10 +9,12 @@
 
 /// ===== PLAYER ===== ///
 
+
 // ===== Constructor =====
 
 Player::Player(double x,double y, Length radius, Counter lives, Counter cooldown) 
 			   : body_({x,y}, radius), lives_(lives), cooldown_(cooldown) {}
+			   	 
 			   	   
 // ===== Accessors and manipulators =====
 
@@ -50,3 +52,11 @@ void Player::direction(const Vector& direction) {
 void Player::target(const Player* target) {
 	target_ = target;
 }
+
+
+// ===== Methods =====void move(const Vector&);
+
+void Player::move(const Vector& move_vec) {
+	body_.center((position() + move_vec).pointed());
+}
+

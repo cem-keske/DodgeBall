@@ -396,9 +396,12 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
  * Updates the simulation and makes all necessary calculation
  */
 void Simulation::update(double delta_t) {
+	std::cout << "Updating targets..." << std::endl;
 	update_player_targets();
+	std::cout << "Updating directions..." << std::endl;
 	update_player_directions();
-	
+	std::cout << "Updating positions..." << std::endl;
+	update_player_positions();
 	
 }
 
@@ -436,6 +439,7 @@ void Simulation::update_player_directions() {
 		
 		for(const auto& obs : obstacles()) {
 			Length tolerance_w_radius(player_radius_ + marge_jeu_);
+			std::cout << "Line: 442" << std::endl;
 			bool intersects = Tools::segment_connected(obs.second, 
 													  player.body().center(), 
 													  player.target()->body().center(),
@@ -446,14 +450,16 @@ void Simulation::update_player_directions() {
 		}
 		
 		if (target_seen)
-			player.direction(Vector (player.target()-> body().center() - 
-									 player.body().center()));
+			player.direction(Vector(player.target()-> body().center() - 
+									player.body().center()));
+
 		else {
 			/***********
 			 * 
 			 * 
 			 */
-		}
+		}		std::cout << "Line: 462" << std::endl;
+
 	}
 }
 
