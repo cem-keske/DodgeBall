@@ -402,7 +402,7 @@ void Simulation::update(double delta_t) {
 	update_player_directions();
 	std::cout << "Updating positions..." << std::endl;
 	update_player_positions();
-	
+	update_graphics();
 }
 
 void Simulation::update_graphics() {
@@ -420,7 +420,8 @@ void Simulation::update_player_targets() {
 		
 		Length min_distance(DIM_MAX*DIM_MAX);
 		
-		for(size_t j(i+1); j < players_size; ++j) {
+		for(size_t j(0); j < players_size; ++j) {
+			if (i == j) continue;
 			Length distance(Tools::distance(players_[i].body().center(),
 											players_[j].body().center()));
 			if (distance < min_distance) {
@@ -439,33 +440,40 @@ void Simulation::update_player_directions() {
 		
 		for(const auto& obs : obstacles()) {
 			Length tolerance_w_radius(player_radius_ + marge_jeu_);
-			std::cout << "Line: 442" << std::endl;
-			bool intersects = Tools::segment_connected(obs.second, 
+			std::cout << "Line: 442, " << player.target()->body().center().to_string() <<  std::endl;
+			bool intersects= (Tools::segment_connected(obs.second, 
 													  player.body().center(), 
 													  player.target()->body().center(),
-													  tolerance_w_radius) == false;
+													  tolerance_w_radius));
 			if(intersects)
 				target_seen = false;
-				
+			std::cout << "Target seen: " << target_seen << std::endl;	
 		}
 		
 		if (target_seen)
 			player.direction(Vector(player.target()-> body().center() - 
 									player.body().center()));
-
-		else {
-			/***********
-			 * 
-			 * 
-			 */
-		}		std::cout << "Line: 462" << std::endl;
+			std::cout << "Direction " << Vector(player.body().center(), 
+									player.target()-> body().center()).to_string() << std::endl;
 
 	}
 }
 
 void Simulation::update_player_positions() {
-	for(auto& player : players_) {
-		player.move(player_speed_*player.direction());
+	size_t nb_players(players_.size());
+	Vector to_move;
+	bool can_move(true);
+	
+	for(size_t i(0); i < nb_players; ++i) {
+		to_move = DELTA_T * player_speed_*players_[i].direction();
+		for(size_t j(0); j < nb_players; ++j) {
+			if (i == j) continue;
+			if (Tools::intersect(players_[i].body(), players_[j].body(), marge_jeu_))
+				can_move = false;
+		}
+		if (can_move)		
+			players_[i].move(to_move);
+		can_move = true;
 	}
 }
 
@@ -491,7 +499,7 @@ void Simulation::update_player_graphics() {
 		// modify existing values
 		player_graphics_[i] = std::make_tuple(&players_[i].body(), arc_angle, 
 											  player_color);	
-		
+		std::cout <<  "Line: 495... player body: " << players_[i].body().center().to_string() << std::endl;
 	}
 }
 
@@ -684,7 +692,7 @@ void Simulation::initialise_dimensions(size_t nb_cells) {
 	
 	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
 	player_speed_ = COEF_VITESSE_JOUEUR * (SIDE/nb_cells);
-	
+		
 	ball_radius_ = COEF_RAYON_BALLE * (SIDE/nb_cells);
 	ball_speed_ = COEF_VITESSE_BALLE * (SIDE/nb_cells);
 	
