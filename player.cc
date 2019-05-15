@@ -14,7 +14,7 @@
 
 Player::Player(double x,double y, Length radius, Counter lives, Counter cooldown) 
 			   : body_({x,y}, radius), lives_(lives), cooldown_(cooldown), 
-			     target_(nullptr) {}
+			   direction_(Vector(Coordinate{0,0})), target_(nullptr) {}
 			   	 
 			   	   
 // ===== Accessors and manipulators =====

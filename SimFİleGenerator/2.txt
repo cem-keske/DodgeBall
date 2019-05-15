@@ -1,0 +1,41 @@
+
+# nbCell
+	5
+
+# number of players
+	20
+
+# position of players
+160	160	2	6
+-320	-160	4	13
+-160	0	2	12
+-160	-320	4	2
+320	160	3	3
+-160	320	1	12
+160	-160	2	7
+0	160	3	10
+160	-320	4	7
+320	320	3	2
+320	-160	2	7
+-160	160	3	11
+0	0	1	18
+-320	-320	3	13
+-160	-160	1	0
+-320	160	1	5
+0	320	2	16
+160	0	1	17
+320	0	3	7
+-320	320	1	7
+
+# number of obstacles
+	1
+
+# position of obstacles
+0	3
+
+# number of balls
+	0
+
+# position of balls
+
+	#	 And that's all

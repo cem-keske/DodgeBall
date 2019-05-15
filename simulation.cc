@@ -396,11 +396,8 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
  * Updates the simulation and makes all necessary calculation
  */
 void Simulation::update(double delta_t) {
-	std::cout << "Updating targets..." << std::endl;
 	update_player_targets();
-	std::cout << "Updating directions..." << std::endl;
 	update_player_directions();
-	std::cout << "Updating positions..." << std::endl;
 	update_player_positions();
 	update_graphics();
 }
@@ -411,9 +408,6 @@ void Simulation::update_graphics() {
 	update_obstacle_bodies();
 }
 
-/**
- * For each player its target is determined by finding the closest player.
- */
 void Simulation::update_player_targets() {
 	size_t players_size(players_.size());
 	for(size_t i(0); i < players_size; ++i) {
@@ -440,25 +434,23 @@ void Simulation::update_player_directions() {
 		
 		for(const auto& obs : obstacles()) {
 			Length tolerance_w_radius(player_radius_ + marge_jeu_);
-			std::cout << "Line: 442, " << player.target()->body().center().to_string() <<  std::endl;
 			bool intersects= (Tools::segment_connected(obs.second, 
 													  player.body().center(), 
 													  player.target()->body().center(),
 													  tolerance_w_radius));
 			if(intersects)
 				target_seen = false;
-			std::cout << "Target seen: " << target_seen << std::endl;	
 		}
 		
 		if (target_seen)
 			player.direction(Vector(player.target()-> body().center() - 
 									player.body().center()));
-			std::cout << "Direction " << Vector(player.body().center(), 
-									player.target()-> body().center()).to_string() << std::endl;
-
 	}
 }
 
+/**
+ * Player directions must be udated before using this function.
+ */ 
 void Simulation::update_player_positions() {
 	size_t nb_players(players_.size());
 	Vector to_move;
@@ -499,7 +491,6 @@ void Simulation::update_player_graphics() {
 		// modify existing values
 		player_graphics_[i] = std::make_tuple(&players_[i].body(), arc_angle, 
 											  player_color);	
-		std::cout <<  "Line: 495... player body: " << players_[i].body().center().to_string() << std::endl;
 	}
 }
 
