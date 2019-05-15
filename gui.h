@@ -23,7 +23,7 @@ class Canvas : public Gtk::DrawingArea{
 	public:
 		Canvas();
 		
-	protected:
+	public:
 		//Overridden draw method for the canvas.
 		bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
   
