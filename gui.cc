@@ -66,7 +66,7 @@ Canvas::Canvas() : center(DIM_MAX,DIM_MAX) {
 
 bool Canvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr){
 		
-	draw_background(cr);
+	draw_background(cr); //this gets onto te old display
 	if(Simulator::empty() == false) {
 		draw_all_player_graphics(cr);
 		draw_all_rectangle_graphics(cr);
@@ -392,8 +392,8 @@ void Gui_Window::refresh(){
 	Simulation_State state(Simulator::active_simulation_state());
 	label_message.set_text(state_to_string(state));
 	
-	//draw all subcomponents
-	on_draw(get_window()->create_cairo_context());
+	//draw canvas and message window again
+	canvas.on_draw(canvas.get_window()->create_cairo_context());
 }
 
 
