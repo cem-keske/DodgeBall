@@ -454,18 +454,38 @@ void Simulation::update_player_directions() {
 void Simulation::update_player_positions() {
 	size_t nb_players(players_.size());
 	Vector to_move;
-	bool can_move(true);
+	bool coll_prospect(false);
+	bool collision(false);
+	
+	Length collision_dist((2*player_radius_ + marge_jeu_) * 
+						  2*player_radius_ + marge_jeu_);
+	Length dist_per_t(DELTA_T * player_speed_);
 	
 	for(size_t i(0); i < nb_players; ++i) {
-		to_move = DELTA_T * player_speed_*players_[i].direction();
 		for(size_t j(0); j < nb_players; ++j) {
 			if (i == j) continue;
-			if (Tools::intersect(players_[i].body(), players_[j].body(), marge_jeu_))
-				can_move = false;
+			
+			if (Tools::dist_squared(players_[i].body(), players_[j].body(), 
+									dist_per_t + marge_jeu_) < collision_dist) {
+				players_[i].position(players_[j].position() -
+									((2*player_radius_+marge_jeu_) * 
+									players_[i].direction().get_unit()).pointed());	
+									}
+			
+			if (Tools::intersect(players_[i].body(), players_[j].body(), 
+								 dist_per_t + marge_jeu_)){		 	
+			coll_prospect = true;
+			}
 		}
-		if (can_move)		
+
+		if (collision == false)	{	
 			players_[i].move(to_move);
-		can_move = true;
+			to_move = DELTA_T * player_speed_*players_[i].direction().get_unit();
+		} else {
+
+		}
+
+		collision = false;
 	}
 }
 

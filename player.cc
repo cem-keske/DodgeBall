@@ -31,6 +31,9 @@ const Vector& Player::direction() const {return direction_;}
 
 const Player* Player::target() const {return target_;}
 
+bool Player::in_collision() const {return in_collision_;}
+
+
 void Player::lives(Counter lives){
 	lives_ = lives;
 };
@@ -54,11 +57,14 @@ void Player::target(const Player* target) {
 	target_ = target;
 }
 
+void Player::in_collision(bool collision) {
+	in_collision_ = collision;
+}
 
-// ===== Methods =====void move(const Vector&);
+
+// ===== Methods =====
 
 void Player::move(const Vector& move_vec) {
 	body_.center(position() + move_vec.pointed());
-	std::cout << "Move: " << move_vec.to_string() << std::endl;
 }
 

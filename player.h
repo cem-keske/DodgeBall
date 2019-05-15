@@ -20,6 +20,8 @@ class Player{
 		Counter cooldown_;
 		Vector direction_;
 		const Player *target_;
+		
+		bool in_collision_;
 	
 	public:	
 	
@@ -36,6 +38,8 @@ class Player{
 		const Circle& body() const; 
 		const Vector& direction() const;
 		const Player* target() const;
+		
+		bool in_collision() const;
 
 		// ===== Manipulators =====
 		
@@ -44,6 +48,8 @@ class Player{
 		void direction(const Vector&);
 		void position(const Coordinate&);
 		void target(const Player*);
+		
+		void in_collision(bool);
 				
 		// ===== Methods =====
 		
