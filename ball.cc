@@ -39,3 +39,8 @@ void Ball::radius(Length radius) {geometry_.radius(radius);}
 
 void Ball::direction(Vector const &direction) {direction_ = direction;}
 
+// ===== Methods =====
+
+void Ball::move(Vector const& move_vec) {
+	geometry_.center(position() + move_vec.pointed());
+} 

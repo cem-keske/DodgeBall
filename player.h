@@ -54,6 +54,8 @@ class Player{
 		// ===== Methods =====
 		
 		void move(const Vector&);
+		void cool_down(Counter);
+		void take_life();
 };
 
 

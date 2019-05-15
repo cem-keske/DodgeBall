@@ -36,6 +36,10 @@ class Ball {
 		void position(Coordinate const&);
 		void radius(Length);
 		void direction(Vector const&);
+		
+		// ===== Methods =====
+		
+		void move(Vector const&);
 };
 
 #endif

@@ -69,3 +69,11 @@ void Player::move(const Vector& move_vec) {
 	body_.center(position() + move_vec.pointed());
 }
 
+void Player::cool_down(Counter count) {
+	cooldown_ += count;
+}
+
+void Player::take_life() {
+	--lives_;
+}
+
