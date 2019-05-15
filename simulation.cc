@@ -103,6 +103,7 @@ class Simulation {
 		void update_player_targets();
 		void update_player_directions();
 		void update_player_positions();
+		void perform_player_actions();
 		
 		void update_player_graphics();
 		void update_ball_bodies(); 
@@ -399,6 +400,7 @@ void Simulation::update(double delta_t) {
 	update_player_targets();
 	update_player_directions();
 	update_player_positions();
+	perform_player_actions();
 	update_graphics();
 }
 
@@ -427,11 +429,8 @@ void Simulation::update_player_targets() {
 }
 
 void Simulation::update_player_directions() {
-	
 	for (auto& player : players_) {
-		
-		bool target_seen(true);
-		
+
 		for(const auto& obs : obstacles()) {
 			Length tolerance_w_radius(player_radius_ + marge_jeu_);
 			bool intersects= (Tools::segment_connected(obs.second, 
@@ -439,16 +438,19 @@ void Simulation::update_player_directions() {
 													  player.target()->body().center(),
 													  tolerance_w_radius));
 			if(intersects)
-				target_seen = false;
+				player.target_seen(false);
+			std::cout << player.target_seen() << std::endl;
+
 		}
 		
-		if (target_seen)
+		if (player.target_seen())
 			player.direction(Vector(player.target()-> body().center() - 
 									player.body().center()));
-		else 
-			player.direction(Vector(0,0));
-			
-		std::cout << target_seen << std::endl;
+		else {
+			player.direction(Vector(Coordinate(0,0)));
+		}
+		
+		player.target_seen(true);
 	}
 }
 
@@ -463,15 +465,33 @@ void Simulation::update_player_positions() {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		to_move = dist_per_t*players_[i].direction();
+				
 		for(size_t j(0); j < nb_players; ++j) {
 			if (i == j) continue;
-			if (Tools::intersect(players_[i].body(), players_[j].body(), marge_jeu_))
+			if (Tools::intersect(players_[i].body(), players_[j].body(), 
+								 marge_jeu_ + dist_per_t))
 				can_move = false;
 		}
 		if (can_move)		
 			players_[i].move(to_move);
 		can_move = true;
+	}
 }
+
+
+void Simulation::perform_player_actions() {
+	
+	for (auto& player : players_) {
+		
+		player.cooldown(player.cooldown() + 1);
+		if(player.target_seen() && player.cooldown() >= MAX_COUNT) {
+			
+			balls_.push_back(Ball(player.direction(), ball_radius_,
+							 (player.position()*(player_radius_ + ball_radius_ + 
+							  marge_jeu_)).pointed()));						
+		}	
+	}
+	
 }
 
 void Simulation::update_player_graphics() {

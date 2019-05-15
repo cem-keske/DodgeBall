@@ -21,7 +21,7 @@ class Player{
 		Vector direction_;
 		const Player *target_;
 		
-		bool in_collision_;
+		bool target_seen_;
 	
 	public:	
 	
@@ -39,7 +39,7 @@ class Player{
 		const Vector& direction() const;
 		const Player* target() const;
 		
-		bool in_collision() const;
+		bool target_seen() const;
 
 		// ===== Manipulators =====
 		
@@ -49,7 +49,7 @@ class Player{
 		void position(const Coordinate&);
 		void target(const Player*);
 		
-		void in_collision(bool);
+		void target_seen(bool);
 				
 		// ===== Methods =====
 		

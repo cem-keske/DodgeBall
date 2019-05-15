@@ -115,6 +115,10 @@ Vector Vector::get_perpendicular() const {
 }
 
 Vector Vector::get_unit() const {
+	
+	if(pointed_.x == 0 && pointed_.y == 0)
+		return Vector(0,0);
+	
 	return Vector(angle());
 }
 

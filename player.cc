@@ -14,7 +14,8 @@
 
 Player::Player(double x,double y, Length radius, Counter lives, Counter cooldown) 
 			   : body_({x,y}, radius), lives_(lives), cooldown_(cooldown), 
-			   direction_(Vector(Coordinate{0,0})), target_(nullptr) {}
+			   direction_(Vector(Coordinate{0,0})), target_(nullptr), 
+			   target_seen_(false) {}
 			   	 
 			   	   
 // ===== Accessors and manipulators =====
@@ -31,7 +32,7 @@ const Vector& Player::direction() const {return direction_;}
 
 const Player* Player::target() const {return target_;}
 
-bool Player::in_collision() const {return in_collision_;}
+bool Player::target_seen() const {return target_seen_;}
 
 
 void Player::lives(Counter lives){
@@ -57,8 +58,8 @@ void Player::target(const Player* target) {
 	target_ = target;
 }
 
-void Player::in_collision(bool collision) {
-	in_collision_ = collision;
+void Player::target_seen(bool seen) {
+	target_seen_ = seen;
 }
 
 
