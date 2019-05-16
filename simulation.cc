@@ -513,17 +513,28 @@ void Simulation::set_dist(size_t x1, size_t y1, size_t x2, size_t y2,
 
 
 void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
-	size_t other_x(0);
-	size_t other_y(0);
-	if(x1 != nb_cells_ - 1) {
-		if(y1 != 0){ //bottom left
-			other_x = x1 + 1;
-			other_x = y1 - 1;
-			set_dist(x1, y1, other_x, other_y, get_neighbor_distance(x1, y1, 
-					 other_x, other_y));
+
+	bool right_free(y1 < nb_cells - 1);
+	bool bottom_free(x1 < nb_cells - 1);
+	bool left_free(x1 != 0);
+
+	if(right_free) {
+		set_dist(x1, y1, x1, y1+1, get_neighbor_distance(x1, y1, 
+					 x1, y1+1));
+		
+		if(bottom_free){ //bottom right
+			set_dist(x1, y1, x1+1, y1+1, get_neighbor_distance(x1, y1, 
+					 x1+1, y1+1));
+		 }
+	}
+	
+	if(bottom_free) {
+		set_dist(x1, y1, x1+1, y1, get_neighbor_distance(x1, y1, 
+				 x1+1, y1))
+		if(left_free) {
+		set_dist(x1, y1, x1+1, y1-1, get_neighbor_distance(x1, y1, 
+				 x1+1, y1-1)
 		}
-		
-		
 	}
 }
 
