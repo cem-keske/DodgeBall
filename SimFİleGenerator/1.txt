@@ -1,6 +1,6 @@
 
 # nbCell
-	5
+	30
 
 # number of players
 	20

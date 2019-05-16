@@ -46,7 +46,7 @@ class Simulation {
 		Length ball_speed_;
 		Length marge_jeu_;
 		Length marge_lecture_;
-		Counter player_cooldown_per_t_ = 1;
+		Counter player_cooldown_per_t_;
 
 		bool success_;
 		bool is_over_;
@@ -147,6 +147,7 @@ class Simulation {
 		
 		void remove_collided_balls();
 		void remove_dead_players();
+		void remove_out_of_bounds();
 		
 		void remove_obstacle(size_t, size_t);
 
@@ -373,12 +374,13 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		ball_speed_ = -1;
 		marge_jeu_ = -1.;
 		marge_lecture_ = -1.;
+		player_cooldown_per_t_ = 1;
 		success_ = false;
-
+		is_over_ = false;
+		
 	if(Simulator::exec_parameters().at("Error")) {	//
-		if(io_files.empty()) { 
+		if(io_files.empty())
 			exit(0);
-		}
 		
 		Reader reader(BEGIN);
 		if(reader.import_file(io_files[0], *this) == false)
@@ -386,7 +388,6 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		else
 			success_ = true;
 	} else {
-		
 		// if there are files to import to simulation
 		if (io_files.size() > 0) {
 			Reader reader(BEGIN);
@@ -446,10 +447,8 @@ void Simulation::initialise_dimensions(size_t nb_cells) {
 	max_dist_ = nb_cells2 * dist_coefficient * dist_coefficient;
 
 	floyd_matrix_.resize(nb_cells2, std::vector<Floyd_Dist>(nb_cells2, max_dist_));
-	
-	
+
 	map_.initialise_map(nb_cells_);
-	std::cout << "nb_cells2 = "  << nb_cells2 << std::endl;
 }
 
 void Simulation::initialise_floyd_matrix() {
@@ -471,7 +470,7 @@ void Simulation::initialise_floyd_matrix() {
 void Simulation::print_floyd() {
 	
 	size_t matrix_size(floyd_matrix_.size());
-	for(int i(0); i< nb_cells_*nb_cells_; ++i)
+	for(size_t i(0); i< nb_cells_*nb_cells_; ++i)
 		std::cout << "\t"<<  i / nb_cells_ << "," << i % nb_cells_ << "\t";
 	std::cout << std::endl;
 	for (size_t i(0); i < matrix_size; ++i) {
@@ -486,9 +485,9 @@ void Simulation::print_floyd() {
 void Simulation::update_floyd(){
 	size_t floyd_size(floyd_matrix_.size());
 	Floyd_Dist sum(0);
-	for(size_t k(0); k< floyd_size; ++k){
-		for(size_t i(0); i< floyd_size; ++i){
-			for(size_t j(0); j< floyd_size; ++j){ //symmetric matrix
+	for(size_t k(0); k < floyd_size; ++k) {
+		for(size_t i(0); i < floyd_size; ++i) {
+			for(size_t j(0); j < floyd_size; ++j) {
 				sum = floyd_matrix_[k][i] + floyd_matrix_[k][j];  
 				if(sum < floyd_matrix_[i][j]){
 					floyd_matrix_[i][j] = sum;
@@ -512,7 +511,7 @@ Floyd_Dist Simulation::get_neighbor_distance(size_t x1, size_t y1,
 	
 	if (map_.is_obstacle(x1, y1) || map_.is_obstacle(x2, y2)) return max_dist_;
 	
-	if(delta_x == 0 || delta_y == 0) { //left or right
+	if(delta_x == 0 || delta_y == 0) { //horizontal/vertical
 	 return dist_coefficient;
 	}
 	
@@ -580,7 +579,7 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 }
 
 void Simulation::update(double delta_t) {
-	
+
 	if(is_over_) return;
 	
 	if (players_.size() < 2) {
@@ -757,6 +756,12 @@ void Simulation::handle_ball_collisions() {
 	if (nb_balls == 0) return;
 	
 	for(size_t i(0); i < nb_balls; ++i) {
+		
+		if(test_center_position(balls_[i].geometry().center().x, 
+								balls_[i].geometry().center().y == false) {
+			balls_[i].collided(true);
+		}
+		
 		for(size_t j(i + 1); j < nb_balls; ++j) {
 			if (detect_ball_ball_collision(balls_[i], balls_[j])) {
 				balls_[i].collided(true);
