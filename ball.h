@@ -13,7 +13,9 @@ class Ball {
 	private:	
 		
 		Vector direction_;		//this will also be the velocity of the movement...
-		Circle geometry_;		
+		Circle geometry_;
+		
+		bool collided_;
 	
 	public:
 	
@@ -30,12 +32,16 @@ class Ball {
 		const Vector& direction() const;
 		const Circle& geometry() const;
 		
+		bool collided() const;
+		
 		// ===== Manipulators =====
 		
 		void geometry(Circle const&);
 		void position(Coordinate const&);
 		void radius(Length);
 		void direction(Vector const&);
+		
+		void collided(bool);
 		
 		// ===== Methods =====
 		

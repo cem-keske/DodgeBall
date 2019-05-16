@@ -335,8 +335,7 @@ void Circle::radius(Length radius) {
 bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length tolerance){
 	if (tolerance < 0) tolerance = (-tolerance); // sign of tolerance doesn't matter
 	Length sum_of_r = circ_one.radius() + circ_two.radius();
-	return (circ_one.center()).distance(circ_two.center()) <= 
-			sum_of_r + tolerance;
+	return (circ_one.center()).distance(circ_two.center()) <= sum_of_r + tolerance;
 }
 
 /**

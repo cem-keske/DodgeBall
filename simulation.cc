@@ -117,10 +117,14 @@ class Simulation {
 		void update_obstacle_bodies(); 
 		
 		void handle_ball_collisions();
-		bool detect_ball_player_collision(const Ball&, const Player&);
-		void handle_ball_player_collisions(const Ball& ball, bool& collided);
+		void handle_ball_player_collisions(Ball& ball);
 		void take_player_life(size_t &player_index);
+		
+		bool detect_ball_player_collision(const Ball&, const Player&);
 		bool detect_ball_ball_collision(const Ball& first, const Ball& second);
+		
+		void remove_collided_balls();
+		void remove_dead_players();
 		
 		void remove_obstacle(size_t, size_t);
 
@@ -408,14 +412,19 @@ void Simulation::update(double delta_t) {
 	
 	if (players_.size() < 2) {
 		is_over_ = true;
+		return;
 	}
+	
 	update_player_targets();
 	update_player_directions();
 	update_player_positions();
 	update_ball_positions();
 	perform_player_actions();
 	handle_ball_collisions();
+	remove_collided_balls();
+	remove_dead_players();
 	update_graphics();
+	
 }
 
 void Simulation::update_graphics() {
@@ -428,15 +437,15 @@ void Simulation::update_player_targets() {
 	
 	size_t players_size(players_.size());
 	for(size_t i(0); i < players_size; ++i) {
-		Length min_distance(DIM_MAX*DIM_MAX);
+		Length min_distance2(DIM_MAX*DIM_MAX*DIM_MAX*(double)DIM_MAX);
 
 		for(size_t j(0); j < players_size; ++j) {
 			if (i == j) continue;
-			Length distance(Tools::distance(players_[i].body().center(),
-											players_[j].body().center()));
-			if (distance < min_distance) {
-				min_distance = distance;
-				players_[i].target(&(players()[j]));
+			Length distance2(Tools::dist_squared(players_[i].body().center(),
+												 players_[j].body().center()));
+			if (distance2 < min_distance2) {
+				min_distance2 = distance2;
+				players_[i].target(&(players_[j]));
 			}
 		}
 	}
@@ -459,7 +468,7 @@ void Simulation::update_player_directions() {
 			}
 		}
 		
-		player.target_seen(intersects == false);
+		player.target_seen(!intersects);
 		
 		if (player.target_seen())
 			player.direction(Vector(player.target()-> body().center() - 
@@ -477,11 +486,10 @@ void Simulation::update_player_positions() {
 	size_t nb_players(players_.size());
 	Vector to_move;
 	Length dist_per_t(DELTA_T * player_speed_);
-	std::cout << "Player speed: " << dist_per_t << std::endl;
 	bool can_move(true);
 	
 	for(size_t i(0); i < nb_players; ++i) {
-		to_move = dist_per_t*players_[i].direction();
+		to_move = dist_per_t*players_[i].direction().get_unit();
 				
 		for(size_t j(0); j < nb_players; ++j) {
 			if (i == j) continue;
@@ -497,7 +505,6 @@ void Simulation::update_player_positions() {
 
 void Simulation::update_ball_positions() {
 	static Length ball_dist_per_t(ball_speed_*DELTA_T);
-	std::cout << "Ball speed: " << ball_dist_per_t << std::endl;
 	for(auto& ball : balls_) {
 		ball.move((ball_dist_per_t*ball.direction().get_unit()).pointed());
 	}
@@ -506,6 +513,7 @@ void Simulation::update_ball_positions() {
 void Simulation::perform_player_actions() {
 	
 	Coordinate ball_pos;
+	
 	for (auto& player : players_) {
 		player.cool_down(player_cooldown_per_t);
 		
@@ -517,14 +525,6 @@ void Simulation::perform_player_actions() {
 						marge_jeu_ * 2)).pointed();
 					   
 			initialise_ball(ball_pos.x, ball_pos.y, player.direction().angle());
-			std::cout << "Player position: " << player.position().to_string() << std::endl;
-			std::cout << "ball position: " << ball_pos.to_string() << std::endl;
-			std::cout << "Change : " << (player.direction().get_unit()*(player_radius_ + ball_radius_ + 
-										   marge_jeu_)).pointed().to_string() << std::endl;
-			std::cout << "Player Direction: " << player.direction().get_unit().to_string() << std::endl;
-			std::cout << "Ball add: " << (player_radius_ + ball_radius_ + 
-										   marge_jeu_) << std::endl;
-
 			player.cooldown(0);						
 		}	
 	}
@@ -582,52 +582,42 @@ void Simulation::update_obstacle_bodies() {
 void Simulation::handle_ball_collisions() {
 	size_t nb_balls(balls_.size());
 	if (nb_balls == 0) return;
-	std::vector<size_t> collided_balls;
-	bool collided(false);
 	
 	for(size_t i(0); i < nb_balls; ++i) {
-		for(size_t j(0); j < nb_balls; ++j) {
-			if (i == j) continue;
-			collided = detect_ball_ball_collision(balls_[i], balls_[j]);
+		for(size_t j(i + 1); j < nb_balls; ++j) {
+			if (detect_ball_ball_collision(balls_[i], balls_[j])) {
+				balls_[i].collided(true);
+				balls_[j].collided(true);
+			}
 		}
 		
-		handle_ball_player_collisions(balls_[i], collided);
-		if (collided)
-			collided_balls.push_back(i);
+		handle_ball_player_collisions(balls_[i]);
 			
 		for(auto &obs : obstacles()) {
 			if(Tools::intersect(obs.second, balls_[i].geometry(), marge_jeu_)){
-				map_.remove_obstacle(obs.first.first, obs.first.second);
-				if (collided == false) {
-					collided_balls.push_back(i);
-				}
+				remove_obstacle(obs.first.first, obs.first.second);
+				balls_[i].collided(true);
 			}
 		}
 	}
-	// Sort indexes to facilitate removal from balls_ vector
-	std::sort(collided_balls.begin(), collided_balls.end());
-	size_t nb_collided(collided_balls.size());
-	for(size_t i(nb_collided); i > 0; --i) {
-		std::swap(balls_.back(), balls_.at(collided_balls[i-1]));
-		balls_.pop_back();
-	}
 }
 
-bool Simulation::detect_ball_player_collision(const Ball& ball, const Player& player){
-	return Tools::intersect(ball.geometry(), 
-							player.body(), marge_jeu_);
-}
-
-void Simulation::handle_ball_player_collisions(const Ball& ball, bool& collided) {
+void Simulation::handle_ball_player_collisions(Ball& ball) {
+	
 	bool player_collided(false);
 	size_t nb_players(players_.size());
+	
 	for(size_t j(0); j < nb_players; ++j) {
 		player_collided = detect_ball_player_collision(ball, players_[j]);
 		if(player_collided) {
 			take_player_life(j);
-			collided = true;
+			ball.collided(true);
 		}
 	}
+}
+
+bool Simulation::detect_ball_player_collision(const Ball& ball, const Player& player){
+	return Tools::intersect(ball.geometry(), player.body(), marge_jeu_);
 }
 
 bool Simulation::detect_ball_ball_collision(const Ball& first, const Ball& second) {
@@ -635,14 +625,42 @@ bool Simulation::detect_ball_ball_collision(const Ball& first, const Ball& secon
 }
 
 void Simulation::take_player_life(size_t &player_index) {
-	size_t nb_players(players_.size());
 	players_[player_index].take_life();
-	if (players_[player_index].lives() <= 0) {
-		std::swap(players_.back(), players_[player_index]);
-		players_.pop_back();
-		--nb_players;
-		--player_index;
+}
+
+void Simulation::remove_collided_balls() {
+	
+	size_t nb_balls(balls_.size());
+	
+	for (size_t i(0); i < nb_balls;) {
+		if(balls_[i].collided()) {
+			std::swap(balls_[i], balls_.back());
+			balls_.pop_back();
+			--nb_balls;
+		} else {
+			++i;
+		}
 	}
+	
+}
+
+void Simulation::remove_dead_players() {
+	
+	size_t nb_players(players_.size());
+	
+	for (size_t i(0); i < nb_players;) {
+		if(players_[i].lives() < 1 || players_[i].lives() > MAX_TOUCH) {
+			std::swap(players_[i], players_.back());
+			players_.pop_back();
+			--nb_players;
+		} else {
+			++i;
+		}
+	}
+}
+
+void Simulation::remove_obstacle(size_t x, size_t y) {
+	map_.remove_obstacle(x, y);
 }
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
@@ -674,7 +692,7 @@ bool Simulation::initialise_obstacle(int x, int y, Counter counter){
 }
 
 bool Simulation::initialise_ball (double x, double y, Angle alpha){
-	if(test_center_position(x,y) == false){ //angle can be positive and negative
+	if(test_center_position(x,y) == false){
 		std::cout << BALL_OUT(balls_.size() + 1) << std::endl;
 		return false;	
 	}
@@ -754,7 +772,7 @@ bool Simulation::detect_all_ball_player_collisions() const {
 
 bool Simulation::detect_all_ball_obstacle_collisions() const {
 	size_t nb_balls = balls_.size();
-	for(auto const& obs_value : map_.obstacle_bodies()){ //iterate over obstacle pairs
+	for(auto const& obs_value : map_.obstacle_bodies()){
 		for(size_t i(0); i<nb_balls; ++i){
 			if(Tools::intersect(obs_value.second,balls_[i].geometry(),marge_lecture_)){
 				std::cout << COLL_BALL_OBSTACLE(i+1) << std::endl; 
