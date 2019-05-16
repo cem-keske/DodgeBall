@@ -289,10 +289,10 @@ namespace Tools {
 		bool intersect(Rectangle const&, Segment const&, Length tolerance);
 		
 		/**
-		 * Returns true if two coordinates can be connected by a segment without
+		 * Returns true if two coordinates can't be connected by a segment without
 		 * intersecting the rectangle.
 		 */ 
-		bool segment_connected(Rectangle const& rectangle, Coordinate const& a,
+		bool segment_not_connected(Rectangle const& rectangle, Coordinate const& a,
 							   Coordinate const& b, Length tolerance);
 		
 		Length distance(Coordinate const&, Coordinate const&);

@@ -407,7 +407,7 @@ bool Tools::intersect(Rectangle const& rectangle, Circle const& circle, Length t
 	return	(rectangle.contains(circle.center(), tol + circle.radius()));
 }
 
-bool Tools::segment_connected(Rectangle const& rectangle, Coordinate const& a,
+bool Tools::segment_not_connected(Rectangle const& rectangle, Coordinate const& a,
 							  Coordinate const& b, Length tolerance){
 	return intersect(rectangle, Segment(a.x,a.y,b.x,b.y), tolerance);	 
 }

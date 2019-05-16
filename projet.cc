@@ -92,6 +92,18 @@ static void init_execution_parameters(std::vector<std::string> const&,
 static int open_gui();
 
 /// ===== MAIN FUNCTION ===== ///
+std::pair<size_t, size_t> get_grid_position(Coordinate const& coord, int nb_cells_){
+	static constexpr double center_pos(DIM_MAX / SIDE);
+	return ((size_t)((center_pos - coord.y/SIDE) * nb_cells_),
+		   ((size_t)((coord.x/SIDE + center_pos) * nb_cells_)));
+}
+
+Coordinate get_cell_center(size_t x, size_t y) {
+	static constexpr double side_coeff(SIDE / DIM_MAX);
+	Length half_square(DIM_MAX / nb_cells_);
+	return {half_square*((1 + side_coeff*y) - nb_cells),
+			half_square*(nb_cells - (1 + side_coeff*x))};
+}
 
 int main(int argc, char* argv[]) {
 	
@@ -179,3 +191,6 @@ static int open_gui() {
 	Gui_Window proWindow;
 	return app->run(proWindow);
 }
+
+
+
