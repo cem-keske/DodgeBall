@@ -19,6 +19,10 @@
 #include <cmath>
 #include <algorithm>
 
+typedef uint64_t Floyd_Dist;
+typedef std::vector<std::vector<Floyd_Dist>> Floyd_Matrix;
+
+
 /// ===== SIMULATION ===== class declaration ///
 
 class Simulation {	
@@ -26,13 +30,14 @@ class Simulation {
 	private:
 		// ===== Fields =====
 		size_t nb_cells_;
+		size_t max_dist_;
 		Length player_radius_;
 		Length player_speed_;
 		Length ball_radius_;
 		Length ball_speed_;
 		Length marge_jeu_;
 		Length marge_lecture_;
-		Counter player_cooldown_per_t = 1;
+		Counter player_cooldown_per_t_ = 1;
 
 		bool success_;
 		bool is_over_;
@@ -41,12 +46,11 @@ class Simulation {
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
 		
+		Floyd_Matrix floyd_matrix_;
+		
 		/**
 		 * In order to hide the inner modules from the gui we decided to use custom
-		 * data structures for each object to be drawn. For the time being they copy
-		 * the geometrical data of each player, ball and obstacle. 
-		 * 
-		 * We intend to implement a better way to pass on these values without copying.  
+		 * data structures for each object to be drawn.
 		 */
 		vec_player_graphics player_graphics_;		
 		vec_ball_bodies ball_bodies_;		
@@ -80,7 +84,7 @@ class Simulation {
 		bool test_collisions();
 		
 		
-		// ===== Accessor Methods for Graphics =====
+		// ===== Manipulators =====
 		
 		const vec_player_graphics& player_graphics() const;
 		const vec_ball_bodies& ball_bodies() const;
@@ -105,6 +109,8 @@ class Simulation {
 		bool detect_all_ball_obstacle_collisions() const;		
 		bool detect_initial_player_collisions() const ;
 		bool detect_initial_ball_collisions() const ;
+		
+		void initialise_floyd_matrix();
 		
 		void update_player_targets();
 		void update_player_directions();
@@ -403,9 +409,42 @@ const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
 	return obstacle_bodies_;
 }
 
-/**
- * Updates the simulation and makes all necessary calculation
- */
+void Simulation::initialise_dimensions(size_t nb_cells) {
+	
+	nb_cells_ = nb_cells;
+	
+	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
+	player_speed_ = COEF_VITESSE_JOUEUR * (SIDE/nb_cells);
+		
+	ball_radius_ = COEF_RAYON_BALLE * (SIDE/nb_cells);
+	ball_speed_ = COEF_VITESSE_BALLE * (SIDE/nb_cells);
+	
+	marge_jeu_= COEF_MARGE_JEU * (SIDE/nb_cells);
+	marge_lecture_= (COEF_MARGE_JEU/2) * (SIDE/nb_cells);
+	
+	Floyd_Dist nb_cells2 (nb_cells * nb_cells);
+	
+	max_dist_ = nb_cells2;
+
+	floyd_matrix_.resize(nb_cells2, std::vector<Floyd_Dist>(nb_cells2, nb_cells2));
+	
+	map_.initialise_map(nb_cells_);
+}
+
+void Simulation::initialise_floyd_matrix() {
+	
+	size_t matrix_size(floyd_matrix_.size());
+	
+	for (size_t i(0); i < matrix_size; ++i) {
+		
+	}
+	
+	
+}
+
+
+
+
 void Simulation::update(double delta_t) {
 	
 	if(is_over_) return;
@@ -515,7 +554,7 @@ void Simulation::perform_player_actions() {
 	Coordinate ball_pos;
 	
 	for (auto& player : players_) {
-		player.cool_down(player_cooldown_per_t);
+		player.cool_down(player_cooldown_per_t_);
 		
 		if (player.target_seen() == false) continue;
 		
@@ -781,22 +820,6 @@ bool Simulation::detect_all_ball_obstacle_collisions() const {
 		}
 	}
 	return true;
-}
-
-void Simulation::initialise_dimensions(size_t nb_cells) {
-	this->nb_cells(nb_cells);
-	
-	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
-	player_speed_ = COEF_VITESSE_JOUEUR * (SIDE/nb_cells);
-		
-	ball_radius_ = COEF_RAYON_BALLE * (SIDE/nb_cells);
-	ball_speed_ = COEF_VITESSE_BALLE * (SIDE/nb_cells);
-	
-	marge_jeu_= COEF_MARGE_JEU * (SIDE/nb_cells);
-	marge_lecture_= (COEF_MARGE_JEU/2) * (SIDE/nb_cells);
-	
-	map_.initialise_map(nb_cells_);
-
 }
 
 bool Simulation::test_collisions() {
