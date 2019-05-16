@@ -29,7 +29,7 @@ typedef std::vector<std::vector<Floyd_Dist>> Floyd_Matrix;
 * result. There's no oveflow since nbCells < 429496.
 */
 static constexpr Floyd_Dist dist_coefficient(100000);
-static constexpr Floyd_Dist sqrt2_const(141421); 
+static constexpr Floyd_Dist sqrt2_const(141421);
 
 
 /// ===== SIMULATION ===== class declaration ///
@@ -400,8 +400,8 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 			return;
 		}
 		update_graphics();
-		initialise_floyd_matrix();
-		print_floyd();
+		//initialise_floyd_matrix();
+		//print_floyd();
 	}
 }
 
@@ -587,7 +587,6 @@ void Simulation::update(double delta_t) {
 		is_over_ = true;
 		return;
 	}
-	
 	update_player_targets();
 	update_player_directions();
 	update_player_positions();
@@ -597,7 +596,6 @@ void Simulation::update(double delta_t) {
 	remove_collided_balls();
 	remove_dead_players();
 	update_graphics();
-	
 }
 
 void Simulation::update_graphics() {
