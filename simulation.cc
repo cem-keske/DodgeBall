@@ -758,8 +758,8 @@ void Simulation::handle_ball_collisions() {
 	for(size_t i(0); i < nb_balls; ++i) {
 		
 		if(test_center_position(balls_[i].geometry().center().x, 
-								balls_[i].geometry().center().y == false) {
-			balls_[i].collided(true);
+								balls_[i].geometry().center().y) == false) {
+			balls_[i].collided(true);	//collided with game frame
 		}
 		
 		for(size_t j(i + 1); j < nb_balls; ++j) {
