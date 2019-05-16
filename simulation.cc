@@ -442,6 +442,83 @@ void Simulation::initialise_floyd_matrix() {
 	
 }
 
+/**
+ * This method is functional only if there's no obstacle in both (x1,y1) and (x2,y2).
+ * (x1,y1) and (x2,y2) are neighbor coordinates from the grid.
+ * 
+ */
+Floyd_Dist Simulation::get_neighbor_distance(size_t x1, size_t y1, size_t x2, size_t y2){
+	/**
+	 * This approximation works until we have 84 nbCells.
+	 * If we have 85 cells we'll have 7225 steps in our longest road and
+	 * 7225*10000 > 14142*(all diagonals in grid). In this case we'll have a false
+	 * result.
+	 */
+	static constexpr Floyd_Dist sqrt2_const(14142); 
+	static constexpr Floyd_Dist one_const(10000);	
+	 
+	int delta_x = x1 - x2;
+	int delta_y = y1 - y2;
+	
+	if(delta_x == 0 || delta_y == 0) { //left or right
+	 return one_const;
+	}
+	
+	//be sure that there's no obstacle on the left and right
+	if(delta_y < 0){ //check right 
+		if(active_sims[0].map_.is_obstacle(x1, y1+1)) //obs on right
+			return infinity;
+	} else if(active_sims[0].map_.is_obstacle(x1, y1-1)){ //obs on left
+		return infinity;
+	} 
+	
+	//be sure that there's no obstacle on the top or bottom
+	if(delta_x < 0){ //check top
+		if(active_sims[0].map_.is_obstacle(x1 + 1, y1)) //obs on top
+			return infinity;
+	} else if(active_sims[0].map_.is_obstacle(x1 - 1, y1)) { //obs on bottom
+		return infinity;
+	}
+	//no obstacles on sides, return sqrt(2) constant
+	return sqrt2_const;
+}
+
+typedef Floyd_Matrix vector<vector<unsigned int>>;
+
+
+Floyd_Matrix matrix (Floyd_Matrix(vector<unsigned int,nbcells*nbcells>,nbcells* nbcells);
+
+
+/**
+ * Returns the stored value of distance between two indexes in floyd matrix.
+ */ 
+Floyd_Dist get_dist(size_t x1, size_t y1, size_t x2, size_t y2){
+	return floyd_matrix_[x1 * nb_cells_ + y1][x2 * nb_cells_ + y2];
+} 
+
+
+/**
+ * Sets both of the indexes i.e from one square to another and vice-versa. 
+ */
+void set_dist(size_t x1, size_t y1, size_t x2, size_t y2, Floyd_Distance dist){
+
+	floyd_matrix_[x1 * nb_cells_ + y1][x2 * nb_cells_ + y2] = dist; //first
+	floyd_matrix_[x2 * nb_cells_ + y2][x1 * nb_cells_ + y1] = dist; //second
+} 
+
+
+void init_dist_to_neighbors (size_t x1, size_t y1){
+	size_t other_x(0);
+	size_t other_y(0);
+	
+	if(y != 0){ //bottom left
+		other_x = x1 - 1;
+		other_x = y1 - 1;
+		set_dist(x1, y1, other_x, other_y, get_pure_distance(x1,y1,other_x,other_y));
+	}
+}
+
+
 
 
 
