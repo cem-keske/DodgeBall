@@ -19,10 +19,6 @@
 #include <cmath>
 #include <algorithm>
 
-enum Neighbor_indexes {TOP_LEFT, TOP, TOP_RIGHT, 
-					   LEFT, 		  RIGHT, 
-					   BOT_LEFT, BOT, BOT_RIGHT};
-
 typedef uint64_t Floyd_Dist;
 typedef std::vector<std::vector<Floyd_Dist>> Floyd_Matrix;
 
@@ -587,44 +583,44 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 }
 
 const Coordinate& Simulation::player_floyd_target(const Player& player) {
-	
-	static constexpr size_t nb_neighbors(8);
-	std::array<bool,nb_neighbors> actionable = {true};
-	std::array<bool,nb_neighbors> obstacle = {true};		
-	
-	std::pair<size_t, size_t> player_pos(get_grid_position(player.position()));
-	std::pair<size_t, size_t> target_pos(get_grid_position(player.target()->
-										 position()));
+	using index_pair = std::pair<size_t, size_t>;
+	index_pair player_pos(get_grid_position(player.position()));
+	index_pair target_pos(get_grid_position(player.target()-> position()));
+	size_t player_x(player_pos.first), player_y(player_pos.second);
+	size_t target_x(target_pos.first), target_y(target_pos.second);
+	std::vector<index_pair> obs_around(obstacles_around(player_x, player_y));		
 	size_t max_index(nb_cells_ - 1);
 	size_t min_distance(max_dist_);
-	
 	size_t distance(0);
-	std::pair<size_t, size_t> floyd_target_pos {0, 0};
+	size_t floyd_target_x, floyd_target_y;
+	Length tolerance_w_radius(player_radius_ + marge_jeu_);
 	
-	// check neighbours
-	for (int i(-1); i < 1; ++i ) {
-		if (max_index < player_pos.first + i || player_pos.first + i < 0) continue;
+	for (int i(-1); i < 1; ++i ) {	// check neighbours
+		if (max_index < player_x + i || player_x + i < 0) continue; //check bounds
 		for(int j(-1); j < 1; ++j) {
-				if (max_index < player_pos.second + j || 
-					player_pos.first + j < 0) continue;
-	
-				distance = get_dist(player_pos.first + i, player_pos.second + j, 
-									target_pos.first, target_pos.second);
-				if (distance < min_distance){
-					if (i * j != 0) {	// check for tangent obstacles if diagonal
-						if (i + j == -2)
-							if (map_.is_obstacle(player_pos.first, 
-												 player_pos.second - 1)) continue;
-							}
-							if (map_.is_obstacle(player_pos.first, 
-												 player_pos.second - 1)) continue;
-						if (i + j == )
+			if (max_index < player_y + j || player_y + j < 0) continue;
+			distance = get_dist(player_x + i, player_y + j, target_x, target_y);
+			if (distance < min_distance){
+				bool will_intersect(false);
+				for (const auto& obs_pos : obs_around) {
+					if (Tools::segment_not_connected(obstacles().at(obs_pos)),
+													 player.position(), 
+													 get_cell_center(
+															obstacles().at(obs_pos)), 
+													 tolerance_w_radius) {
+						will_intersect = true;
+						break;				
 					}
-					
-					floyd_target_pos.first = player_pos.first + i;
-					floyd_target_pos.second = player_pos.second + j;
+				}
+				if (will_intersect == false) {
+					floyd_target_x = player_pos.first + i;
+					floyd_target_y = player_pos.second + j;
+					min_distance = distance;
+				}
+			}
 		}
 	}
+	return get_cell_center(floyd_target_x, floyd_target_y);
 }
 
 
@@ -680,7 +676,7 @@ void Simulation::update_player_directions() {
 		bool intersects(false);
 		for(const auto& obs : obstacles()) {
 			Length tolerance_w_radius(player_radius_ + marge_jeu_);
-			if (Tools::segment_connected(obs.second, player.body().center(), 
+			if (Tools::segment_not_connected(obs.second, player.body().center(), 
 										 player.target()->body().center(),
 										 tolerance_w_radius)) {
 				intersects = true;
