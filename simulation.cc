@@ -401,8 +401,8 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 			return;
 		}
 		update_graphics();
-		//initialise_floyd_matrix();
-		//print_floyd();
+		initialise_floyd_matrix();
+		print_floyd();
 	}
 }
 
@@ -487,7 +487,7 @@ void Simulation::update_floyd(){
 	Floyd_Dist sum(0);
 	for(size_t k(0); k < floyd_size; ++k) {
 		for(size_t i(0); i < floyd_size; ++i) {
-			for(size_t j(0); j < floyd_size; ++j) {
+			for(size_t j(i); j < floyd_size; ++j) { //symmetric matrix
 				sum = floyd_matrix_[k][i] + floyd_matrix_[k][j];  
 				if(sum < floyd_matrix_[i][j]){
 					floyd_matrix_[i][j] = sum;
@@ -506,17 +506,21 @@ void Simulation::update_floyd(){
  */
 Floyd_Dist Simulation::get_neighbor_distance(size_t x1, size_t y1, 
 											 size_t x2, size_t y2) {
+	std::cout << "Checking:" << x1 << "," <<y1 << " and " << x2 << "," << y2 << std::endl;
+	
 	int delta_x = x1 - x2;
 	int delta_y = y1 - y2;
 	
 	if (map_.is_obstacle(x1, y1) || map_.is_obstacle(x2, y2)) return max_dist_;
 	
 	if(delta_x == 0 || delta_y == 0) { //horizontal/vertical
+		std::cout << "deltas zero" << std::endl;
 	 return dist_coefficient;
 	}
 	
 	//be sure that there's no obstacle on the left and right
 	if(delta_y < 0){ 
+		std::cout << "delta y < 0" << std::endl;
 		if(map_.is_obstacle(x1, y1+1))
 			return max_dist_;
 	} else if(map_.is_obstacle(x1, y1-1)){ 
@@ -556,13 +560,13 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 
 	bool right_free(y1 < nb_cells_ - 1);
 	bool bottom_free(x1 < nb_cells_ - 1);
-	bool left_free(x1 != 0);
+	bool left_free(y1 != 0);
 
 	if(right_free) {
 		set_dist(x1, y1, x1, y1+1, get_neighbor_distance(x1, y1, 
 					 x1, y1+1));
 		
-		if(bottom_free){ //bottom right
+		if(bottom_free){
 			set_dist(x1, y1, x1+1, y1+1, get_neighbor_distance(x1, y1, 
 					 x1+1, y1+1));
 		 }

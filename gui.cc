@@ -392,14 +392,13 @@ void Gui_Window::refresh(){
 	Simulation_State state(Simulator::active_simulation_state());
 	label_message.set_text(state_to_string(state));
 	
-	//draw all subcomponents
+	//draw an invisible rectangle and delete it to not to explicitly call drawer method
 	auto window = get_window();
     if (window) {
         Gdk::Rectangle rectangle(0, 0, get_allocation().get_width(),
                                  get_allocation().get_height());
         window->invalidate_rect(rectangle, false);
     }
-	//on_draw(get_window()->create_cairo_context());
 }
 
 
