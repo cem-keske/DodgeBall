@@ -128,9 +128,9 @@ class Simulation {
 		void set_dist(size_t x1, size_t y1, size_t x2, size_t y2, Floyd_Dist dist);
 		void init_dist_to_neighbors (size_t x1, size_t y1);
 		
-		const Coordinate& player_floyd_target(const Player&); 
+		Coordinate player_floyd_target(const Player&); 
 		Coordinate get_cell_center(size_t, size_t);
-		std::vector<std::pair<size_t, size_t>> get_grid_position(Coordinate const&);
+		std::pair<size_t, size_t> get_grid_position(Coordinate const&);
 		std::vector<std::pair<size_t,size_t>> obstacles_around(size_t x1, size_t y1);
 		
 		void update_player_targets();
@@ -585,7 +585,7 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 	}
 }
 
-const Coordinate& Simulation::player_floyd_target(const Player& player) {
+Coordinate Simulation::player_floyd_target(const Player& player) {
 	using index_pair = std::pair<size_t, size_t>;
 	index_pair player_pos(get_grid_position(player.position()));
 	index_pair target_pos(get_grid_position(player.target()-> position()));
@@ -607,10 +607,10 @@ const Coordinate& Simulation::player_floyd_target(const Player& player) {
 				bool will_intersect(false);
 				for (const auto& obs_pos : obs_around) {
 					if (Tools::segment_not_connected(obstacles().at(obs_pos),
-													 player.position(), 
-													 get_cell_center(
-															obstacles().at(obs_pos)), 
-													 tolerance_w_radius) {
+													 player.position(),
+													 get_cell_center(player_x + i, 
+																	 player_y + j), 
+													 tolerance_w_radius)) {
 						will_intersect = true;
 						break;				
 					}
@@ -627,51 +627,51 @@ const Coordinate& Simulation::player_floyd_target(const Player& player) {
 }
 
 
-std::pair<size_t, size_t> Simulation::get_grid_position(Coordinate const& coord, 
-														int nb_cells_){
+std::pair<size_t, size_t> Simulation::get_grid_position(Coordinate const& coord){
 	static constexpr double center_pos(DIM_MAX / SIDE);
-	return ((size_t)((center_pos - coord.y/SIDE) * nb_cells_),
+	return std::pair<size_t,size_t>((size_t)((center_pos - coord.y/SIDE) * nb_cells_),
 		   ((size_t)((coord.x/SIDE + center_pos) * nb_cells_)));
 }
 
 Coordinate Simulation::get_cell_center(size_t x, size_t y) {
 	static constexpr double side_coeff(SIDE / DIM_MAX);
 	Length half_square(DIM_MAX / nb_cells_);
-	return {half_square*((1 + side_coeff*y) - nb_cells),
-			half_square*(nb_cells - (1 + side_coeff*x))};
+	return {half_square * ((1 + side_coeff*y) - nb_cells_),
+			half_square * (nb_cells_ - (1 + side_coeff*x))};
 }
 
-std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x1, 
-																   size_t y1){
+std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x, 
+																   size_t y){
 	static constexpr size_t neighbor_number(8);
-	vector<std::pair<size_t,size_t>> obstacles;
-	obstacles.reserve(neighbor_number);
+	std::vector<std::pair<size_t,size_t>> obstacle_vec;
+	obstacle_vec.reserve(neighbor_number);
 	bool left_side(y==0);
 	bool right_side(y==(nb_cells_-1));
 	bool on_top(x==0);
 	bool on_bottom(x==(nb_cells_-1));
 	if(left_side == false){ //fill the left side
-		if(map_.is_obstacle(x1,y-1)) 
-			obstacles.push_back(x1, y-1);
-		if(on_top == false && map_.is_obstacle(x1-1,y-1))
-			obstacles.push_back(x1, y-1);
-		if(on_bottom == false && map_.is_obstacle(x1+1,y-1))
-			obstacles.push_back(x1+1, y-1);
+		if(map_.is_obstacle(x,y-1)) 
+			obstacle_vec.push_back(std::pair<size_t,size_t>(x, y-1));
+		if(on_top == false && map_.is_obstacle(x-1,y-1))
+			obstacle_vec.push_back(std::pair<size_t,size_t>(x-1, y-1));
+		if(on_bottom == false && map_.is_obstacle(x+1,y-1))
+			obstacle_vec.push_back(std::pair<size_t,size_t>(x+1, y-1));
 	}
 	if(right_side == false){
-		if(map_.is_obstacle(x1,y+1)) 
-			obstacles.push_back(x1, y+1);
-		if(on_top == false && map_.is_obstacle(x1-1,y+1))
-			obstacles.push_back(x1, y+1);
-		if(on_bottom == false && map_.is_obstacle(x1+1,y+1))
-			obstacles.push_back(x1+1, y+1);
+		if(map_.is_obstacle(x,y+1)) 
+			obstacle_vec.push_back(std::pair<size_t,size_t>(x,y+1));
+		if(on_top == false && map_.is_obstacle(x-1,y+1))
+			obstacle_vec.push_back(std::pair<size_t,size_t>(x-1,y+1));
+		if(on_bottom == false && map_.is_obstacle(x+1,y+1))
+			obstacle_vec.push_back(std::pair<size_t,size_t>(x+1,y+1));
 	}
-	if(on_bottom == false && map_.is_obstacle(x1+1, y1))
-		obstacles.push_back(x+1, y);
-	if(on_top == false && map_.is_obstacle(x1-1, y1))
-		obstacles.push_back(x-1, y);
+	if(on_bottom == false && map_.is_obstacle(x+1, y))
+		obstacle_vec.push_back(std::pair<size_t,size_t>(x+1,y));
+	if(on_top == false && map_.is_obstacle(x-1, y))
+		obstacle_vec.push_back(std::pair<size_t,size_t>(x-1,y));
 	
-	return obstacles;
+
+	return obstacle_vec;
 }   
 
 
