@@ -105,6 +105,39 @@ Coordinate get_cell_center(size_t x, size_t y) {
 			half_square*(nb_cells - (1 + side_coeff*x))};
 }
 
+
+vector<std::pair<size_t,size_t>> obstacles_around(size_t x1, size_t y1){
+	static constexpr size_t neighbor_number(8);
+	(vector<std::pair<size_t,size_t>> obstacles).reserve(neighbor_number);
+	bool left_side(y==0);
+	bool right_side(y==(nb_cells_-1));
+	bool on_top(x==0);
+	bool on_bottom(x==(nb_cells_-1));
+	if(left_side == false){ //fill the left side
+		if(map_.is_obstacle(x1,y-1)) 
+			obstacles.push_back(x1, y-1);
+		if(on_top == false && map_.is_obstacle(x1-1,y-1))
+			obstacles.push_back(x1, y-1);
+		if(on_bottom == false && map_.is_obstacle(x1+1,y-1))
+			obstacles.push_back(x1+1, y-1);
+	}
+	if(right_side == false){
+		if(map_.is_obstacle(x1,y+1)) 
+			obstacles.push_back(x1, y+1);
+		if(on_top == false && map_.is_obstacle(x1-1,y+1))
+			obstacles.push_back(x1, y+1);
+		if(on_bottom == false && map_.is_obstacle(x1+1,y+1))
+			obstacles.push_back(x1+1, y+1);
+	}
+	if(on_bottom == false && map_.is_obstacle(x1+1, y1))
+		obstacles.push_back(x+1, y);
+	if(on_top == false && map_.is_obstacle(x1-1, y1))
+		obstacles.push_back(x-1, y);
+	
+	return obstacles;
+	
+}   
+
 int main(int argc, char* argv[]) {
 	
 	std::vector<std::string> io_files;
