@@ -19,6 +19,10 @@
 #include <cmath>
 #include <algorithm>
 
+enum Neighbor_indexes {TOP_LEFT, TOP, TOP_RIGHT, 
+					   LEFT, 		  RIGHT, 
+					   BOT_LEFT, BOT, BOT_RIGHT};
+
 typedef uint64_t Floyd_Dist;
 typedef std::vector<std::vector<Floyd_Dist>> Floyd_Matrix;
 
@@ -127,6 +131,8 @@ class Simulation {
 		
 		void set_dist(size_t x1, size_t y1, size_t x2, size_t y2, Floyd_Dist dist);
 		void init_dist_to_neighbors (size_t x1, size_t y1);
+		
+		const Coordinate& player_floyd_target(const Player&); 
 		
 		void update_player_targets();
 		void update_player_directions();
@@ -442,8 +448,7 @@ void Simulation::initialise_dimensions(size_t nb_cells) {
 	marge_lecture_= (COEF_MARGE_JEU/2) * (SIDE/nb_cells);
 	
 	Floyd_Dist nb_cells2 (nb_cells * nb_cells);
-	
-	
+
 	max_dist_ = nb_cells2 * dist_coefficient * dist_coefficient;
 
 	floyd_matrix_.resize(nb_cells2, std::vector<Floyd_Dist>(nb_cells2, max_dist_));
@@ -497,7 +502,6 @@ void Simulation::update_floyd(){
 		}		
 	}
 }
-
 
 /**
  * This method is functional only if there's no obstacle in both (x1,y1) and (x2,y2).
@@ -582,6 +586,48 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 	}
 }
 
+const Coordinate& Simulation::player_floyd_target(const Player& player) {
+	
+	static constexpr size_t nb_neighbors(8);
+	std::array<bool,nb_neighbors> actionable = {true};
+	std::array<bool,nb_neighbors> obstacle = {true};		
+	
+	std::pair<size_t, size_t> player_pos(get_grid_position(player.position()));
+	std::pair<size_t, size_t> target_pos(get_grid_position(player.target()->
+										 position()));
+	size_t max_index(nb_cells_ - 1);
+	size_t min_distance(max_dist_);
+	
+	size_t distance(0);
+	std::pair<size_t, size_t> floyd_target_pos {0, 0};
+	
+	// check neighbours
+	for (int i(-1); i < 1; ++i ) {
+		if (max_index < player_pos.first + i || player_pos.first + i < 0) continue;
+		for(int j(-1); j < 1; ++j) {
+				if (max_index < player_pos.second + j || 
+					player_pos.first + j < 0) continue;
+	
+				distance = get_dist(player_pos.first + i, player_pos.second + j, 
+									target_pos.first, target_pos.second);
+				if (distance < min_distance){
+					if (i * j != 0) {	// check for tangent obstacles if diagonal
+						if (i + j == -2)
+							if (map_.is_obstacle(player_pos.first, 
+												 player_pos.second - 1)) continue;
+							}
+							if (map_.is_obstacle(player_pos.first, 
+												 player_pos.second - 1)) continue;
+						if (i + j == )
+					}
+					
+					floyd_target_pos.first = player_pos.first + i;
+					floyd_target_pos.second = player_pos.second + j;
+		}
+	}
+}
+
+
 void Simulation::update(double delta_t) {
 
 	if(is_over_) return;
@@ -641,14 +687,14 @@ void Simulation::update_player_directions() {
 				break;							 
 			}
 		}
-		
 		player.target_seen(!intersects);
 		
 		if (player.target_seen())
 			player.direction(Vector(player.target()-> body().center() - 
 									player.body().center()));
 		else {
-			player.direction(Vector(Coordinate(0,0)));
+			player.direction(Vector(find_floyd_target(player) - 
+									player.body().center()));
 		}		
 	}
 }
@@ -680,7 +726,7 @@ void Simulation::update_player_positions() {
 void Simulation::update_ball_positions() {
 	static Length ball_dist_per_t(ball_speed_*DELTA_T);
 	for(auto& ball : balls_) {
-		ball.move((ball_dist_per_t*ball.direction().get_unit()).pointed());
+		ball.move(ball_dist_per_t*ball.direction().get_unit());
 	}
 }
 
