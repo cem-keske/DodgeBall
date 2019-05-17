@@ -3,7 +3,7 @@
 # Macro definitions
 
 CXX   = g++ 
-CXXFLAGS = -Wall -std=c++11
+CXXFLAGS = -Wall -O3 -std=c++11
 CXXFILES = projet.cc simulation.cc player.cc ball.cc map.cc tools.cc  gui.cc
 OFILES = projet.o simulation.o player.o ball.o map.o tools.o gui.o
 LINKING = `pkg-config --cflags gtkmm-3.0`

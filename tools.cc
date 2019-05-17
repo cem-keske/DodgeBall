@@ -240,14 +240,14 @@ Length Rectangle::base() const {return base_;}
 
 const Coordinate& Rectangle::bottom_left() const {return bottom_left_;}	
 
-const Coordinate& Rectangle::bottom_right() const {
+const Coordinate Rectangle::bottom_right() const {
 	return Coordinate{base_,0} += bottom_left_;
 }
-const Coordinate& Rectangle::top_left() const {
+const Coordinate Rectangle::top_left() const {
 	return Coordinate{0,height_} += bottom_left_;
 }				
 
-const Coordinate& Rectangle::top_right() const {
+const Coordinate Rectangle::top_right() const {
 	return Coordinate{base_,height_} += bottom_left_;
 }	
 

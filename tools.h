@@ -215,9 +215,9 @@ class Rectangle {
 		Length height() const;
 		Length base() const;
 		const Coordinate& bottom_left() const;
-		const Coordinate& bottom_right() const;
-		const Coordinate& top_left() const;
-		const Coordinate& top_right() const;
+		const Coordinate bottom_right() const;
+		const Coordinate top_left() const;
+		const Coordinate top_right() const;
 		double y_up() const;	//upper bound
 		double y_down() const;	//lower bound
 		double x_left() const;	//left bound
