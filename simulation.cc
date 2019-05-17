@@ -951,8 +951,8 @@ void Simulation::remove_dead_players() {
 
 void Simulation::remove_obstacle(size_t x, size_t y) {
 	map_.remove_obstacle(x, y);
-	//initialise_floyd_matrix();
-	update_floyd();
+	initialise_floyd_matrix();
+	//update_floyd();
 }
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
