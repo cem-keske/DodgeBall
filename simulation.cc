@@ -700,6 +700,10 @@ void Simulation::update(double delta_t) {
 	remove_collided_balls();
 	remove_dead_players();
 	update_graphics();
+	
+	if (players_.size() < 2) {
+		state(GAME_OVER);
+	}
 }
 
 void Simulation::update_graphics() {
