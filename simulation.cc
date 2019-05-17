@@ -47,10 +47,11 @@ class Simulation {
 		Length marge_jeu_;
 		Length marge_lecture_;
 		Counter player_cooldown_per_t_;
-
+		
+		Simulation_State state_;
+		
 		bool success_;
-		bool is_over_;
-				
+							
 		Map map_;
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
@@ -64,17 +65,18 @@ class Simulation {
 		vec_player_graphics player_graphics_;		
 		vec_ball_bodies ball_bodies_;		
 		vec_obstacle_bodies obstacle_bodies_;		
-
+		
 	public:
 	
 		// ===== Constructor =====
 		
 		Simulation(std::vector<std::string> const&);
-
+		
 		
 		// ===== Public Methods =====
 		
 		Simulation_State state() const;
+		void state(Simulation_State);
 		
 		bool success() const;
 		
@@ -128,7 +130,7 @@ class Simulation {
 		void set_dist(size_t x1, size_t y1, size_t x2, size_t y2, Floyd_Dist dist);
 		void init_dist_to_neighbors (size_t x1, size_t y1);
 		
-		Coordinate player_floyd_target(const Player&); 
+		Coordinate player_floyd_target(const Player&, bool&); 
 		Coordinate get_cell_center(size_t, size_t);
 		std::pair<size_t, size_t> get_grid_position(Coordinate const&);
 		std::vector<std::pair<size_t,size_t>> obstacles_around(size_t x1, size_t y1);
@@ -363,8 +365,6 @@ void Simulator::save_simulation(const std::string &file_path) {
 	active_sims()[current_sim_index()].save(file_path);
 }
 
-
-
 /// ===== SIMULATION ===== ///
 
 // ===== Constructor ===== 
@@ -380,8 +380,9 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		marge_jeu_ = -1.;
 		marge_lecture_ = -1.;
 		player_cooldown_per_t_ = 1;
+		max_dist_ = -1;
 		success_ = false;
-		is_over_ = false;
+		state(GAME_READY);
 		
 	if(Simulator::exec_parameters().at("Error")) {	//
 		if(io_files.empty())
@@ -407,7 +408,6 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		}
 		update_graphics();
 		initialise_floyd_matrix();
-		print_floyd();
 	}
 }
 
@@ -429,8 +429,11 @@ const vec_ball_bodies& Simulation::ball_bodies() const {
 }
 
 const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
-
 	return obstacle_bodies_;
+}
+
+void Simulation::state(Simulation_State state) {
+	state_ = state;
 }
 
 void Simulation::initialise_dimensions(size_t nb_cells) {
@@ -491,7 +494,7 @@ void Simulation::update_floyd(){
 	Floyd_Dist sum(0);
 	for(size_t k(0); k < floyd_size; ++k) {
 		for(size_t i(0); i < floyd_size; ++i) {
-			for(size_t j(i); j < floyd_size; ++j) { //symmetric matrix
+			for(size_t j(0); j < floyd_size; ++j) { //symmetric matrix
 				sum = floyd_matrix_[k][i] + floyd_matrix_[k][j];  
 				if(sum < floyd_matrix_[i][j]){
 					floyd_matrix_[i][j] = sum;
@@ -508,22 +511,18 @@ void Simulation::update_floyd(){
  * 
  */
 Floyd_Dist Simulation::get_neighbor_distance(size_t x1, size_t y1, 
-											 size_t x2, size_t y2) {
-	std::cout << "Checking:" << x1 << "," <<y1 << " and " << x2 << "," << y2 << std::endl;
-	
+											 size_t x2, size_t y2) {	
 	int delta_x = x1 - x2;
 	int delta_y = y1 - y2;
 	
 	if (map_.is_obstacle(x1, y1) || map_.is_obstacle(x2, y2)) return max_dist_;
 	
 	if(delta_x == 0 || delta_y == 0) { //horizontal/vertical
-		std::cout << "deltas zero" << std::endl;
 	 return dist_coefficient;
 	}
 	
 	//be sure that there's no obstacle on the left and right
 	if(delta_y < 0){ 
-		std::cout << "delta y < 0" << std::endl;
 		if(map_.is_obstacle(x1, y1+1))
 			return max_dist_;
 	} else if(map_.is_obstacle(x1, y1-1)){ 
@@ -585,7 +584,7 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 	}
 }
 
-Coordinate Simulation::player_floyd_target(const Player& player) {
+Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) {
 	using index_pair = std::pair<size_t, size_t>;
 	index_pair player_pos(get_grid_position(player.position()));
 	index_pair target_pos(get_grid_position(player.target()-> position()));
@@ -593,31 +592,49 @@ Coordinate Simulation::player_floyd_target(const Player& player) {
 	size_t target_x(target_pos.first), target_y(target_pos.second);
 	std::vector<index_pair> obs_around(obstacles_around(player_x, player_y));		
 	size_t max_index(nb_cells_ - 1);
-	size_t min_distance(max_dist_);
-	size_t distance(0);
-	size_t floyd_target_x, floyd_target_y;
+	size_t floyd_target_x(0), floyd_target_y(0);
+	Floyd_Dist min_distance(max_dist_);
+	Floyd_Dist distance(0);
 	Length tolerance_w_radius(player_radius_ + marge_jeu_);
-	
-	for (int i(-1); i < 1; ++i ) {	// check neighbours
+	std::cout << "--------Player position: [" << player_pos.first << "; " << player_pos.second << " ]----------" << std::endl;
+	std::cout << "Target position: [" << target_pos.first << "; " << target_pos.second << " ]" << std::endl;
+	for (int i(-1); i <= 1; ++i ) {	// check neighbours
 		if (max_index < player_x + i || player_x + i < 0) continue; //check bounds
-		for(int j(-1); j < 1; ++j) {
+		for(int j(-1); j <= 1; ++j) {
 			if (max_index < player_y + j || player_y + j < 0) continue;
 			distance = get_dist(player_x + i, player_y + j, target_x, target_y);
+			bool will_collide(false);
+			std::cout << "Floyd distance for [" << player_x+i << ", " << player_y + j << "] : " << distance << std::endl;
 			if (distance < min_distance){
 				for (const auto& obs_pos : obs_around) {
+					std::cout << "Obstacles around ... " << std::endl;
+
 					if (Tools::segment_not_connected(obstacles().at(obs_pos),
 													 player.position(),
 													 get_cell_center(player_x + i, 
 																	 player_y + j), 
 													 tolerance_w_radius)) {
-						break;				
+						std::cout << "Cannot Seee...." << std::endl;
+						will_collide = true;
+						break;
 					}
-				floyd_target_x = player_pos.first + i;
-				floyd_target_y = player_pos.second + j;
-				min_distance = distance;
+				}
+				if(will_collide == false) {
+					floyd_target_x = player_x + i;
+					floyd_target_y = player_y+ j;
+					min_distance = distance;
+				}
 			}
 		}
 	}
+	if(min_distance >= max_dist_) {
+		trapped = true;
+		std::cout << "this player is trapped..." << std::endl;
+		return player.position();
+	}
+	
+	std::cout << "F_target position: [" << floyd_target_x << "; " << floyd_target_y << std::endl;
+
 	return get_cell_center(floyd_target_x, floyd_target_y);
 }
 
@@ -644,7 +661,7 @@ std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x,
 	bool right_side(y==(nb_cells_-1));
 	bool on_top(x==0);
 	bool on_bottom(x==(nb_cells_-1));
-	if(left_side == false){ //fill the left side
+	if(left_side == false){
 		if(map_.is_obstacle(x,y-1)) 
 			obstacle_vec.push_back(std::pair<size_t,size_t>(x, y-1));
 		if(on_top == false && map_.is_obstacle(x-1,y-1))
@@ -664,7 +681,6 @@ std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x,
 		obstacle_vec.push_back(std::pair<size_t,size_t>(x+1,y));
 	if(on_top == false && map_.is_obstacle(x-1, y))
 		obstacle_vec.push_back(std::pair<size_t,size_t>(x-1,y));
-	
 
 	return obstacle_vec;
 }   
@@ -672,17 +688,17 @@ std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x,
 
 void Simulation::update(double delta_t) {
 
-	if(is_over_) return;
+	if(state() != GAME_READY) return;
 	
 	if (players_.size() < 2) {
-		is_over_ = true;
+		state(GAME_OVER);
 		return;
 	}
 	update_player_targets();
 	update_player_directions();
 	update_player_positions();
+	perform_player_actions();	
 	update_ball_positions();
-	perform_player_actions();
 	handle_ball_collisions();
 	remove_collided_balls();
 	remove_dead_players();
@@ -731,12 +747,19 @@ void Simulation::update_player_directions() {
 		}
 		player.target_seen(!intersects);
 		
-		if (player.target_seen())
-			player.direction(Vector(player.target()-> body().center() -
-									player.body().center()));
+		if (player.target_seen()) {
+			Vector to_target(player.target()->body().center()-player.body().center());
+			player.direction(Vector(to_target));
+		}
 		else {
-			player.direction(Vector(player_floyd_target(player) -
-									player.body().center()));
+			bool trapped(false);
+			Vector to_target (player_floyd_target(player, trapped) - 
+							  player.body().center());
+			if (to_target.length() <= marge_jeu_) 
+				player.direction(Vector(0,0));
+			else 
+				player.direction(Vector(to_target));
+			if (trapped) state(PLAYER_TRAPPED);
 		}
 	}
 }
@@ -783,7 +806,7 @@ void Simulation::perform_player_actions() {
 		
 		if((player.cooldown() >= MAX_COUNT)) {
 			ball_pos = player.position() + 
-					   (player.direction()*(player_radius_ + ball_radius_ + 
+					   (player.direction().get_unit()*(player_radius_ + ball_radius_ + 
 						marge_jeu_ * 2)).pointed();
 					   
 			initialise_ball(ball_pos.x, ball_pos.y, player.direction().angle());
@@ -802,8 +825,7 @@ void Simulation::update_player_graphics() {
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
 						// of a player
-	
-	
+		
 	for(size_t i(0); i < nb_players; ++i) {
 		
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
@@ -1065,14 +1087,8 @@ bool Simulation::test_collisions() {
 }
 
 Simulation_State Simulation::state() const {
-	if(is_over())
-		return GAME_OVER;
-	return GAME_READY;
-}
-
-bool Simulation::is_over() const {
-	return is_over_;
-	return false;
+	
+	return state_;
 }
 
 /**
