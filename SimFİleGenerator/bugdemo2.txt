@@ -1,0 +1,25 @@
+	 # this test file is CORRECT
+
+# nbCell
+	3
+
+# number of players
+	 2
+
+# position of players
+    0	 -330	4 0	   # first player
+    0     330	3 0	   # second player
+
+# number of obstacles
+	1
+# position of obstacles
+1 1	    # first obstacle
+
+
+# number of balls
+	0
+
+
+  #	 And that's all
+
+

@@ -1,0 +1,14 @@
+# Projet Dodgeball 2019
+4
+# Players
+2
+    -353 355 4 0
+    372 -376 4 0
+# Obstacles
+4
+    1 2
+    1 1
+    2 2
+    3 0
+# Balls
+0

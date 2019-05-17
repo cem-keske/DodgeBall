@@ -1,0 +1,16 @@
+#Nombre de cellules
+3
+  #Nombre de joueurs
+2
+
+  #Joueurs
+0 -400 4 0
+0 400 4 0
+ #Nombre d'obstacles
+1
+ #Obstacles
+1 1
+ #Nombre de balles
+0
+ #Balles
+#Fin de fichier
