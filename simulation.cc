@@ -737,12 +737,12 @@ void Simulation::update_player_directions() {
 		player.target_seen(!intersects);
 		
 		if (player.target_seen())
-			player.direction(Vector(player.target()-> body().center() - 
+			player.direction(Vector(player.target()-> body().center() -
 									player.body().center()));
 		else {
-			player.direction(Vector(player_floyd_target(player) - 
+			player.direction(Vector(player_floyd_target(player) -
 									player.body().center()));
-		}		
+		}
 	}
 }
 
