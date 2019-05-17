@@ -772,7 +772,7 @@ void Simulation::update_player_positions() {
 	
 	for(size_t i(0); i < nb_players; ++i) {
 		to_move = players_[i].direction();
-		to_move.length(dist_per_t);
+		if (to_move.length() != 0.) to_move.length(dist_per_t);
 				
 		for(size_t j(0); j < nb_players; ++j) {
 			if (i == j) continue;
