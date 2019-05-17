@@ -1069,7 +1069,8 @@ bool Simulation::detect_all_ball_obstacle_collisions() const {
 	size_t nb_balls = balls_.size();
 	for(auto const& obs_value : map_.obstacle_bodies()){
 		for(size_t i(0); i<nb_balls; ++i){
-			if(Tools::intersect(obs_value.second,balls_[i].geometry(),marge_lecture_)){
+			if(Tools::intersect(obs_value.second,balls_[i].geometry() , 
+								marge_lecture_)){
 				std::cout << COLL_BALL_OBSTACLE(i+1) << std::endl; 
 				return false;
 			}
