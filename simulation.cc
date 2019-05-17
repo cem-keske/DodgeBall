@@ -494,11 +494,10 @@ void Simulation::update_floyd(){
 	Floyd_Dist sum(0);
 	for(size_t k(0); k < floyd_size; ++k) {
 		for(size_t i(0); i < floyd_size; ++i) {
-			for(size_t j(i); j < floyd_size; ++j) { //symmetric matrix
+			for(size_t j(0); j < floyd_size; ++j) { //symmetric matrix
 				sum = floyd_matrix_[k][i] + floyd_matrix_[k][j];  
-				if(sum < floyd_matrix_[i][j]){
-					floyd_matrix_[i][j] = sum;
-					floyd_matrix_[j][i] = sum;
+				if(sum < floyd_matrix_[j][i]){
+					floyd_matrix_[j][i] = sum;		
 				}	
 			}	
 		}		
@@ -566,14 +565,12 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 
 	if(right_free) {
 		set_dist(x1, y1, x1, y1+1, get_neighbor_distance(x1, y1, 
-					 x1, y1+1));
-		
+					 x1, y1+1));	
 		if(bottom_free){
 			set_dist(x1, y1, x1+1, y1+1, get_neighbor_distance(x1, y1, 
 					 x1+1, y1+1));
 		 }
-	}
-	
+	}	
 	if(bottom_free) {
 		set_dist(x1, y1, x1+1, y1, get_neighbor_distance(x1, y1, 
 				 x1+1, y1));
@@ -952,7 +949,7 @@ void Simulation::remove_dead_players() {
 void Simulation::remove_obstacle(size_t x, size_t y) {
 	map_.remove_obstacle(x, y);
 	initialise_floyd_matrix();
-	//update_floyd();
+	update_floyd();
 }
 
 bool Simulation::initialise_obstacle(int x, int y, Counter counter){
