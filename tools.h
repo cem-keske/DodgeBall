@@ -304,7 +304,7 @@ namespace Tools {
 		
 		/**
 		 * Returns true if the point C is on the segment AB.
-		 * Points A, B and C must be the same line !!!
+		 * Points A, B and C must be the same line!!! (not maybe in the same segment) 
 		 */ 
 		bool can_be_on(Segment const& a_b, Coordinate const& c);
 		

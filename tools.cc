@@ -162,7 +162,7 @@ const Vector operator+(Vector lhs, Vector const& rhs) {
 }
 
 const Vector operator-(Vector lhs, Vector const& rhs) {
-	return lhs -= rhs;;
+	return lhs -= rhs;
 }
 
 const Vector operator/(Vector vec, double number){
@@ -221,15 +221,15 @@ Vector Segment::get_perpendicular() const{
 
 // ===== Constructors =====
 
-Rectangle::Rectangle(Coordinate const &bottom_left_, Length base, Length height)
-					:bottom_left_(bottom_left_), base_(base),height_(height) { 
+Rectangle::Rectangle(Coordinate const &bottom_left_, Length base, Length height):
+					 bottom_left_(bottom_left_), base_(base),height_(height) { 
 	assert(base>0 && height>0);
 }
 
-Rectangle::Rectangle(Coordinate const& vertex_a, Coordinate const& vertex_c)
-					 :bottom_left_(vertex_a),
-	 				  base_(abs(vertex_a.x - vertex_c.x)),
-					  height_(abs(vertex_a.y - vertex_c.y)) {}
+Rectangle::Rectangle(Coordinate const& vertex_a, Coordinate const& vertex_c):
+					 bottom_left_(vertex_a),
+	 				 base_(abs(vertex_a.x - vertex_c.x)),
+					 height_(abs(vertex_a.y - vertex_c.y)) {}
 					  
 
 // ===== Accessors & Manipulators =====
@@ -250,11 +250,7 @@ const Coordinate Rectangle::top_left() const {
 const Coordinate Rectangle::top_right() const {
 	return Coordinate{base_,height_} += bottom_left_;
 }	
-
-	
-		  
-					
-					
+			
 double Rectangle::y_up() const {
 	return bottom_left_.y + height_;
 }
@@ -339,10 +335,10 @@ bool Tools::intersect(Circle const& circ_one,Circle const& circ_two,Length toler
 }
 
 /**
- * Feel free to see why this algorithm works using:
+ * To see the graphical demonstration:
  * -> https://www.desmos.com/calculator/qtmx4wcbfj
  */ 
-bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
+bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){	
 	
 	if(rec.contains(seg.point_a(), tol) || rec.contains(seg.point_b(), tol)) {
 		return true; //at least one of the corners are inside
@@ -365,7 +361,6 @@ bool Tools::intersect(Rectangle const& rec, Segment const& seg, Length tol){
 	//the line intersects the rectangle area but two points are outside of the area
 	return (risky_a_inside && Tools::can_be_on(seg, risky_point_a)) || 
 		   (risky_b_inside && Tools::can_be_on(seg, risky_point_b));
-
 }
 
 
@@ -386,7 +381,7 @@ Coordinate Tools::closest_point(Segment const& seg, Coordinate const& coord){
 	 * The formula to find the closest point on a line 
 	 * to another point given is used.
 	 * 
-	 * For the graphical and mathematical demonstration:
+	 * For the graphical demonstration:
 	 * --> https://www.desmos.com/calculator/jwttibjrxi
 	 * --> The vector AC is projected on AB to determine the point.
 	 */ 
@@ -422,7 +417,6 @@ bool Tools::is_between(double a, double b, double c){
 	double low(std::min(a,b));
 	return low <= c && c <= high;
 }
-
 
 double bound(double to_bound, double min, double max) {
 	to_bound = std::min(max, to_bound);

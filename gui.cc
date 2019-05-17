@@ -323,8 +323,6 @@ bool Gui_Window::timer_tick(){
 		refresh(); //refresh the gui window after updating the simulation
 		if(Simulator::active_simulation_state() != GAME_READY){ 
 		//when there's no sim to run
-			std::cout << state_to_string(Simulator::active_simulation_state()) << std::endl;
-			button_start_stop.set_label(labels[1]);
 			stop_timer();
 			on_draw(get_window()->create_cairo_context());
 		}
@@ -397,12 +395,15 @@ void Gui_Window::refresh(){
 	else
 		button_start_stop.set_label(labels[0]);
 	
-	//draw an invisible rectangle and delete it to not to explicitly call drawer method
-	auto window = get_window();
-    if (window) {
-        Gdk::Rectangle rectangle(0, 0, get_allocation().get_width(),
-                                 get_allocation().get_height());
-        window->invalidate_rect(rectangle, false);
+	
+	//Force the gui window to redraw itself.
+    auto gui_window = get_window();
+    if (gui_window) {
+		
+        Gdk::Rectangle to_invalidate(0, 0, get_allocation().get_width(),
+									 get_allocation().get_height());
+        gui_window->invalidate_rect(to_invalidate, false);
+        
     }
 }
 

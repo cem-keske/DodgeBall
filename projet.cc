@@ -25,54 +25,12 @@
 
 **************************************************************************************/
 
-/**************************************************************************************
-                                                                                       
-                                                                                                                                                                           
-                                       ``.....``                                       
-                               `-/oyhmNNNNNNNNNNmdhs+/-                                
-                           `/sdNNMMMMMMMMMMMMMMMMMMMMMNNho:`                           
-                        .+hNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNNh/`                        
-                     `/hNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNy:                      
-                   `+mNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNd/                    
-                  /dMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNd:                  
-                .yNMMMMMMMhyhdNMMMMMMMMMMMMMMMMMMMMMMMMMNdhyhMMMMMMMNs`                
-               :mMMMMMMMMh   `.:odNMMNmmdddddddmNNMMNho:.`  `mMMMMMMMMd-               
-              +NMMMMMMMMM/       `./-..`````````..-:.`       oMMMMMMMMMN:              
-             /NMMMMMMMMMM:                                   oMMMMMMMMMMN:             
-            -NMMMMMMMMMMMs                                   hMMMMMMMMMMMm.            
-           `dMMMMMMMMMMMm:                                   /mMMMMMMMMMMMy            
-           /MMMMMMMMMMMd.                                     -mMMMMMMMMMMM-           
-           dMMMMMMMMMMN.                                       :MMMMMMMMMMMy           
-          `MMMMMMMMMMMh                                         mMMMMMMMMMMN           
-          -MMMMMMMMMMMs                                         hMMMMMMMMMMM`          
-          :MMMMMMMMMMMy                                         dMMMMMMMMMMM.          
-          -MMMMMMMMMMMm                                        `NMMMMMMMMMMN`          
-           NMMMMMMMMMMM/                                       oMMMMMMMMMMMd           
-           yMMMMMMMMMMMm-                                     :NMMMMMMMMMMMo           
-           -NMMMMMMMMMMMm:                                  `/NMMMMMMMMMMMN`           
-            sMMMMMMMMMMMMNy:`                             `:hMMMMMMMMMMMMM+            
-            `dMMMMMmyhmNMMMMds/.``                   `.-/ymMMMMMMMMMMMMMMy             
-             .dMMMMd/.-:sNMMMMMNmdys+`           .oyhdmMMMMMMMMMMMMMMMMMh`             
-              .hMMMMMmo..+dMMMMMMMMN-             :NMMMMMMMMMMMMMMMMMMMy`              
-               `sNMMMMMy`.:shNNNNNm+               yMMMMMMMMMMMMMMMMMNo                
-                 :dMMMMMy```.+.o+-+                +MMMMMMMMMMMMMMMMd-                 
-                  `+mMMMMms-```````                +MMMMMMMMMMMMMMm/                   
-                    `+mNMMMMNmdhddm-               +MMMMMMMMMMMNd/`                    
-                       :yNMMMMMMMMM:               +MMMMMMMMNms:                       
-                         `/smNMMMMM:               +MMMMMNds:`                         
-                             ./shmh.               -dmho/.                             
-                                                                                       
-                                                                                       
-**************************************************************************************/
-
 #include <algorithm>
 #include <memory>
 #include <iostream>
 #include "define.h"
 #include "simulation.h"
 #include "gui.h"
-
-
 
 /// ===== CONSTANTS ===== ///
 

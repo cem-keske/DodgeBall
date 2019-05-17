@@ -24,7 +24,8 @@ typedef std::map<std::pair<size_t, size_t>, Rectangle> Rectangle_map;
 /**
  * A cell is either empty or occupied by an obstacle. Enum class is preferred 
  * to ensure each cell is given a value corresponding to its state 
- * (not any arbitrary boolean). 
+ * (not any arbitrary boolean).
+ * 
  */  
 enum class Cell : bool{
 	FREE,
@@ -61,11 +62,6 @@ class Map{
 		bool is_free(size_t line, size_t col) const;
 		bool is_obstacle(size_t line, size_t col) const; 
 		const Rectangle& obstacle_body(size_t, size_t) const;
-		
-		/** 
-		 * In the future installments this method may be replaced by another means
-		 * of iterating over obstacle bodies to further solidify encapsulation.
-		 */
 		const Rectangle_map& obstacle_bodies() const;
 		
 		// ===== Utilities
