@@ -437,7 +437,7 @@ void Simulation::state(Simulation_State state) {
 }
 
 void Simulation::initialise_dimensions(size_t nb_cells) {
-	
+	std::cout << "IMENSIONS REINITILIYEDYYASD" << std::endl;
 	nb_cells_ = nb_cells;
 	
 	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
@@ -687,10 +687,6 @@ void Simulation::update(double delta_t) {
 
 	if(state() != GAME_READY) return;
 	
-	if (players_.size() < 2) {
-		state(GAME_OVER);
-		return;
-	}
 	update_player_targets();
 	update_player_directions();
 	update_player_positions();
@@ -791,11 +787,15 @@ void Simulation::update_player_positions() {
 }
 
 void Simulation::update_ball_positions() {
-	static Length ball_dist_per_t(ball_speed_*DELTA_T);
+	Length ball_dist_per_t(ball_speed_*DELTA_T);
 	for(auto& ball : balls_) {
 		Vector to_move(ball.direction());
 		to_move.length(ball_dist_per_t);
+		std::cout << "Old ball position: " << ball.geometry().center().to_string();				
 		ball.move(to_move);
+		std::cout << "New ball position: " << ball.geometry().center().to_string();				
+		std::cout << "Ball speed: " << to_move.length() << std::endl;
+		
 	}
 }
 
@@ -1281,6 +1281,7 @@ bool Reader::read_nb_cells(std::ifstream& in_file, Simulation& simulation){
 		#endif
 		return false;
 	}
+	std::cout << "new file's nbcells:  " << nb_cells << std::endl;
 	simulation.initialise_dimensions((size_t)nb_cells); // no internal tests necessary
 	return true;
 }
