@@ -399,14 +399,15 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 			if(reader.import_file(io_files[0], *this) == true)
 				success_ = true;
 		}
-		
+						
+		initialise_floyd_matrix();
+
 		if (Simulator::exec_parameters().at("Step")){
 			update(DELTA_T);
 			save(io_files.back());
 			return;
 		}
 		update_graphics();
-		initialise_floyd_matrix();
 	}
 }
 
@@ -1275,7 +1276,7 @@ bool Reader::read_nb_cells(std::ifstream& in_file, Simulation& simulation){
 		return false;
 	int nb_cells(0);
 	std::istringstream i_string(line);
-	if(!(i_string >> nb_cells) || nb_cells<MIN_CELL) {
+	if(!(i_string >> nb_cells) || nb_cells<MIN_CELL || nb_cells>MAX_CELL) {
 		#ifndef NDEBUG
 		std::cout << "Invalid cell number: " << nb_cells << std::endl;
 		#endif
