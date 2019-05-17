@@ -47,10 +47,11 @@ class Simulation {
 		Length marge_jeu_;
 		Length marge_lecture_;
 		Counter player_cooldown_per_t_;
-
+		
+		Simulation_State state_;
+		
 		bool success_;
-		bool is_over_;
-				
+							
 		Map map_;
 		std::vector<Player> players_;
 		std::vector<Ball> balls_;
@@ -64,17 +65,18 @@ class Simulation {
 		vec_player_graphics player_graphics_;		
 		vec_ball_bodies ball_bodies_;		
 		vec_obstacle_bodies obstacle_bodies_;		
-
+		
 	public:
 	
 		// ===== Constructor =====
 		
 		Simulation(std::vector<std::string> const&);
-
+		
 		
 		// ===== Public Methods =====
 		
 		Simulation_State state() const;
+		void state(Simulation_State);
 		
 		bool success() const;
 		
@@ -128,7 +130,7 @@ class Simulation {
 		void set_dist(size_t x1, size_t y1, size_t x2, size_t y2, Floyd_Dist dist);
 		void init_dist_to_neighbors (size_t x1, size_t y1);
 		
-		Coordinate player_floyd_target(const Player&); 
+		Coordinate player_floyd_target(const Player&, bool&); 
 		Coordinate get_cell_center(size_t, size_t);
 		std::pair<size_t, size_t> get_grid_position(Coordinate const&);
 		std::vector<std::pair<size_t,size_t>> obstacles_around(size_t x1, size_t y1);
@@ -363,8 +365,6 @@ void Simulator::save_simulation(const std::string &file_path) {
 	active_sims()[current_sim_index()].save(file_path);
 }
 
-
-
 /// ===== SIMULATION ===== ///
 
 // ===== Constructor ===== 
@@ -381,7 +381,7 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		marge_lecture_ = -1.;
 		player_cooldown_per_t_ = 1;
 		success_ = false;
-		is_over_ = false;
+		state(GAME_READY);
 		
 	if(Simulator::exec_parameters().at("Error")) {	//
 		if(io_files.empty())
@@ -429,8 +429,11 @@ const vec_ball_bodies& Simulation::ball_bodies() const {
 }
 
 const vec_obstacle_bodies& Simulation::obstacle_bodies() const {
-
 	return obstacle_bodies_;
+}
+
+void Simulation::state(Simulation_State state) {
+	state_ = state;
 }
 
 void Simulation::initialise_dimensions(size_t nb_cells) {
@@ -585,7 +588,7 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 	}
 }
 
-Coordinate Simulation::player_floyd_target(const Player& player) {
+Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) {
 	using index_pair = std::pair<size_t, size_t>;
 	index_pair player_pos(get_grid_position(player.position()));
 	index_pair target_pos(get_grid_position(player.target()-> position()));
@@ -622,6 +625,10 @@ Coordinate Simulation::player_floyd_target(const Player& player) {
 				}
 			}
 		}
+	}
+	if(min_distance >= max_dist_) {
+		trapped = true;
+		return player.position();
 	}
 	return get_cell_center(floyd_target_x, floyd_target_y);
 }
@@ -669,7 +676,6 @@ std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x,
 		obstacle_vec.push_back(std::pair<size_t,size_t>(x+1,y));
 	if(on_top == false && map_.is_obstacle(x-1, y))
 		obstacle_vec.push_back(std::pair<size_t,size_t>(x-1,y));
-	
 
 	return obstacle_vec;
 }   
@@ -677,10 +683,10 @@ std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x,
 
 void Simulation::update(double delta_t) {
 
-	if(is_over_) return;
+	if(state() != GAME_READY) return;
 	
 	if (players_.size() < 2) {
-		is_over_ = true;
+		state(GAME_OVER);
 		return;
 	}
 	update_player_targets();
@@ -736,12 +742,19 @@ void Simulation::update_player_directions() {
 		}
 		player.target_seen(!intersects);
 		
-		if (player.target_seen())
-			player.direction(Vector(player.target()-> body().center() -
-									player.body().center()));
+		if (player.target_seen()) {
+			Vector to_target(player.target()->body().center()-player.body().center());
+			player.direction(Vector(to_target));
+		}
 		else {
-			player.direction(Vector(player_floyd_target(player) -
-									player.body().center()));
+			bool trapped(false);
+			Vector to_target (player_floyd_target(player, trapped) - 
+							  player.body().center());
+			if (to_target.length() <= marge_jeu_) 
+				player.direction(Vector(0,0));
+			else 
+				player.direction(Vector(to_target));
+			if (trapped) state(PLAYER_TRAPPED);
 		}
 	}
 }
@@ -807,8 +820,7 @@ void Simulation::update_player_graphics() {
 	
 	double arc_angle;	// angle of the arc corresponding to cooldown counter 
 						// of a player
-	
-	
+		
 	for(size_t i(0); i < nb_players; ++i) {
 		
 		auto player_color = static_cast<Predefined_Color>(players_[i].lives()-1);
@@ -1070,14 +1082,8 @@ bool Simulation::test_collisions() {
 }
 
 Simulation_State Simulation::state() const {
-	if(is_over())
-		return GAME_OVER;
-	return GAME_READY;
-}
-
-bool Simulation::is_over() const {
-	return is_over_;
-	return false;
+	
+	return state_;
 }
 
 /**
