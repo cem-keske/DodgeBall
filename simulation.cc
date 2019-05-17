@@ -607,22 +607,17 @@ Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) 
 			if (max_index < player_y + j || player_y + j < 0) continue;
 			distance = get_dist(player_x + i, player_y + j, target_x, target_y);
 			if (distance < min_distance){
-				bool will_intersect(false);
 				for (const auto& obs_pos : obs_around) {
 					if (Tools::segment_not_connected(obstacles().at(obs_pos),
 													 player.position(),
 													 get_cell_center(player_x + i, 
 																	 player_y + j), 
 													 tolerance_w_radius)) {
-						will_intersect = true;
 						break;				
 					}
-				}
-				if (will_intersect == false) {
-					floyd_target_x = player_pos.first + i;
-					floyd_target_y = player_pos.second + j;
-					min_distance = distance;
-				}
+				floyd_target_x = player_pos.first + i;
+				floyd_target_y = player_pos.second + j;
+				min_distance = distance;
 			}
 		}
 	}
