@@ -688,10 +688,15 @@ void Simulation::update(double delta_t) {
 	if(state() != GAME_READY) return;
 	
 	update_player_targets();
+	std::cout << "update targets" << std::endl;
 	update_player_directions();
+	std::cout << "update player_dir" << std::endl;
 	update_player_positions();
-	perform_player_actions();	
+	std::cout << "update player_pos" << std::endl;
+	perform_player_actions();
+	std::cout << "update player_actions" << std::endl;	
 	update_ball_positions();
+	std::cout << "update ball_pos" << std::endl;
 	handle_ball_collisions();
 	remove_collided_balls();
 	remove_dead_players();
@@ -1009,7 +1014,7 @@ bool Simulation::initialise_player (double x, double y, Counter lives,
 }
 
 bool Simulation::test_center_position(double x,double y) const {
-	if (x < -DIM_MAX || y < -DIM_MAX || x > DIM_MAX || y > DIM_MAX) {
+	if (x <= -DIM_MAX || y <= -DIM_MAX || x >= DIM_MAX || y >= DIM_MAX) {
 		return false;
 	}
 	return true;

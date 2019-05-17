@@ -5,7 +5,7 @@
 
   #Joueurs
 0 -400 4 0
-0 400 4 0
+0 300 4 0
  #Nombre d'obstacles
 1
  #Obstacles

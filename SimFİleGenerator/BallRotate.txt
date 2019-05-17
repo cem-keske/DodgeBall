@@ -3,11 +3,14 @@
 	15
 
 # number of players
-	2
+	5
 
 # position of players
 200 200 4 0
 -200 -200 4 0
+200 -200 4 0
+-200 200 4 0
+0 0 4 0
 # number of obstacles
 	0
 
