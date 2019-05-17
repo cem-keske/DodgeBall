@@ -775,7 +775,8 @@ void Simulation::update_player_positions() {
 	bool can_move(true);
 	
 	for(size_t i(0); i < nb_players; ++i) {
-		to_move = dist_per_t*players_[i].direction().get_unit();
+		to_move = players_[i].direction();
+		to_move.length(dist_per_t);
 				
 		for(size_t j(0); j < nb_players; ++j) {
 			if (i == j) continue;
@@ -792,7 +793,9 @@ void Simulation::update_player_positions() {
 void Simulation::update_ball_positions() {
 	static Length ball_dist_per_t(ball_speed_*DELTA_T);
 	for(auto& ball : balls_) {
-		ball.move(ball_dist_per_t*ball.direction().get_unit());
+		Vector to_move(ball.direction());
+		to_move.length(ball_dist_per_t);
+		ball.move(to_move);
 	}
 }
 
