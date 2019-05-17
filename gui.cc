@@ -17,6 +17,7 @@ static constexpr int default_border_thickness(3);
 static constexpr double circle_arc_ratio(0.35);	//between radius and arc's thickness
 static constexpr int delta_t_ms((int)(DELTA_T * 1000)); //DELTA_T converted to ms
 static constexpr double starting_angle(M_PI_2*3); 	//the angle where the arcs start
+static std::string labels[] = {"Start","Stop"};
 
 
 
@@ -289,13 +290,11 @@ void Gui_Window::on_button_clicked_save(){
 }
 
 void Gui_Window::on_button_clicked_start_stop(){
-	static std::string labels[] = {"Start","Stop"};
 	
 	if(Simulator::active_simulation_state() == NO_GAME) {
 		show_warning("No game to start or stop!");
 		return;
 	}
-	
 	//call the correct handler
 	if(button_start_stop.get_label() == labels[0]) {
 		if (start_timer()) 
@@ -318,13 +317,17 @@ void Gui_Window::on_button_clicked_step(){
 
 // ===== Timer Utilites =====
 
-
 bool Gui_Window::timer_tick(){
 	if(timer_running == true){
 		Simulator::update_active_sim(DELTA_T);
 		refresh(); //refresh the gui window after updating the simulation
-		if(Simulator::active_simulation_state() != GAME_READY) //when there's no sim to run
+		if(Simulator::active_simulation_state() != GAME_READY){ 
+		//when there's no sim to run
+			std::cout << state_to_string(Simulator::active_simulation_state()) << std::endl;
+			button_start_stop.set_label(labels[1]);
 			stop_timer();
+			on_draw(get_window()->create_cairo_context());
+		}
 	}
 	return timer_running;
 }
@@ -350,7 +353,6 @@ bool Gui_Window::stop_timer(){
 
 
 // ===== Other Utility Methods =====
-
 
 void Gui_Window::connect_buttons_to_handlers(){
 	button_exit.signal_clicked().connect(sigc::mem_fun(*this,
@@ -379,7 +381,6 @@ void Gui_Window::add_button_panel_components(){
 
 // ===== Refresher =====
 
-
 /**
  * Refreshes the gui window and all subcomponents using the current simulation.
  * 
@@ -391,6 +392,10 @@ void Gui_Window::refresh(){
 	//change the message shown if necessary
 	Simulation_State state(Simulator::active_simulation_state());
 	label_message.set_text(state_to_string(state));
+	if(timer_running)
+		button_start_stop.set_label(labels[1]);
+	else
+		button_start_stop.set_label(labels[0]);
 	
 	//draw an invisible rectangle and delete it to not to explicitly call drawer method
 	auto window = get_window();
