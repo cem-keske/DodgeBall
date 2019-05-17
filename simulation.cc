@@ -380,6 +380,7 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		marge_jeu_ = -1.;
 		marge_lecture_ = -1.;
 		player_cooldown_per_t_ = 1;
+		max_dist_ = -1;
 		success_ = false;
 		state(GAME_READY);
 		
@@ -493,7 +494,7 @@ void Simulation::update_floyd(){
 	Floyd_Dist sum(0);
 	for(size_t k(0); k < floyd_size; ++k) {
 		for(size_t i(0); i < floyd_size; ++i) {
-			for(size_t j(i); j < floyd_size; ++j) { //symmetric matrix
+			for(size_t j(0); j < floyd_size; ++j) { //symmetric matrix
 				sum = floyd_matrix_[k][i] + floyd_matrix_[k][j];  
 				if(sum < floyd_matrix_[i][j]){
 					floyd_matrix_[i][j] = sum;
@@ -510,22 +511,18 @@ void Simulation::update_floyd(){
  * 
  */
 Floyd_Dist Simulation::get_neighbor_distance(size_t x1, size_t y1, 
-											 size_t x2, size_t y2) {
-	std::cout << "Checking:" << x1 << "," <<y1 << " and " << x2 << "," << y2 << std::endl;
-	
+											 size_t x2, size_t y2) {	
 	int delta_x = x1 - x2;
 	int delta_y = y1 - y2;
 	
 	if (map_.is_obstacle(x1, y1) || map_.is_obstacle(x2, y2)) return max_dist_;
 	
 	if(delta_x == 0 || delta_y == 0) { //horizontal/vertical
-		std::cout << "deltas zero" << std::endl;
 	 return dist_coefficient;
 	}
 	
 	//be sure that there's no obstacle on the left and right
 	if(delta_y < 0){ 
-		std::cout << "delta y < 0" << std::endl;
 		if(map_.is_obstacle(x1, y1+1))
 			return max_dist_;
 	} else if(map_.is_obstacle(x1, y1-1)){ 
@@ -595,18 +592,19 @@ Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) 
 	size_t target_x(target_pos.first), target_y(target_pos.second);
 	std::vector<index_pair> obs_around(obstacles_around(player_x, player_y));		
 	size_t max_index(nb_cells_ - 1);
-	size_t min_distance(max_dist_);
-	size_t distance(0);
 	size_t floyd_target_x(0), floyd_target_y(0);
+	Floyd_Dist min_distance(max_dist_);
+	Floyd_Dist distance(0);
 	Length tolerance_w_radius(player_radius_ + marge_jeu_);
-	
+	std::cout << "--------Player position: [" << player_pos.first << "; " << player_pos.second << " ]----------" << std::endl;
+	std::cout << "Target position: [" << target_pos.first << "; " << target_pos.second << " ]" << std::endl;
 	for (int i(-1); i <= 1; ++i ) {	// check neighbours
 		if (max_index < player_x + i || player_x + i < 0) continue; //check bounds
 		for(int j(-1); j <= 1; ++j) {
-			if (i == 0 && j == 0) continue;
 			if (max_index < player_y + j || player_y + j < 0) continue;
 			distance = get_dist(player_x + i, player_y + j, target_x, target_y);
 			bool will_collide(false);
+			std::cout << "Floyd distance for [" << player_x+i << ", " << player_y + j << "] : " << distance << std::endl;
 			if (distance < min_distance){
 				for (const auto& obs_pos : obs_around) {
 					std::cout << "Obstacles around ... " << std::endl;
@@ -620,21 +618,21 @@ Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) 
 						will_collide = true;
 						break;
 					}
-					if(will_collide == false) {
-						floyd_target_x = player_x + i;
-						floyd_target_y = player_y+ j;
-						min_distance = distance;
-					}
+				}
+				if(will_collide == false) {
+					floyd_target_x = player_x + i;
+					floyd_target_y = player_y+ j;
+					min_distance = distance;
 				}
 			}
 		}
 	}
 	if(min_distance >= max_dist_) {
 		trapped = true;
+		std::cout << "this player is trapped..." << std::endl;
 		return player.position();
 	}
-	std::cout << "Player position: [" << player_pos.first << "; " << player_pos.second << std::endl;
-	std::cout << "Target position: [" << target_pos.first << "; " << target_pos.second << std::endl;
+	
 	std::cout << "F_target position: [" << floyd_target_x << "; " << floyd_target_y << std::endl;
 
 	return get_cell_center(floyd_target_x, floyd_target_y);
@@ -663,7 +661,7 @@ std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x,
 	bool right_side(y==(nb_cells_-1));
 	bool on_top(x==0);
 	bool on_bottom(x==(nb_cells_-1));
-	if(left_side == false){ //fill the left side
+	if(left_side == false){
 		if(map_.is_obstacle(x,y-1)) 
 			obstacle_vec.push_back(std::pair<size_t,size_t>(x, y-1));
 		if(on_top == false && map_.is_obstacle(x-1,y-1))
@@ -699,8 +697,8 @@ void Simulation::update(double delta_t) {
 	update_player_targets();
 	update_player_directions();
 	update_player_positions();
+	perform_player_actions();	
 	update_ball_positions();
-	perform_player_actions();
 	handle_ball_collisions();
 	remove_collided_balls();
 	remove_dead_players();
@@ -808,7 +806,7 @@ void Simulation::perform_player_actions() {
 		
 		if((player.cooldown() >= MAX_COUNT)) {
 			ball_pos = player.position() + 
-					   (player.direction()*(player_radius_ + ball_radius_ + 
+					   (player.direction().get_unit()*(player_radius_ + ball_radius_ + 
 						marge_jeu_ * 2)).pointed();
 					   
 			initialise_ball(ball_pos.x, ball_pos.y, player.direction().angle());
