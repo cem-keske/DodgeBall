@@ -407,7 +407,6 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 		}
 		update_graphics();
 		initialise_floyd_matrix();
-		print_floyd();
 	}
 }
 
@@ -598,26 +597,35 @@ Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) 
 	size_t max_index(nb_cells_ - 1);
 	size_t min_distance(max_dist_);
 	size_t distance(0);
-	size_t floyd_target_x, floyd_target_y;
+	size_t floyd_target_x(0), floyd_target_y(0);
 	Length tolerance_w_radius(player_radius_ + marge_jeu_);
 	
-	for (int i(-1); i < 1; ++i ) {	// check neighbours
+	for (int i(-1); i <= 1; ++i ) {	// check neighbours
 		if (max_index < player_x + i || player_x + i < 0) continue; //check bounds
-		for(int j(-1); j < 1; ++j) {
+		for(int j(-1); j <= 1; ++j) {
+			if (i == 0 && j == 0) continue;
 			if (max_index < player_y + j || player_y + j < 0) continue;
 			distance = get_dist(player_x + i, player_y + j, target_x, target_y);
+			bool will_collide(false);
 			if (distance < min_distance){
 				for (const auto& obs_pos : obs_around) {
+					std::cout << "Obstacles around ... " << std::endl;
+
 					if (Tools::segment_not_connected(obstacles().at(obs_pos),
 													 player.position(),
 													 get_cell_center(player_x + i, 
 																	 player_y + j), 
 													 tolerance_w_radius)) {
-						break;				
+						std::cout << "Cannot Seee...." << std::endl;
+						will_collide = true;
+						break;
 					}
-				floyd_target_x = player_pos.first + i;
-				floyd_target_y = player_pos.second + j;
-				min_distance = distance;
+					if(will_collide == false) {
+						floyd_target_x = player_x + i;
+						floyd_target_y = player_y+ j;
+						min_distance = distance;
+					}
+				}
 			}
 		}
 	}
@@ -625,6 +633,10 @@ Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) 
 		trapped = true;
 		return player.position();
 	}
+	std::cout << "Player position: [" << player_pos.first << "; " << player_pos.second << std::endl;
+	std::cout << "Target position: [" << target_pos.first << "; " << target_pos.second << std::endl;
+	std::cout << "F_target position: [" << floyd_target_x << "; " << floyd_target_y << std::endl;
+
 	return get_cell_center(floyd_target_x, floyd_target_y);
 }
 
