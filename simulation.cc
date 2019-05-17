@@ -21,6 +21,7 @@
 
 typedef uint64_t Floyd_Dist;
 typedef std::vector<std::vector<Floyd_Dist>> Floyd_Matrix;
+typedef std::pair<size_t, size_t> Index_Pair ;
 
 /**
 * This approximation works until we have 84 nbCells.
@@ -93,7 +94,6 @@ class Simulation {
 		bool initialise_obstacle(int, int, Counter);	
 		
 		bool test_collisions();
-		void print_floyd();
 		
 		// ===== Manipulators =====
 		
@@ -132,8 +132,8 @@ class Simulation {
 		
 		Coordinate player_floyd_target(const Player&, bool&); 
 		Coordinate get_cell_center(size_t, size_t);
-		std::pair<size_t, size_t> get_grid_position(Coordinate const&);
-		std::vector<std::pair<size_t,size_t>> obstacles_around(size_t x1, size_t y1);
+		Index_Pair get_grid_position(Coordinate const&);
+		std::vector<Index_Pair> obstacles_around(size_t x1, size_t y1);
 		
 		void update_player_targets();
 		void update_player_directions();
@@ -349,8 +349,7 @@ void Simulator::update_active_sim(double delta_t) {
 }
 
 /**
- * Update all active sims. Multiple active simulations are not implemented yet, so this
- * function behaves the  same as the one above.
+ * Update all active sims. Multiple active simulations are not implemented yet.
  */
 void Simulator::update_all_sims(double delta_t) {
 	for (auto& sim: active_sims()) {
@@ -437,7 +436,7 @@ void Simulation::state(Simulation_State state) {
 }
 
 void Simulation::initialise_dimensions(size_t nb_cells) {
-	std::cout << "IMENSIONS REINITILIYEDYYASD" << std::endl;
+
 	nb_cells_ = nb_cells;
 	
 	player_radius_ = COEF_RAYON_JOUEUR * (SIDE/nb_cells);
@@ -472,21 +471,6 @@ void Simulation::initialise_floyd_matrix() {
 	}
 	
 	update_floyd();
-}
-
-void Simulation::print_floyd() {
-	
-	size_t matrix_size(floyd_matrix_.size());
-	for(size_t i(0); i< nb_cells_*nb_cells_; ++i)
-		std::cout << "\t"<<  i / nb_cells_ << "," << i % nb_cells_ << "\t";
-	std::cout << std::endl;
-	for (size_t i(0); i < matrix_size; ++i) {
-		std::cout << i / nb_cells_ << "," << i % nb_cells_ << "\t";
-		for (size_t j(0); j < matrix_size; ++j) {
-			std::cout <<  floyd_matrix_[i][j] << "\t";
-		}
-		std::cout << std::endl;
-	}
 }
 
 void Simulation::update_floyd(){
@@ -556,9 +540,12 @@ void Simulation::set_dist(size_t x1, size_t y1, size_t x2, size_t y2,
 	floyd_matrix_[x2 * nb_cells_ + y2][x1 * nb_cells_ + y1] = dist; //second
 } 
 
-
+/**
+ * Diagonals are initialized to sqrt2 * default_distance 
+ */
 void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 
+	// testing bounds
 	bool right_free(y1 < nb_cells_ - 1);
 	bool bottom_free(x1 < nb_cells_ - 1);
 	bool left_free(y1 != 0);
@@ -581,41 +568,51 @@ void Simulation::init_dist_to_neighbors (size_t x1, size_t y1){
 	}
 }
 
+/**
+ * 
+ */
 Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) {
-	using index_pair = std::pair<size_t, size_t>;
-	index_pair player_pos(get_grid_position(player.position()));
-	index_pair target_pos(get_grid_position(player.target()-> position()));
+	
+	Index_Pair player_pos(get_grid_position(player.position()));
+	Index_Pair target_pos(get_grid_position(player.target()-> position()));
+	
 	size_t player_x(player_pos.first), player_y(player_pos.second);
 	size_t target_x(target_pos.first), target_y(target_pos.second);
-	std::vector<index_pair> obs_around(obstacles_around(player_x, player_y));		
+	
+	std::vector<Index_Pair> obs_around(obstacles_around(player_x, player_y));
+			
 	size_t max_index(nb_cells_ - 1);
+	
 	size_t floyd_target_x(0), floyd_target_y(0);
+	
 	Floyd_Dist min_distance(max_dist_);
 	Floyd_Dist distance(0);
+	
 	Length tolerance_w_radius(player_radius_ + marge_jeu_);
-	std::cout << "--------Player position: [" << player_pos.first << "; " << player_pos.second << " ]----------" << std::endl;
-	std::cout << "Target position: [" << target_pos.first << "; " << target_pos.second << " ]" << std::endl;
+	
 	for (int i(-1); i <= 1; ++i ) {	// check neighbours
+		
 		if (max_index < player_x + i || player_x + i < 0) continue; //check bounds
+		
 		for(int j(-1); j <= 1; ++j) {
+			
 			if (max_index < player_y + j || player_y + j < 0) continue;
+			
 			distance = get_dist(player_x + i, player_y + j, target_x, target_y);
+			
 			bool will_collide(false);
-			std::cout << "Floyd distance for [" << player_x+i << ", " << player_y + j << "] : " << distance << std::endl;
 			if (distance < min_distance){
-				for (const auto& obs_pos : obs_around) {
-					std::cout << "Obstacles around ... " << std::endl;
-
+				for (const auto& obs_pos : obs_around) {		
 					if (Tools::segment_not_connected(obstacles().at(obs_pos),
 													 player.position(),
 													 get_cell_center(player_x + i, 
 																	 player_y + j), 
 													 tolerance_w_radius)) {
-						std::cout << "Cannot Seee...." << std::endl;
 						will_collide = true;
 						break;
 					}
 				}
+				
 				if(will_collide == false) {
 					floyd_target_x = player_x + i;
 					floyd_target_y = player_y+ j;
@@ -624,21 +621,19 @@ Coordinate Simulation::player_floyd_target(const Player& player, bool& trapped) 
 			}
 		}
 	}
+	
 	if(min_distance >= max_dist_) {
 		trapped = true;
-		std::cout << "this player is trapped..." << std::endl;
 		return player.position();
 	}
 	
-	std::cout << "F_target position: [" << floyd_target_x << "; " << floyd_target_y << std::endl;
-
 	return get_cell_center(floyd_target_x, floyd_target_y);
 }
 
 
-std::pair<size_t, size_t> Simulation::get_grid_position(Coordinate const& coord){
+Index_Pair Simulation::get_grid_position(Coordinate const& coord){
 	static constexpr double center_pos(DIM_MAX / SIDE);
-	return std::pair<size_t,size_t>((size_t)((center_pos - coord.y/SIDE) * nb_cells_),
+	return Index_Pair((size_t)((center_pos - coord.y/SIDE) * nb_cells_),
 		   ((size_t)((coord.x/SIDE + center_pos) * nb_cells_)));
 }
 
@@ -649,35 +644,40 @@ Coordinate Simulation::get_cell_center(size_t x, size_t y) {
 			half_square * (nb_cells_ - (1 + side_coeff*x))};
 }
 
-std::vector<std::pair<size_t,size_t>> Simulation::obstacles_around(size_t x, 
-																   size_t y){
+/**
+ * There are relatively few cases so an if cascade is sufficient.
+ */
+std::vector<Index_Pair> Simulation::obstacles_around(size_t x, size_t y){
 	static constexpr size_t neighbor_number(8);
-	std::vector<std::pair<size_t,size_t>> obstacle_vec;
+	std::vector<Index_Pair> obstacle_vec;
 	obstacle_vec.reserve(neighbor_number);
+	
+	// bound check
 	bool left_side(y==0);
 	bool right_side(y==(nb_cells_-1));
 	bool on_top(x==0);
 	bool on_bottom(x==(nb_cells_-1));
+	
 	if(left_side == false){
 		if(map_.is_obstacle(x,y-1)) 
-			obstacle_vec.push_back(std::pair<size_t,size_t>(x, y-1));
+			obstacle_vec.push_back(Index_Pair(x, y-1));
 		if(on_top == false && map_.is_obstacle(x-1,y-1))
-			obstacle_vec.push_back(std::pair<size_t,size_t>(x-1, y-1));
+			obstacle_vec.push_back(Index_Pair(x-1, y-1));
 		if(on_bottom == false && map_.is_obstacle(x+1,y-1))
-			obstacle_vec.push_back(std::pair<size_t,size_t>(x+1, y-1));
+			obstacle_vec.push_back(Index_Pair(x+1, y-1));
 	}
 	if(right_side == false){
 		if(map_.is_obstacle(x,y+1)) 
-			obstacle_vec.push_back(std::pair<size_t,size_t>(x,y+1));
+			obstacle_vec.push_back(Index_Pair(x,y+1));
 		if(on_top == false && map_.is_obstacle(x-1,y+1))
-			obstacle_vec.push_back(std::pair<size_t,size_t>(x-1,y+1));
+			obstacle_vec.push_back(Index_Pair(x-1,y+1));
 		if(on_bottom == false && map_.is_obstacle(x+1,y+1))
-			obstacle_vec.push_back(std::pair<size_t,size_t>(x+1,y+1));
+			obstacle_vec.push_back(Index_Pair(x+1,y+1));
 	}
 	if(on_bottom == false && map_.is_obstacle(x+1, y))
-		obstacle_vec.push_back(std::pair<size_t,size_t>(x+1,y));
+		obstacle_vec.push_back(Index_Pair(x+1,y));
 	if(on_top == false && map_.is_obstacle(x-1, y))
-		obstacle_vec.push_back(std::pair<size_t,size_t>(x-1,y));
+		obstacle_vec.push_back(Index_Pair(x-1,y));
 
 	return obstacle_vec;
 }   
@@ -688,15 +688,10 @@ void Simulation::update(double delta_t) {
 	if(state() != GAME_READY) return;
 	
 	update_player_targets();
-	std::cout << "update targets" << std::endl;
 	update_player_directions();
-	std::cout << "update player_dir" << std::endl;
 	update_player_positions();
-	std::cout << "update player_pos" << std::endl;
 	perform_player_actions();
-	std::cout << "update player_actions" << std::endl;	
 	update_ball_positions();
-	std::cout << "update ball_pos" << std::endl;
 	handle_ball_collisions();
 	remove_collided_balls();
 	remove_dead_players();
@@ -717,6 +712,7 @@ void Simulation::update_player_targets() {
 	
 	size_t players_size(players_.size());
 	for(size_t i(0); i < players_size; ++i) {
+		
 		Length min_distance2(DIM_MAX*DIM_MAX*DIM_MAX*(double)DIM_MAX);
 
 		for(size_t j(0); j < players_size; ++j) {
@@ -781,6 +777,7 @@ void Simulation::update_player_positions() {
 				
 		for(size_t j(0); j < nb_players; ++j) {
 			if (i == j) continue;
+			// No movement if it leads to collision
 			if (Tools::intersect(players_[i].body(), players_[j].body(), 
 								 marge_jeu_ + dist_per_t))
 				can_move = false;
@@ -796,11 +793,7 @@ void Simulation::update_ball_positions() {
 	for(auto& ball : balls_) {
 		Vector to_move(ball.direction());
 		to_move.length(ball_dist_per_t);
-		std::cout << "Old ball position: " << ball.geometry().center().to_string();				
 		ball.move(to_move);
-		std::cout << "New ball position: " << ball.geometry().center().to_string();				
-		std::cout << "Ball speed: " << to_move.length() << std::endl;
-		
 	}
 }
 
@@ -814,6 +807,7 @@ void Simulation::perform_player_actions() {
 		if (player.target_seen() == false) continue;
 		
 		if((player.cooldown() >= MAX_COUNT)) {
+			// ball is initialised 2*m_j away from player to prevent collision
 			ball_pos = player.position() + 
 					   (player.direction().get_unit()*(player_radius_ + ball_radius_ + 
 						marge_jeu_ * 2)).pointed();
@@ -1286,7 +1280,6 @@ bool Reader::read_nb_cells(std::ifstream& in_file, Simulation& simulation){
 		#endif
 		return false;
 	}
-	std::cout << "new file's nbcells:  " << nb_cells << std::endl;
 	simulation.initialise_dimensions((size_t)nb_cells); // no internal tests necessary
 	return true;
 }
