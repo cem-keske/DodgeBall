@@ -1,6 +1,6 @@
 
 # nbCell
-	17
+	21
 
 # number of players
 	19
