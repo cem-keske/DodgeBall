@@ -408,6 +408,9 @@ Simulation::Simulation(std::vector<std::string>const& io_files) {
 			return;
 		}
 		update_graphics();
+			if (players_.size() < 2) {
+		state(GAME_OVER);
+		}
 	}
 }
 
@@ -685,8 +688,10 @@ std::vector<Index_Pair> Simulation::obstacles_around(size_t x, size_t y){
 
 
 void Simulation::update(double delta_t) {
-
+		
 	if(state() != GAME_READY) return;
+	
+
 	
 	update_player_targets();
 	update_player_directions();
